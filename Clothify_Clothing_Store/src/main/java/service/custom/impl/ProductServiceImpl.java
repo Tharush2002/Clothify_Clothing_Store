@@ -59,7 +59,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public boolean updateProduct(Product product) {
+    public void updateProduct(Product product) {
         ProductEntity productEntity = productRepository.findByID(product.getProductId());
         productEntity.setName(product.getName());
         productEntity.setQuantity(product.getQuantity());
@@ -72,7 +72,6 @@ public class ProductServiceImpl implements ProductService {
             productEntity.setSupplierEntity(null);
         }
         productRepository.update(productEntity);
-        return true;
     }
 
     @Override

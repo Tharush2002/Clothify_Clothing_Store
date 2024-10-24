@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="442.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.product.UpdateProductFormController">
+<AnchorPane prefHeight="442.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.product.EditProductFormController">
    <children>
       <HBox alignment="CENTER" prefHeight="74.0" prefWidth="374.0" styleClass="updateProductsTitleBar" stylesheets="@../styles/style.css" AnchorPane.bottomAnchor="368.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>

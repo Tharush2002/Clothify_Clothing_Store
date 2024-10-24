@@ -93,7 +93,7 @@ public class AddProductFormController implements Initializable {
     @FXML
     void btnCancelAddProductsOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
-        Scene scene = EmployeeDashboardFormController.getEmployeeDashboardStage().getScene();
+        Scene scene = EmployeeDashboardFormController.employeeDashboardStage.getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
         VBox vbox = (VBox) root.getChildren().get(7);
         vbox.setVisible(false);

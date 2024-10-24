@@ -11,11 +11,8 @@ import javafx.stage.StageStyle;
 import java.io.IOException;
 
 public class HomeFormController {
-    private static Stage homeStage;
 
-    public static Stage getHomeStage(){
-        return homeStage;
-    }
+    public static Stage homeStage;
 
     private void hideHomeStage(ActionEvent event){
         homeStage = (Stage) ((Node) event.getSource()).getScene().getWindow();

@@ -11,4 +11,8 @@ public interface SupplierRepository extends SuperRepository {
     SupplierEntity findBySupplierID(String supplierId);
 
     SupplierEntity findByName(String name);
+
+    void deleteByID(String supplierId);
+
+    void update(SupplierEntity supplierEntity);
 }

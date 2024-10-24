@@ -34,4 +34,17 @@ public class SupplierServiceImpl implements SupplierService {
         }
         return new Supplier();
     }
+
+    @Override
+    public void deleteSupplier(String supplierId) {supplierRepository.deleteByID(supplierId);}
+
+    @Override
+    public void updateSupplier(Supplier supplier) {
+        SupplierEntity supplierEntity = supplierRepository.findBySupplierID(supplier.getSupplierId());
+        supplierEntity.setName(supplier.getName());
+        supplierEntity.setCompany(supplier.getCompany());
+        supplierEntity.setEmail(supplier.getEmail());
+        supplierRepository.update(supplierEntity);
+    }
+
 }

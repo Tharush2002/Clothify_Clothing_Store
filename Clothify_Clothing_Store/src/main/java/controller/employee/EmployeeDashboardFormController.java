@@ -2,7 +2,8 @@ package controller.employee;
 
 import controller.HomeFormController;
 import controller.product.AddProductFormController;
-import controller.product.UpdateProductFormController;
+import controller.product.EditProductFormController;
+import controller.supplier.EditSupplierFormController;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -32,6 +33,7 @@ import model.Product;
 import model.Supplier;
 import service.ServiceFactory;
 import service.custom.ProductService;
+import service.custom.SupplierService;
 import util.ActionTableType;
 import util.DashboardViewType;
 import util.Type;
@@ -43,18 +45,8 @@ import java.time.LocalTime;
 import java.util.*;
 
 public class EmployeeDashboardFormController implements Initializable {
-    private static Stage employeeDashboardStage;
 
-    private final ProductService productService=ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
-    private ObservableList<Product> allProducts= FXCollections.observableArrayList();
-    private static Product selectedProductToEdit = new Product();
-    private Product selectedProductToDelete = new Product();
-
-    private List<OrderItems> orderItems=new ArrayList<>();
-
-    public static Stage getEmployeeDashboardStage(){
-        return employeeDashboardStage;
-    }
+    public static Stage employeeDashboardStage;
 
     private void setEmployeeDashboardStage(MouseEvent event){
         employeeDashboardStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -64,9 +56,21 @@ public class EmployeeDashboardFormController implements Initializable {
         employeeDashboardStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
 
-    public static Product getSelectedProductToEdit(){
+    //VARIABLES ===============
+
+    public static Product selectedProductToEdit = new Product();
+    public static Supplier selectedSupplierToEdit = new Supplier();
+    private ObservableList<Product> allProducts= FXCollections.observableArrayList();
+    private ObservableList<Supplier> allSuppliers= FXCollections.observableArrayList();
+    private List<OrderItems> orderItems=new ArrayList<>();
+
+    public Product getSelectedProductToEdit(){
         return selectedProductToEdit;
     }
+
+    //SERVICE-FACTORIES
+    private final ProductService productService=ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
+    private final SupplierService supplierService=ServiceFactory.getInstance().getServiceType(Type.SUPPLIER);
 
     @FXML
     public Button btnCheckOut;
@@ -79,6 +83,15 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     public TableView<Product> tblCatalogProducts;
+
+    @FXML
+    private TableView<Supplier> tblSuppliers;
+
+    @FXML
+    private TableView<Product> tblSuppliersAddProducts;
+
+    @FXML
+    private TableView<Product> tblSuppliersSuppliedProducts;
 
     @FXML
     public Button btnAddToCart;
@@ -103,6 +116,36 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     private TableColumn<Product, Double> columnCatalogProductsUnitPrice;
+
+    @FXML
+    private TableColumn<Supplier, Void> columnSuppliersAction;
+
+    @FXML
+    private TableColumn<Product, String> columnSuppliersAddProductsItemID;
+
+    @FXML
+    private TableColumn<Product, String> columnSuppliersAddProductsSupplierID;
+
+    @FXML
+    private TableColumn<Supplier, String> columnSuppliersEmail;
+
+    @FXML
+    private TableColumn<Supplier, String> columnSuppliersCompany;
+
+    @FXML
+    private TableColumn<Supplier, String> columnSuppliersID;
+
+    @FXML
+    private TableColumn<Supplier, String> columnSuppliersName;
+
+    @FXML
+    private TableColumn<Product, String> columnSuppliersSuppliedProductsID;
+
+    @FXML
+    private TableColumn<Product, String> columnSuppliersSuppliedProductsName;
+
+    @FXML
+    private TableColumn<Product, String> columnSuppliersSuppliedProductsSupplierID;
 
     @FXML
     private AnchorPane anchorPaneCatalog;
@@ -149,7 +192,7 @@ public class EmployeeDashboardFormController implements Initializable {
     @FXML
     void btnCloseOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
-        HomeFormController.getHomeStage().show();
+        HomeFormController.homeStage.show();
     }
 
     @FXML
@@ -198,10 +241,6 @@ public class EmployeeDashboardFormController implements Initializable {
             btnCheckOut.setDisable(false);
             loadCatalogProductsTable(allProducts);
             resetProductValuesDisplay();
-
-//            System.out.println(orderItems);
-//            System.out.println(orderItems.size());
-//            System.out.println("====================================================");
         }
     }
 
@@ -230,19 +269,45 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        allProducts=productService.getAllProducts();
-
         loadDateAndTime();
-        loadCatalogProductsTable(allProducts);
+        loadTables();
         handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
         tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
                 addProductValuesToDisplay(newVal);
             }
         });
+        tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                System.out.println(newVal);
+            }
+        });
     }
 
     // MY IMPLEMENTATIONS
+
+    private void loadTables(){
+        allProducts=productService.getAllProducts();
+        allSuppliers=supplierService.getAllSuppliers();
+
+        loadCatalogProductsTable(allProducts);
+        loadSuppliersTable(allSuppliers);
+    }
+
+    public void loadSuppliersTable(ObservableList<Supplier> allSuppliers) {
+        columnSuppliersID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
+        columnSuppliersName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        columnSuppliersCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
+        columnSuppliersEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+
+        columnSuppliersID.setStyle("-fx-alignment:center;");
+        columnSuppliersName.setStyle("-fx-alignment:center;");
+        columnSuppliersCompany.setStyle("-fx-alignment:center;");
+        columnSuppliersEmail.setStyle("-fx-alignment:center;");
+
+        setIconsToTables(ActionTableType.SUPPLIERS);
+        tblSuppliers.setItems(allSuppliers);
+    }
 
     private void handleDashboardSidePanelBtnClicks(DashboardViewType type){
         switch(type){
@@ -264,6 +329,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 anchorPaneSuppliers.setVisible(false);
 
                 resetProductValuesDisplay();
+                resetSuppliersTables();
                 break;
             case ORDERS:
 //                HANDLE BUTTON STYLES WHEN CLICKED
@@ -368,7 +434,7 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     private void setIconsToTables(ActionTableType type){
-        Callback<TableColumn<Product, Void>, TableCell<Product, Void>> cellFactory = new Callback<>() {
+        Callback<TableColumn<Product, Void>, TableCell<Product, Void>> productCellFactory = new Callback<>() {
             @Override
             public TableCell<Product, Void> call(final TableColumn<Product, Void> param) {
                 return new TableCell<>() {
@@ -384,20 +450,23 @@ public class EmployeeDashboardFormController implements Initializable {
                             deleteIcon.setStyle("-fx-cursor: hand ;");
                             editIcon.setStyle("-fx-cursor: hand ;");
 
-                            // Delete button action
                             deleteIcon.setOnMouseClicked(event -> {
                                 switch(type){
                                     case PRODUCTS:
                                         handleDeleteActions(type, tblCatalogProducts.getItems().get(getIndex()));
                                         break;
+                                    case SUPPLIERS:
+                                        handleDeleteActions(type, tblSuppliers.getItems().get(getIndex()));
                                 }
                             });
 
-                            // Edit button action
                             editIcon.setOnMouseClicked(event -> {
                                 switch(type){
                                     case PRODUCTS:
                                         selectedProductToEdit = tblCatalogProducts.getItems().get(getIndex());
+                                        break;
+                                    case SUPPLIERS:
+                                        selectedSupplierToEdit = tblSuppliers.getItems().get(getIndex());
                                         break;
                                 }
                                 handleEditActions(type, event);
@@ -412,39 +481,84 @@ public class EmployeeDashboardFormController implements Initializable {
                 };
             }
         };
+
+        Callback<TableColumn<Supplier, Void>, TableCell<Supplier, Void>> supplierCellFactory = new Callback<>() {
+            @Override
+            public TableCell<Supplier, Void> call(final TableColumn<Supplier, Void> param) {
+                return new TableCell<>() {
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            Button editIcon = new Button("Edit");
+                            Button deleteIcon = new Button("Delete");
+
+                            deleteIcon.setStyle("-fx-cursor: hand;");
+                            editIcon.setStyle("-fx-cursor: hand;");
+
+                            deleteIcon.setOnMouseClicked(event -> {
+                                handleDeleteActions(type, tblSuppliers.getItems().get(getIndex()));
+                            });
+
+                            editIcon.setOnMouseClicked(event -> {
+                                selectedSupplierToEdit = tblSuppliers.getItems().get(getIndex());
+                                handleEditActions(type, event);
+                            });
+
+                            HBox managebtn = new HBox(editIcon, deleteIcon);
+                            managebtn.setStyle("-fx-alignment:center");
+                            managebtn.setSpacing(8);
+                            setGraphic(managebtn);
+                        }
+                    }
+                };
+            }
+        };
+
         switch(type){
             case PRODUCTS:
-                columnCatalogProductsAction.setCellFactory(cellFactory);
+                columnCatalogProductsAction.setCellFactory(productCellFactory);
                 break;
             case SUPPLIERS:
-//                columnCatalogProductsAction.setCellFactory(cellFactory);
+                columnSuppliersAction.setCellFactory(supplierCellFactory);
                 break;
         }
     }
 
     private void handleEditActions(ActionTableType type, MouseEvent event){
         setEmployeeDashboardStage(event);
-        switch(type){
-            case PRODUCTS:
-                try {
-                    Stage stage=new Stage();
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/UpdateProducts.fxml"));
-                    Parent root = loader.load();
-                    UpdateProductFormController controller = loader.getController();
-                    controller.setMainController(this);
-                    stage.setScene(new Scene(root));
-                    stage.initStyle(StageStyle.UNDECORATED);
-                    stage.show();
-                    stage.setResizable(false);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                enableScreen();
-                break;
-            case SUPPLIERS:
-                System.out.println("BBBB");
-                break;
+        try {
+            Stage stage=new Stage();
+            FXMLLoader loader = new FXMLLoader();
+            switch(type){
+                case PRODUCTS:
+                    loader = new FXMLLoader(getClass().getResource("../../view/EditProducts.fxml"));
+                    break;
+                case SUPPLIERS:
+                    loader = new FXMLLoader(getClass().getResource("../../view/EditSupplier.fxml"));
+                    break;
+            }
+            Parent root = loader.load();
+            switch(type){
+                case PRODUCTS:
+                    EditProductFormController editProductFormController = loader.getController();
+                    editProductFormController.setMainController(this);
+                    break;
+                case SUPPLIERS:
+                    EditSupplierFormController editSupplierFormController  = loader.getController();
+                    editSupplierFormController.setMainController(this);
+                    break;
+            }
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+            stage.setResizable(false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        enableScreen();
     }
 
     private void enableScreen() {
@@ -457,7 +571,7 @@ public class EmployeeDashboardFormController implements Initializable {
         screen.setVisible(false);
     }
 
-    private void handleDeleteActions(ActionTableType type, Product product){
+    private void handleDeleteActions(ActionTableType type, Object object){
         enableScreen();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation Dialog");
@@ -465,24 +579,28 @@ public class EmployeeDashboardFormController implements Initializable {
         alert.setContentText("Please confirm your action.");
         Optional<ButtonType> result = alert.showAndWait();
 
-        switch(type){
-            case PRODUCTS:
-                if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            switch(type){
+                case PRODUCTS:
+                    Product product = (Product) object;
                     productService.deleteProduct(product.getProductId());
                     loadCatalogProductsTable(productService.getAllProducts());
-                    Alert completionAlert = new Alert(Alert.AlertType.INFORMATION);
-                    completionAlert.setTitle("Deletion Successful");
-                    completionAlert.setHeaderText(null);
-                    completionAlert.setContentText("The product has been successfully deleted.");
-                    completionAlert.showAndWait();
-                    disableScreen();
-                } else {
-                    disableScreen();
-                }
-                break;
-            case SUPPLIERS:
-                System.out.println("BBBB");
-                break;
+                    break;
+                case SUPPLIERS:
+                    Supplier supplier = (Supplier) object;
+                    supplierService.deleteSupplier(supplier.getSupplierId());
+                    loadSuppliersTable(supplierService.getAllSuppliers());
+                    break;
+            }
+
+            Alert completionAlert = new Alert(Alert.AlertType.INFORMATION);
+            completionAlert.setTitle("Deletion Successful");
+            completionAlert.setHeaderText(null);
+            completionAlert.setContentText("Selected property has been successfully deleted.");
+            completionAlert.showAndWait();
+            disableScreen();
+        } else {
+            disableScreen();
         }
     }
 
@@ -522,6 +640,8 @@ public class EmployeeDashboardFormController implements Initializable {
         tblCatalogProducts.getSelectionModel().clearSelection();
     }
 
-
+    private void resetSuppliersTables() {
+        tblSuppliers.getSelectionModel().clearSelection();
+    }
 
 }

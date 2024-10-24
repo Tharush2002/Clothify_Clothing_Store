@@ -28,7 +28,7 @@ import util.Type;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class UpdateProductFormController implements Initializable {
+public class EditProductFormController implements Initializable {
     private EmployeeDashboardFormController mainController;
 
     public void setMainController(EmployeeDashboardFormController mainController) {
@@ -39,7 +39,7 @@ public class UpdateProductFormController implements Initializable {
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
     private final CategoryService categoryService = ServiceFactory.getInstance().getServiceType(Type.CATEGORY);
 
-    private final Product selectedProductToEdit = mainController.getSelectedProductToEdit();
+    private final Product selectedProductToEdit = EmployeeDashboardFormController.selectedProductToEdit;
 
     @FXML
     public JFXComboBox<String> cmbEditProductCategory;
@@ -67,7 +67,7 @@ public class UpdateProductFormController implements Initializable {
     @FXML
     void btnCancelEditProductsOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
-        Scene scene = EmployeeDashboardFormController.getEmployeeDashboardStage().getScene();
+        Scene scene = EmployeeDashboardFormController.employeeDashboardStage.getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
         VBox vbox = (VBox) root.getChildren().get(7);
         vbox.setVisible(false);
@@ -82,10 +82,14 @@ public class UpdateProductFormController implements Initializable {
             selectedProductToEdit.setUnitPrice(Double.parseDouble(txtEditProductUnitPrice.getText()));
             selectedProductToEdit.setCategory(categoryService.findCategoryByName(cmbEditProductCategory.getValue()));
 
-            if (!cmbEditProductSupplier.getValue().equals("")){
-                selectedProductToEdit.setSupplier(supplierService.findSupplierByName(cmbEditProductSupplier.getValue()));
+            if (cmbEditProductSupplier.getValue()!=null){
+                if(!cmbEditProductSupplier.getValue().equals("")){
+                    selectedProductToEdit.setSupplier(supplierService.findSupplierByName(cmbEditProductSupplier.getValue()));
+                }else{
+                    selectedProductToEdit.setSupplier(null);
+                }
             }else{
-                selectedProductToEdit.setCategory(null);
+                selectedProductToEdit.setSupplier(null);
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);

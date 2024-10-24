@@ -61,8 +61,11 @@ public class ProductRepositoryImpl implements ProductRepository {
                 existingProduct.setQuantity(entity.getQuantity());
                 existingProduct.setUnitPrice(entity.getUnitPrice());
                 existingProduct.setCategoryEntity(entity.getCategoryEntity());
-                if(entity.getSupplierEntity()!=null || entity.getSupplierEntity().getSupplierId()!=null) existingProduct.setSupplierEntity(entity.getSupplierEntity());
-
+                if(entity.getSupplierEntity()!=null){
+                    if(entity.getSupplierEntity().getSupplierId()!=null){
+                        existingProduct.setSupplierEntity(entity.getSupplierEntity());
+                    }
+                }
                 String categoryHql = "FROM CategoryEntity WHERE categoryId = :categoryId";
                 Query<CategoryEntity> categoryQuery = session.createQuery(categoryHql, CategoryEntity.class);
                 categoryQuery.setParameter("categoryId", entity.getCategoryEntity().getCategoryId());
