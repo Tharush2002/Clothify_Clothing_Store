@@ -1,4 +1,6 @@
 package repository.custom.impl;
 
-public class AdminRepositoryImpl {
+import repository.custom.AdminRepository;
+
+public class AdminRepositoryImpl implements AdminRepository {
 }

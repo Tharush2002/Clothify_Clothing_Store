@@ -4,8 +4,6 @@ import entity.ProductEntity;
 import entity.SupplierEntity;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import model.Category;
-import model.Product;
 import model.Supplier;
 import repository.RepositoryFactory;
 import repository.custom.ProductRepository;
@@ -13,7 +11,6 @@ import repository.custom.SupplierRepository;
 import service.custom.SupplierService;
 import util.Type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SupplierServiceImpl implements SupplierService {

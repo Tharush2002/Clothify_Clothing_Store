@@ -18,9 +18,12 @@ public class OrderItemsEntity {
     @JoinColumn(name = "order_id", referencedColumnName = "orderID")
     private OrderEntity orderEntity;
 
-    @OneToOne(cascade = {CascadeType.MERGE})
-    @JoinColumn(name = "product_id", referencedColumnName = "productID")
-    private ProductEntity productEntity;
+    private String productName;
+    private String productId;
+    private String categoryId;
+    private String categoryName;
+    private String supplierId;
+    private String supplierName;
 
     private Double unitPrice;
     private String size;

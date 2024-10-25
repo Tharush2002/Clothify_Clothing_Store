@@ -14,6 +14,7 @@ import repository.custom.ProductRepository;
 import repository.custom.SupplierRepository;
 import service.custom.ProductService;
 import util.Type;
+
 import java.util.List;
 
 public class ProductServiceImpl implements ProductService {
@@ -80,11 +81,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product searchProduct(String id) {
-        return null;
-    }
-
-    @Override
     public ObservableList<Product> findProductsBySupplierID(String supplierId) {
         List<ProductEntity> suppliedProducts = productRepository.findBySupplierID(supplierId);
         ObservableList<Product> productObservableList= FXCollections.observableArrayList();
@@ -99,4 +95,16 @@ public class ProductServiceImpl implements ProductService {
         return productObservableList;
     }
 
+    @Override
+    public Product findProductByProductID(String productId) {
+        ProductEntity productEntity = productRepository.findByID(productId);
+        return new Product(
+                productEntity.getProductId(),
+                productEntity.getName(),
+                new Category(productEntity.getCategoryEntity().getCategoryId(),productEntity.getCategoryEntity().getName()),
+                productEntity.getQuantity(),
+                productEntity.getUnitPrice(),
+                new Supplier(productEntity.getSupplierEntity().getSupplierId(),productEntity.getSupplierEntity().getName(),productEntity.getSupplierEntity().getCompany(),productEntity.getSupplierEntity().getEmail())
+        );
+    }
 }

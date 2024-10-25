@@ -15,6 +15,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import lombok.Setter;
 import model.Category;
 import model.Product;
 import model.Supplier;
@@ -27,12 +28,9 @@ import util.Type;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@Setter
 public class AddProductFormController implements Initializable {
-    private EmployeeDashboardFormController mainController;
-
-    public void setMainController(EmployeeDashboardFormController mainController) {
-        this.mainController = mainController;
-    }
+    private EmployeeDashboardFormController employeeDashboardFormController;
 
     private final SupplierService supplierService = ServiceFactory.getInstance().getServiceType(Type.SUPPLIER);
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
@@ -74,7 +72,8 @@ public class AddProductFormController implements Initializable {
                 }
 
                 productService.addProduct(new Product(null,name,categoryObject,quantity,unitPrice,supplierObject));
-                mainController.loadCatalogProductsTable(productService.getAllProducts());
+                employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
+                employeeDashboardFormController.setLabels();
                 btnCancelAddProductsOnAction(event);
                 return;
             }

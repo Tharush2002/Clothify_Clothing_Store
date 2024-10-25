@@ -20,14 +20,14 @@
 
 <AnchorPane prefHeight="651.0" prefWidth="1200.0" style="-fx-background-color: #fff;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.employee.EmployeeDashboardFormController">
    <children>
-      <AnchorPane fx:id="anchorPaneCatalog" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
+      <AnchorPane fx:id="anchorPaneCatalog" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
          <children>
             <VBox alignment="TOP_CENTER" layoutX="674.4" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="309.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
                <children>
                   <Pane layoutX="10.0" layoutY="132.0" prefHeight="173.0" prefWidth="310.0" />
                   <VBox prefHeight="115.0" prefWidth="310.0">
                      <children>
-                        <Label text="Today Status :">
+                        <Label text="All Time Status :">
                            <padding>
                               <Insets left="30.0" />
                            </padding>
@@ -37,7 +37,7 @@
                         </Label>
                         <HBox prefHeight="14.0" prefWidth="310.0">
                            <children>
-                              <Label text="Total Customers :">
+                              <Label text="Total Products :">
                                  <padding>
                                     <Insets left="60.0" top="8.0" />
                                  </padding>
@@ -45,7 +45,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="100">
+                              <Label fx:id="lblTotalProducts" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="8.0" />
                                  </padding>
@@ -65,7 +65,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="50">
+                              <Label fx:id="lblTotalOrders" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="3.0" />
                                  </padding>
@@ -77,7 +77,7 @@
                         </HBox>
                         <HBox layoutX="10.0" layoutY="53.0" prefHeight="14.0" prefWidth="310.0">
                            <children>
-                              <Label text="Total Returns :">
+                              <Label text="Total Stock :">
                                  <padding>
                                     <Insets left="60.0" top="3.0" />
                                  </padding>
@@ -85,7 +85,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="10">
+                              <Label fx:id="lblTotalStock" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="3.0" />
                                  </padding>
@@ -293,29 +293,9 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="100">
+                              <Label fx:id="lblTotalSuppliers" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="8.0" />
-                                 </padding>
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                        </HBox>
-                        <HBox layoutX="10.0" layoutY="28.0" prefHeight="14.0" prefWidth="310.0">
-                           <children>
-                              <Label text="Total Items Supplied :">
-                                 <padding>
-                                    <Insets left="60.0" top="3.0" />
-                                 </padding>
-                                 <font>
-                                    <Font size="13.0" />
-                                 </font>
-                              </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="50">
-                                 <padding>
-                                    <Insets left="5.0" top="3.0" />
                                  </padding>
                                  <font>
                                     <Font size="13.0" />
@@ -333,7 +313,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="10">
+                              <Label fx:id="lblTotalCompanies" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="3.0" />
                                  </padding>
@@ -442,7 +422,7 @@
             </VBox>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneOrders" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
+      <AnchorPane fx:id="anchorPaneOrders" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
          <children>
             <Label layoutX="81.0" layoutY="18.0" text="ORDERS">
                <font>
@@ -454,7 +434,7 @@
                   <Pane layoutX="10.0" layoutY="132.0" prefHeight="165.0" prefWidth="310.0" />
                   <VBox prefHeight="91.0" prefWidth="310.0">
                      <children>
-                        <Label text="Today Status :">
+                        <Label text="All Time Status :">
                            <padding>
                               <Insets left="30.0" />
                            </padding>
@@ -472,7 +452,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="100">
+                              <Label fx:id="lblTotalCustomerCount" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="8.0" />
                                  </padding>
@@ -492,7 +472,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="50">
+                              <Label fx:id="lblTotalOrderCount" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="3.0" />
                                  </padding>
@@ -512,7 +492,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="10.0" layoutY="10.0" text="10">
+                              <Label fx:id="lblTotalReturnOrderCount" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="3.0" />
                                  </padding>
@@ -542,7 +522,7 @@
                   <Pane prefHeight="13.0" prefWidth="310.0" />
                   <TableView fx:id="tblOrderItems" maxWidth="260.0" prefHeight="299.0" prefWidth="260.0">
                      <columns>
-                        <TableColumn fx:id="tblOrderItemsProductID" prefWidth="46.399962246418" text="id" />
+                        <TableColumn fx:id="columnOrderItemsProductID" prefWidth="46.399962246418" text="id" />
                         <TableColumn fx:id="columnOrderItemsProductName" prefWidth="122.40008926391602" text="name" />
                         <TableColumn fx:id="columnOrderItemsProductSize" prefWidth="88.80006408691406" text="size" />
                      </columns>

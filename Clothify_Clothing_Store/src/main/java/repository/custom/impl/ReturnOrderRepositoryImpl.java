@@ -1,4 +1,6 @@
 package repository.custom.impl;
 
-public class ReturnOrderRepositoryImpl {
+import repository.custom.ReturnOrderRepository;
+
+public class ReturnOrderRepositoryImpl implements ReturnOrderRepository {
 }

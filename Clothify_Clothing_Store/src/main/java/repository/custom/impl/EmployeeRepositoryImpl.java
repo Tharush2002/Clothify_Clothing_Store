@@ -1,4 +1,6 @@
 package repository.custom.impl;
 
-public class EmployeeRepositoryImpl {
+import repository.custom.EmployeeRepository;
+
+public class EmployeeRepositoryImpl implements EmployeeRepository {
 }

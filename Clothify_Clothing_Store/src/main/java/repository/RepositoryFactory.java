@@ -20,6 +20,7 @@ public class RepositoryFactory {
             case EMPLOYEE:return (T) new EmployeeRepositoryImpl();
             case ORDER:return (T) new OrderRepositoryImpl();
             case RETURNORDER:return (T) new ReturnOrderRepositoryImpl();
+            case ORDERITEMS:return (T) new OrderItemsRepositoryImpl();
         }
         return null;
     }

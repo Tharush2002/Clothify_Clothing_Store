@@ -1,6 +1,7 @@
 package controller.employee;
 
 import com.jfoenix.controls.JFXTextField;
+import controller.CheckOutFormController;
 import controller.HomeFormController;
 import controller.product.AddProductFormController;
 import controller.product.AddProductsBySupplierFormController;
@@ -31,8 +32,7 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import model.*;
 import service.ServiceFactory;
-import service.custom.ProductService;
-import service.custom.SupplierService;
+import service.custom.*;
 import util.ActionTableType;
 import util.DashboardViewType;
 import util.Type;
@@ -43,8 +43,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class EmployeeDashboardFormController implements Initializable {
 
@@ -65,19 +63,17 @@ public class EmployeeDashboardFormController implements Initializable {
     public static ObservableList<Product> suppliedProducts = FXCollections.observableArrayList();
 
     private final String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-    private ObservableList<Product> allProducts= FXCollections.observableArrayList();
+    public static ObservableList<Product> allProducts= FXCollections.observableArrayList();
     private ObservableList<Supplier> allSuppliers= FXCollections.observableArrayList();
-    private List<OrderItems> orderItems=new ArrayList<>();
-    List<TempOrderItems> tempOrderItemsList = new ArrayList<>();
-
-
-    public Product getSelectedProductToEdit(){
-        return selectedProductToEdit;
-    }
+    private ObservableList<Order> allOrders= FXCollections.observableArrayList();
+    public static List<TempOrderItems> tempOrderItemsList = new ArrayList<>();
 
     //SERVICE-FACTORIES
     private final ProductService productService=ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
     private final SupplierService supplierService=ServiceFactory.getInstance().getServiceType(Type.SUPPLIER);
+    private final OrderItemsService orderItemsService=ServiceFactory.getInstance().getServiceType(Type.ORDERITEMS);
+    private final OrderService orderService=ServiceFactory.getInstance().getServiceType(Type.ORDER);
+    private final CustomerService customerSevice=ServiceFactory.getInstance().getServiceType(Type.CUSTOMER);
 
     @FXML
     public Button btnCheckOut;
@@ -215,15 +211,6 @@ public class EmployeeDashboardFormController implements Initializable {
     private Button btnSuppliers;
 
     @FXML
-    private Label lblDate;
-
-    @FXML
-    private Label lblTime;
-
-    @FXML
-    private ComboBox<String> cmbCatalogSize;
-
-    @FXML
     private Label lblCatalogProductID;
 
     @FXML
@@ -233,6 +220,36 @@ public class EmployeeDashboardFormController implements Initializable {
     private Label lblCatalogUnitPrice;
 
     @FXML
+    private Label lblDate;
+
+    @FXML
+    private Label lblTime;
+
+    @FXML
+    private Label lblTotalCompanies;
+
+    @FXML
+    private Label lblTotalCustomerCount;
+
+    @FXML
+    private Label lblTotalOrderCount;
+
+    @FXML
+    private Label lblTotalOrders;
+
+    @FXML
+    private Label lblTotalProducts;
+
+    @FXML
+    private Label lblTotalReturnOrderCount;
+
+    @FXML
+    private Label lblTotalStock;
+
+    @FXML
+    private Label lblTotalSuppliers;
+
+    @FXML
     private JFXTextField txtAddSupplierCompany;
 
     @FXML
@@ -240,6 +257,9 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     private JFXTextField txtAddSupplierName;
+
+    @FXML
+    private ComboBox<String> cmbCatalogSize;
 
     @FXML
     void btnCloseOnAction(ActionEvent event) {
@@ -288,6 +308,7 @@ public class EmployeeDashboardFormController implements Initializable {
             }
             loadSuppliersTable(supplierService.getAllSuppliers());
             loadCatalogProductsTable(productService.getAllProducts());
+            setLabels();
             return;
         }
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -318,25 +339,51 @@ public class EmployeeDashboardFormController implements Initializable {
                 }
             }
             for (int index = 0; tempOrderItemsList.size() > index; index++) {
-                boolean isProductIdMatches= tempOrderItemsList.get(index).getProduct().getProductId().equals(lblCatalogProductID.getText());
-                boolean isProductSizeMatches= tempOrderItemsList.get(index).getSize().equals(cmbCatalogSize.getValue().toString().trim());
+                boolean isProductIdMatches= tempOrderItemsList.get(index).getOrderItem().getProductId().equals(lblCatalogProductID.getText());
+                boolean isProductSizeMatches= tempOrderItemsList.get(index).getOrderItem().getSize().equals(cmbCatalogSize.getValue().toString().trim());
                 if (isProductSizeMatches && isProductIdMatches){
                     tempOrderItemsList.get(index).setQuantity(tempOrderItemsList.get(index).getQuantity()+spinnerCatalogQuantity.getValue());
                     return;
                 }
             }
-            tempOrderItemsList.add(new TempOrderItems(new Order(null,null,null,spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(),null,new Customer(),null), selectedProduct, selectedProduct.getName(), selectedProduct.getUnitPrice(), cmbCatalogSize.getValue().trim(), spinnerCatalogQuantity.getValue()));
+            tempOrderItemsList.add(new TempOrderItems(
+                    new OrderItems(
+                            new Order(null, null, null,spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(),null,new Customer(),null),
+                            selectedProduct.getName(),
+                            selectedProduct.getProductId(),
+                            selectedProduct.getCategory().getCategoryId(),
+                            selectedProduct.getCategory().getName(),
+                            selectedProduct.getSupplier().getSupplierId(),
+                            selectedProduct.getSupplier().getName(),
+                            selectedProduct.getUnitPrice(),
+                            cmbCatalogSize.getValue().trim()),
+                    spinnerCatalogQuantity.getValue())
+            );
         }finally {
             btnCheckOut.setDisable(false);
             loadCatalogProductsTable(allProducts);
             resetProductValuesDisplay();
-
-            System.out.println(tempOrderItemsList);
         }
     }
 
     @FXML
     public void btnCheckoutOnAction(ActionEvent event) {
+        try {
+            setEmployeeDashboardStage(event);
+            Stage stage=new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/CheckOut.fxml"));
+            Parent root = loader.load();
+            CheckOutFormController controller = loader.getController();
+            controller.setCheckOutButton(btnCheckOut);
+            controller.setEmployeeDashboardFormController(this);
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+            stage.setResizable(false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        enableScreen();
     }
 
     @FXML
@@ -347,7 +394,7 @@ public class EmployeeDashboardFormController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/AddProducts.fxml"));
             Parent root = loader.load();
             AddProductFormController controller = loader.getController();
-            controller.setMainController(this);
+            controller.setEmployeeDashboardFormController(this);
             stage.setScene(new Scene(root));
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
@@ -366,7 +413,7 @@ public class EmployeeDashboardFormController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/AddProductsBySupplier.fxml"));
             Parent root = loader.load();
             AddProductsBySupplierFormController controller = loader.getController();
-            controller.setMainController(this);
+            controller.setEmployeeDashboardFormController(this);
             stage.setScene(new Scene(root));
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
@@ -390,11 +437,11 @@ public class EmployeeDashboardFormController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadDateAndTime();
         loadTables();
+        setLabels();
         handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
         tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
                 addProductValuesToDisplay(newVal);
-                System.out.println(newVal);
             }
         });
         tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
@@ -402,19 +449,64 @@ public class EmployeeDashboardFormController implements Initializable {
                 loadSuppliedProductsTable(productService.findProductsBySupplierID(newVal.getSupplierId()));
             }
         });
-
+        tblOrders.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                loadOrderItemsTable(orderItemsService.findOrderItemsByOrderID(newVal.getOrderId()));
+            }
+        });
     }
-
 
 
     // MY IMPLEMENTATIONS
 
-    private void loadTables(){
-        allProducts=productService.getAllProducts();
-        allSuppliers=supplierService.getAllSuppliers();
+    //LOAD TABLES
 
-        loadCatalogProductsTable(allProducts);
-        loadSuppliersTable(allSuppliers);
+    private void loadTables(){
+        loadCatalogProductsTable(productService.getAllProducts());
+        loadSuppliersTable(supplierService.getAllSuppliers());
+        loadOrdersTable(orderService.getAllOrders());
+    }
+
+    public void loadOrdersTable(ObservableList<Order> allOrders) {
+        if(allOrders!=null){
+            this.allOrders=allOrders;
+
+            columnOrdersID.setCellValueFactory(new PropertyValueFactory<>("orderId"));
+            columnOrdersTime.setCellValueFactory(new PropertyValueFactory<>("time"));
+            columnOrdersDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+            columnOrdersPaymentType.setCellValueFactory(new PropertyValueFactory<>("paymentType"));
+            columnOrdersItemCount.setCellValueFactory(new PropertyValueFactory<>("orderItemCount"));
+            columnOrdersTotal.setCellValueFactory(new PropertyValueFactory<>("total"));
+
+            columnOrdersCustomerID.setCellValueFactory(cellData -> {
+                Customer customer = cellData.getValue().getCustomer();
+                return new SimpleStringProperty(customer != null ? customer.getCustomerId() : "-");
+            });
+
+            columnOrdersID.setStyle("-fx-alignment:center;");
+            columnOrdersTime.setStyle("-fx-alignment:center;");
+            columnOrdersDate.setStyle("-fx-alignment:center;");
+            columnOrdersPaymentType.setStyle("-fx-alignment:center;");
+            columnOrdersItemCount.setStyle("-fx-alignment:center;");
+            columnOrdersTotal.setStyle("-fx-alignment:center;");
+            columnOrdersCustomerID.setStyle("-fx-alignment:center;");
+
+            tblOrders.setItems(allOrders);
+        }
+    }
+
+    private void loadOrderItemsTable(ObservableList<OrderItems> orderItems){
+        if(orderItems!=null){
+            columnOrderItemsProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
+            columnOrderItemsProductSize.setCellValueFactory(new PropertyValueFactory<>("size"));
+            columnOrderItemsProductID.setCellValueFactory(new PropertyValueFactory<>("productId"));
+
+            columnOrderItemsProductName.setStyle("-fx-alignment:center;");
+            columnOrderItemsProductSize.setStyle("-fx-alignment:center;");
+            columnOrderItemsProductID.setStyle("-fx-alignment:center;");
+
+            tblOrderItems.setItems(orderItems);
+        }
     }
 
     private void loadSuppliedProductsTable(ObservableList<Product> suppliedProducts) {
@@ -437,6 +529,8 @@ public class EmployeeDashboardFormController implements Initializable {
 
     public void loadSuppliersTable(ObservableList<Supplier> allSuppliers) {
         if(allSuppliers!=null){
+            this.allSuppliers=allSuppliers;
+
             columnSuppliersID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
             columnSuppliersName.setCellValueFactory(new PropertyValueFactory<>("name"));
             columnSuppliersCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
@@ -447,110 +541,29 @@ public class EmployeeDashboardFormController implements Initializable {
             columnSuppliersCompany.setStyle("-fx-alignment:center;");
             columnSuppliersEmail.setStyle("-fx-alignment:center;");
 
-            setIconsToTables(ActionTableType.SUPPLIERS);
+            setActionsToTables(ActionTableType.SUPPLIERS);
             tblSuppliers.setItems(allSuppliers);
         }
     }
 
-    private void handleDashboardSidePanelBtnClicks(DashboardViewType type){
-        switch(type){
-            case CATALOG:
-//                HANDLE BUTTON STYLES WHEN CLICKED
-                btnCatalog.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
-                btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-//                ENABLE AND SHOW ANCHOR PANE CATALOG
-                anchorPaneCatalog.setDisable(false);
-                anchorPaneCatalog.setVisible(true);
-//                DISABLE AND HIDE REMAINING ANCHOR PANES
-                anchorPaneOrders.setDisable(true);
-                anchorPaneReports.setDisable(true);
-                anchorPaneSuppliers.setDisable(true);
-                anchorPaneOrders.setVisible(false);
-                anchorPaneReports.setVisible(false);
-                anchorPaneSuppliers.setVisible(false);
+    public void loadSuppliersAddProductsTable() {
+        if (suppliedProducts.size()!=0){
+            columnSuppliersAddProductsProductName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
-                resetProductValuesDisplay();
-                resetSuppliersTables();
-                break;
-            case ORDERS:
-//                HANDLE BUTTON STYLES WHEN CLICKED
-                btnOrders.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
-                btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-//                ENABLE AND SHOW ANCHOR PANE ORDERS
-                anchorPaneOrders.setDisable(false);
-                anchorPaneOrders.setVisible(true);
-//                DISABLE AND HIDE REMAINING ANCHOR PANES
-                anchorPaneCatalog.setDisable(true);
-                anchorPaneReports.setDisable(true);
-                anchorPaneSuppliers.setDisable(true);
-                anchorPaneCatalog.setVisible(false);
-                anchorPaneReports.setVisible(false);
-                anchorPaneSuppliers.setVisible(false);
-
-                resetProductValuesDisplay();
-                break;
-            case SUPPLIERS:
-//                HANDLE BUTTON STYLES WHEN CLICKED
-                btnSuppliers.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
-                btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-//                ENABLE AND SHOW ANCHOR PANE ORDERS
-                anchorPaneSuppliers.setDisable(false);
-                anchorPaneSuppliers.setVisible(true);
-//                DISABLE AND HIDE REMAINING ANCHOR PANES
-                anchorPaneOrders.setDisable(true);
-                anchorPaneReports.setDisable(true);
-                anchorPaneCatalog.setDisable(true);
-                anchorPaneOrders.setVisible(false);
-                anchorPaneReports.setVisible(false);
-                anchorPaneCatalog.setVisible(false);
-
-                resetProductValuesDisplay();
-                break;
-            case REPORTS:
-//                HANDLE BUTTON STYLES WHEN CLICKED
-                btnReports.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
-                btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-                btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
-//                ENABLE AND SHOW ANCHOR PANE ORDERS
-                anchorPaneReports.setDisable(false);
-                anchorPaneReports.setVisible(true);
-//                DISABLE AND HIDE REMAINING ANCHOR PANES
-                anchorPaneOrders.setDisable(true);
-                anchorPaneCatalog.setDisable(true);
-                anchorPaneSuppliers.setDisable(true);
-                anchorPaneOrders.setVisible(false);
-                anchorPaneCatalog.setVisible(false);
-                anchorPaneSuppliers.setVisible(false);
-
-                resetProductValuesDisplay();
-                break;
+            columnSuppliersAddProductsCategoryName.setCellValueFactory(cellData -> {
+                Category category = cellData.getValue().getCategory();
+                return new SimpleStringProperty(category != null ? category.getName() : "-");
+            });
+            tblSuppliersAddProducts.setItems(suppliedProducts);
+            columnSuppliersAddProductsProductName.setStyle("-fx-alignment:center;");
+            columnSuppliersAddProductsCategoryName.setStyle("-fx-alignment:center;");
         }
-    }
-
-    private void loadDateAndTime() {
-        Date date = new Date();
-        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-        lblDate.setText(f.format(date));
-
-        Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, e -> {
-            LocalTime now = LocalTime.now();
-            lblTime.setText(now.getHour() + ":" + now.getMinute() + ":" + now.getSecond());
-        }),
-            new KeyFrame(Duration.seconds(1))
-        );
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
     }
 
     public void loadCatalogProductsTable(ObservableList<Product> allProducts) {
         if(allProducts!=null){
+            this.allProducts = allProducts;
+
             columnCatalogProductsID.setCellValueFactory(new PropertyValueFactory<>("productId"));
             columnCatalogProductsName.setCellValueFactory(new PropertyValueFactory<>("name"));
             columnCatalogProductsQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
@@ -573,12 +586,103 @@ public class EmployeeDashboardFormController implements Initializable {
             columnCatalogProductsUnitPrice.setStyle("-fx-alignment:center;");
             columnCatalogProductsSupplierID.setStyle("-fx-alignment:center;");
 
-            setIconsToTables(ActionTableType.PRODUCTS);
+            setActionsToTables(ActionTableType.PRODUCTS);
             tblCatalogProducts.setItems(allProducts);
         }
     }
 
-    private void setIconsToTables(ActionTableType type){
+    //=============
+
+    private void handleDashboardSidePanelBtnClicks(DashboardViewType type){
+        switch(type){
+            case CATALOG:
+//                HANDLE BUTTON STYLES WHEN CLICKED
+                btnCatalog.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
+                btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+//                ENABLE AND SHOW ANCHOR PANE CATALOG
+                anchorPaneCatalog.setDisable(false);
+                anchorPaneCatalog.setVisible(true);
+//                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneOrders.setDisable(true);
+                anchorPaneReports.setDisable(true);
+                anchorPaneSuppliers.setDisable(true);
+                anchorPaneOrders.setVisible(false);
+                anchorPaneReports.setVisible(false);
+                anchorPaneSuppliers.setVisible(false);
+                break;
+            case ORDERS:
+//                HANDLE BUTTON STYLES WHEN CLICKED
+                btnOrders.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
+                btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+//                ENABLE AND SHOW ANCHOR PANE ORDERS
+                anchorPaneOrders.setDisable(false);
+                anchorPaneOrders.setVisible(true);
+//                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneCatalog.setDisable(true);
+                anchorPaneReports.setDisable(true);
+                anchorPaneSuppliers.setDisable(true);
+                anchorPaneCatalog.setVisible(false);
+                anchorPaneReports.setVisible(false);
+                anchorPaneSuppliers.setVisible(false);
+                break;
+            case SUPPLIERS:
+//                HANDLE BUTTON STYLES WHEN CLICKED
+                btnSuppliers.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
+                btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+//                ENABLE AND SHOW ANCHOR PANE ORDERS
+                anchorPaneSuppliers.setDisable(false);
+                anchorPaneSuppliers.setVisible(true);
+//                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneOrders.setDisable(true);
+                anchorPaneReports.setDisable(true);
+                anchorPaneCatalog.setDisable(true);
+                anchorPaneOrders.setVisible(false);
+                anchorPaneReports.setVisible(false);
+                anchorPaneCatalog.setVisible(false);
+                break;
+            case REPORTS:
+//                HANDLE BUTTON STYLES WHEN CLICKED
+                btnReports.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
+                btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+//                ENABLE AND SHOW ANCHOR PANE ORDERS
+                anchorPaneReports.setDisable(false);
+                anchorPaneReports.setVisible(true);
+//                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneOrders.setDisable(true);
+                anchorPaneCatalog.setDisable(true);
+                anchorPaneSuppliers.setDisable(true);
+                anchorPaneOrders.setVisible(false);
+                anchorPaneCatalog.setVisible(false);
+                anchorPaneSuppliers.setVisible(false);
+                break;
+        }
+        resetTables();
+    }
+
+    private void loadDateAndTime() {
+        Date date = new Date();
+        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
+        lblDate.setText(f.format(date));
+
+        Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, e -> {
+            LocalTime now = LocalTime.now();
+            lblTime.setText(now.getHour() + ":" + now.getMinute() + ":" + now.getSecond());
+        }),
+            new KeyFrame(Duration.seconds(1))
+        );
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+    }
+
+    private void setActionsToTables(ActionTableType type){
         Callback<TableColumn<Product, Void>, TableCell<Product, Void>> productCellFactory = new Callback<>() {
             @Override
             public TableCell<Product, Void> call(final TableColumn<Product, Void> param) {
@@ -596,24 +700,11 @@ public class EmployeeDashboardFormController implements Initializable {
                             editIcon.setStyle("-fx-cursor: hand ;");
 
                             deleteIcon.setOnMouseClicked(event -> {
-                                switch(type){
-                                    case PRODUCTS:
-                                        handleDeleteActions(type, tblCatalogProducts.getItems().get(getIndex()));
-                                        break;
-                                    case SUPPLIERS:
-                                        handleDeleteActions(type, tblSuppliers.getItems().get(getIndex()));
-                                }
+                                handleDeleteActions(type, tblCatalogProducts.getItems().get(getIndex()));
                             });
 
                             editIcon.setOnMouseClicked(event -> {
-                                switch(type){
-                                    case PRODUCTS:
-                                        selectedProductToEdit = tblCatalogProducts.getItems().get(getIndex());
-                                        break;
-                                    case SUPPLIERS:
-                                        selectedSupplierToEdit = tblSuppliers.getItems().get(getIndex());
-                                        break;
-                                }
+                                selectedProductToEdit = tblCatalogProducts.getItems().get(getIndex());
                                 handleEditActions(type, event);
                             });
 
@@ -689,11 +780,11 @@ public class EmployeeDashboardFormController implements Initializable {
             switch(type){
                 case PRODUCTS:
                     EditProductFormController editProductFormController = loader.getController();
-                    editProductFormController.setMainController(this);
+                    editProductFormController.setEmployeeDashboardFormController(this);
                     break;
                 case SUPPLIERS:
                     EditSupplierFormController editSupplierFormController  = loader.getController();
-                    editSupplierFormController.setMainController(this);
+                    editSupplierFormController.setEmployeeDashboardFormController(this);
                     break;
             }
             stage.setScene(new Scene(root));
@@ -706,18 +797,7 @@ public class EmployeeDashboardFormController implements Initializable {
         enableScreen();
     }
 
-    private void enableScreen() {
-        screen.setDisable(false);
-        screen.setVisible(true);
-    }
-
-    private void disableScreen() {
-        screen.setDisable(true);
-        screen.setVisible(false);
-    }
-
     private void handleDeleteActions(ActionTableType type, Object object){
-        enableScreen();
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation Dialog");
         alert.setHeaderText("Are you sure you want to delete the selected Item?");
@@ -744,10 +824,12 @@ public class EmployeeDashboardFormController implements Initializable {
             completionAlert.setHeaderText(null);
             completionAlert.setContentText("Selected property has been successfully deleted.");
             completionAlert.showAndWait();
-            disableScreen();
-        } else {
-            disableScreen();
         }
+    }
+
+    private void enableScreen() {
+        screen.setDisable(false);
+        screen.setVisible(true);
     }
 
     private void addProductValuesToDisplay(Product newVal) {
@@ -776,6 +858,16 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
+    private boolean isValidEmail(String email) {
+        return email.matches(emailPattern);
+    }
+
+    private void resetTables(){
+        resetProductValuesDisplay();
+        resetSuppliersTables();
+        resetOrdersTables();
+    }
+
     private void resetProductValuesDisplay() {
         lblCatalogProductID.setText("");
         lblCatalogProductName.setText("");
@@ -796,23 +888,46 @@ public class EmployeeDashboardFormController implements Initializable {
         txtAddSupplierName.setText("");
     }
 
-    public void loadSuppliersAddProductsTable() {
-        if (suppliedProducts.size()!=0){
-            columnSuppliersAddProductsProductName.setCellValueFactory(new PropertyValueFactory<>("name"));
-
-            columnSuppliersAddProductsCategoryName.setCellValueFactory(cellData -> {
-                Category category = cellData.getValue().getCategory();
-                return new SimpleStringProperty(category != null ? category.getName() : "-");
-            });
-            tblSuppliersAddProducts.setItems(suppliedProducts);
-            columnSuppliersAddProductsProductName.setStyle("-fx-alignment:center;");
-            columnSuppliersAddProductsCategoryName.setStyle("-fx-alignment:center;");
-        }
+    private void resetOrdersTables(){
+        tblOrderItems.getItems().clear();
+        tblOrders.getSelectionModel().clearSelection();
     }
 
-    private boolean isValidEmail(String email) {
-        Pattern pattern = Pattern.compile(emailPattern);
-        Matcher matcher = pattern.matcher(email);
-        return matcher.matches();
+    public void setLabels() {
+        ObservableList<Customer> customers = customerSevice.getAllCustomers();
+        if(customers!=null){
+            lblTotalCustomerCount.setText(String.valueOf(customers.size()));
+        }else{
+            lblTotalCustomerCount.setText("");
+        }
+
+        if(allOrders!=null){
+            lblTotalOrderCount.setText(String.valueOf(allOrders.size()));
+            lblTotalOrders.setText(String.valueOf(allOrders.size()));
+        }else{
+            lblTotalOrderCount.setText("");
+            lblTotalOrders.setText("");
+        }
+
+        if(allSuppliers!=null){
+            lblTotalSuppliers.setText(String.valueOf(allSuppliers.size()));
+            lblTotalCompanies.setText(String.valueOf(allSuppliers.size()));
+        }else{
+            lblTotalSuppliers.setText("");
+            lblTotalCompanies.setText("");
+        }
+
+        if(allProducts!=null){
+            lblTotalProducts.setText(String.valueOf(allProducts.size()));
+
+            Integer totalStock = 0;
+            for(int index=0;index<allProducts.size();index++){
+                totalStock+=allProducts.get(index).getQuantity();
+            }
+            lblTotalStock.setText(String.valueOf(totalStock));
+        }else{
+            lblTotalProducts.setText("");
+            lblTotalStock.setText("");
+        }
     }
 }
