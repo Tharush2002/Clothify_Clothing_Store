@@ -24,6 +24,7 @@ public class OrderEntity {
     private LocalTime time;
     private Double total;
     private String paymentType;
+    private Integer orderItemCount;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customer_id", referencedColumnName = "customerID")

@@ -84,4 +84,19 @@ public class ProductServiceImpl implements ProductService {
         return null;
     }
 
+    @Override
+    public ObservableList<Product> findProductsBySupplierID(String supplierId) {
+        List<ProductEntity> suppliedProducts = productRepository.findBySupplierID(supplierId);
+        ObservableList<Product> productObservableList= FXCollections.observableArrayList();
+        if (suppliedProducts!=null){
+            suppliedProducts.forEach(entity->{
+                Product product = new Product(entity.getProductId(), entity.getName(), new Category(),entity.getQuantity(), entity.getUnitPrice(), new Supplier());
+                if (entity.getCategoryEntity()!=null) product.setCategory(new Category(entity.getCategoryEntity().getCategoryId(),entity.getCategoryEntity().getName()));
+                if (entity.getSupplierEntity()!=null) product.setSupplier(new Supplier(entity.getSupplierEntity().getSupplierId(),entity.getSupplierEntity().getName(),entity.getSupplierEntity().getCompany(),entity.getSupplierEntity().getEmail()));
+                productObservableList.add(product);
+            });
+        }
+        return productObservableList;
+    }
+
 }

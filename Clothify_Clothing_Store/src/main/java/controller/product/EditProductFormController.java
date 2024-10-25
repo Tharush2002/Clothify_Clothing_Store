@@ -77,19 +77,31 @@ public class EditProductFormController implements Initializable {
     @FXML
     void btnSaveChangesOnAction(ActionEvent event) {
         try{
-            selectedProductToEdit.setName(txtEditProductName.getText());
-            selectedProductToEdit.setQuantity(spinnerEditProductQuantity.getValue());
-            selectedProductToEdit.setUnitPrice(Double.parseDouble(txtEditProductUnitPrice.getText()));
-            selectedProductToEdit.setCategory(categoryService.findCategoryByName(cmbEditProductCategory.getValue()));
+            String name = txtEditProductName.getText().trim();
+            String unitPrice = txtEditProductUnitPrice.getText().trim();
+            String categoryName = cmbEditProductCategory.getValue().trim();
+            String supplierName = cmbEditProductSupplier.getValue().trim();
+            if(!name.equals("") && !categoryName.equals("") && !unitPrice.equals("")){
+                selectedProductToEdit.setName(name);
+                selectedProductToEdit.setQuantity(spinnerEditProductQuantity.getValue());
+                selectedProductToEdit.setUnitPrice(Double.parseDouble(unitPrice));
+                selectedProductToEdit.setCategory(categoryService.findCategoryByName(categoryName));
 
-            if (cmbEditProductSupplier.getValue()!=null){
-                if(!cmbEditProductSupplier.getValue().equals("")){
-                    selectedProductToEdit.setSupplier(supplierService.findSupplierByName(cmbEditProductSupplier.getValue()));
+                if (supplierName!=null){
+                    if(!supplierName.equals("")){
+                        selectedProductToEdit.setSupplier(supplierService.findSupplierByName(cmbEditProductSupplier.getValue()));
+                    }else{
+                        selectedProductToEdit.setSupplier(null);
+                    }
                 }else{
                     selectedProductToEdit.setSupplier(null);
                 }
             }else{
-                selectedProductToEdit.setSupplier(null);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle(null);
+                alert.setContentText("Please Enter All the Fields with Correct Data");
+                alert.show();
+                return;
             }
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.ERROR);

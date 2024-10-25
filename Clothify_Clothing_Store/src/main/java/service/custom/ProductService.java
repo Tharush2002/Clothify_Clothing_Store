@@ -12,4 +12,6 @@ public interface ProductService extends SuperService {
     void updateProduct(Product product);
     void deleteProduct(String id);
     Product searchProduct(String id);
+
+    ObservableList<Product> findProductsBySupplierID(String supplierId);
 }

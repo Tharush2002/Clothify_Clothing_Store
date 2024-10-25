@@ -18,8 +18,8 @@ public class ProductRepositoryImpl implements ProductRepository {
         try {
             transaction = session.beginTransaction();
             if (entity.getCategoryEntity() != null) {
-                CategoryEntity existingCategory = session.createQuery("FROM CategoryEntity WHERE categoryId = :categoryId", CategoryEntity.class)
-                        .setParameter("categoryId", entity.getCategoryEntity().getCategoryId())
+                CategoryEntity existingCategory = session.createQuery("FROM CategoryEntity WHERE name = :name", CategoryEntity.class)
+                        .setParameter("name", entity.getCategoryEntity().getName())
                         .uniqueResult();
 
                 if (existingCategory != null) {
@@ -29,6 +29,19 @@ public class ProductRepositoryImpl implements ProductRepository {
                     session.flush();
                 }
             }
+            if (entity.getSupplierEntity() != null) {
+                SupplierEntity existingSupplier = session.createQuery("FROM SupplierEntity WHERE name = :name", SupplierEntity.class)
+                        .setParameter("name", entity.getSupplierEntity().getName())
+                        .uniqueResult();
+
+                if (existingSupplier != null) {
+                    entity.setSupplierEntity(existingSupplier);
+                } else {
+                    session.save(entity.getSupplierEntity());
+                    session.flush();
+                }
+            }
+
             session.save(entity);
             transaction.commit();
             return true;
@@ -60,19 +73,16 @@ public class ProductRepositoryImpl implements ProductRepository {
                 existingProduct.setName(entity.getName());
                 existingProduct.setQuantity(entity.getQuantity());
                 existingProduct.setUnitPrice(entity.getUnitPrice());
-                existingProduct.setCategoryEntity(entity.getCategoryEntity());
-                if(entity.getSupplierEntity()!=null){
-                    if(entity.getSupplierEntity().getSupplierId()!=null){
-                        existingProduct.setSupplierEntity(entity.getSupplierEntity());
-                    }
-                }
-                String categoryHql = "FROM CategoryEntity WHERE categoryId = :categoryId";
-                Query<CategoryEntity> categoryQuery = session.createQuery(categoryHql, CategoryEntity.class);
-                categoryQuery.setParameter("categoryId", entity.getCategoryEntity().getCategoryId());
-                CategoryEntity existingCategory = categoryQuery.uniqueResult();
 
-                if (existingCategory != null) {
-                    existingProduct.setCategoryEntity(existingCategory);
+                if (entity.getCategoryEntity()!=null){
+                    String categoryHql = "FROM CategoryEntity WHERE categoryId = :name";
+                    Query<CategoryEntity> categoryQuery = session.createQuery(categoryHql, CategoryEntity.class);
+                    categoryQuery.setParameter("name", entity.getCategoryEntity().getName());
+                    CategoryEntity existingCategory = categoryQuery.uniqueResult();
+
+                    if (existingCategory != null) {
+                        existingProduct.setCategoryEntity(existingCategory);
+                    }
                 }
 
                 if(entity.getSupplierEntity()!=null){
@@ -163,6 +173,29 @@ public class ProductRepositoryImpl implements ProductRepository {
         } finally {
             session.close();
         }
+    }
+
+    @Override
+    public List<ProductEntity> findBySupplierID(String supplierId) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        List<ProductEntity> productEntityList = null;
+        try {
+            transaction = session.beginTransaction();
+            String hql = "FROM ProductEntity p WHERE p.supplierEntity.supplierId = :supplierId";
+            Query<ProductEntity> query = session.createQuery(hql, ProductEntity.class);
+            query.setParameter("supplierId", supplierId);
+            productEntityList = query.getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+        return productEntityList;
     }
 
 }

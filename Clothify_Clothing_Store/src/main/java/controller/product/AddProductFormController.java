@@ -56,10 +56,10 @@ public class AddProductFormController implements Initializable {
     @FXML
     void btnAddProductOnAction(ActionEvent event) {
         try{
-            String name = txtSetProductName.getText();
-            String category = txtSetProductCategory.getText();
-            Double unitPrice = Double.parseDouble(txtSetProductUnitPrice.getText());
-            String supplier = cmbSetProductSupplier.getValue();
+            String name = txtSetProductName.getText().trim();
+            String category = txtSetProductCategory.getText().trim();
+            Double unitPrice = Double.parseDouble(txtSetProductUnitPrice.getText().trim());
+            String supplier = cmbSetProductSupplier.getValue().trim();
             Integer quantity = spinnerSetProductQuantity.getValue();
             if(!name.equals("") && !category.equals("") && unitPrice!=null){
                 Supplier supplierObject = new Supplier();
@@ -78,7 +78,7 @@ public class AddProductFormController implements Initializable {
                 btnCancelAddProductsOnAction(event);
                 return;
             }
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle(null);
             alert.setContentText("Please Enter All the Fields with Correct Data");
             alert.show();

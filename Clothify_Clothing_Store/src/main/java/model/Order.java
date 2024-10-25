@@ -16,6 +16,6 @@ public class Order {
     private LocalTime time;
     private Double total;
     private String paymentType;
-//    private Product[] productsPurchased;
     private Customer customer;
+    private Integer orderItemCount;
 }

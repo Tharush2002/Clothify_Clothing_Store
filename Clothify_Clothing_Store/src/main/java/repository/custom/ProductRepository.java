@@ -13,4 +13,6 @@ public interface ProductRepository extends SuperRepository {
     ProductEntity findByID(String productId);
 
     void deleteByID(String productId);
+
+    List<ProductEntity> findBySupplierID(String supplierId);
 }

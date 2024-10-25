@@ -1,18 +1,24 @@
 package service.custom.impl;
 
+import entity.ProductEntity;
 import entity.SupplierEntity;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import model.Category;
+import model.Product;
 import model.Supplier;
 import repository.RepositoryFactory;
+import repository.custom.ProductRepository;
 import repository.custom.SupplierRepository;
 import service.custom.SupplierService;
 import util.Type;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SupplierServiceImpl implements SupplierService {
     private final SupplierRepository supplierRepository = RepositoryFactory.getInstance().getRepositoryType(Type.SUPPLIER);
+    private final ProductRepository productRepository = RepositoryFactory.getInstance().getRepositoryType(Type.PRODUCT);
 
     @Override
     public ObservableList<Supplier> getAllSuppliers() {
@@ -36,7 +42,15 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public void deleteSupplier(String supplierId) {supplierRepository.deleteByID(supplierId);}
+    public void deleteSupplier(String supplierId) {
+        List<ProductEntity> productsListBySupplierID = productRepository.findBySupplierID(supplierId);
+        productsListBySupplierID.forEach(productEntity -> {
+            productEntity.setSupplierEntity(null);
+            productRepository.update(productEntity);
+        });
+        supplierRepository.deleteByID(supplierId);
+        System.out.println(supplierId);
+    }
 
     @Override
     public void updateSupplier(Supplier supplier) {
@@ -47,4 +61,10 @@ public class SupplierServiceImpl implements SupplierService {
         supplierRepository.update(supplierEntity);
     }
 
+    @Override
+    public void addSupplier(Supplier supplier) {
+        if(supplierRepository.findByName(supplier.getName())==null){
+            supplierRepository.save(new SupplierEntity(null, null, supplier.getName(), supplier.getCompany(),supplier.getEmail()));
+        }
+    }
 }

@@ -14,15 +14,14 @@ public class OrderItemsEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "order_id", referencedColumnName = "orderID")
     private OrderEntity orderEntity;
 
-    @OneToMany
+    @OneToOne(cascade = {CascadeType.MERGE})
     @JoinColumn(name = "product_id", referencedColumnName = "productID")
     private ProductEntity productEntity;
 
-    private Integer quantity;
-    private Double cost;
+    private Double unitPrice;
     private String size;
 }

@@ -15,4 +15,6 @@ public interface SupplierRepository extends SuperRepository {
     void deleteByID(String supplierId);
 
     void update(SupplierEntity supplierEntity);
+
+    void save(SupplierEntity supplierEntity);
 }

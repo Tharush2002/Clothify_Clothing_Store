@@ -1,7 +1,9 @@
 package controller.employee;
 
+import com.jfoenix.controls.JFXTextField;
 import controller.HomeFormController;
 import controller.product.AddProductFormController;
+import controller.product.AddProductsBySupplierFormController;
 import controller.product.EditProductFormController;
 import controller.supplier.EditSupplierFormController;
 import javafx.animation.Animation;
@@ -27,10 +29,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Duration;
-import model.Category;
-import model.OrderItems;
-import model.Product;
-import model.Supplier;
+import model.*;
 import service.ServiceFactory;
 import service.custom.ProductService;
 import service.custom.SupplierService;
@@ -41,8 +40,11 @@ import util.Type;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class EmployeeDashboardFormController implements Initializable {
 
@@ -60,9 +62,14 @@ public class EmployeeDashboardFormController implements Initializable {
 
     public static Product selectedProductToEdit = new Product();
     public static Supplier selectedSupplierToEdit = new Supplier();
+    public static ObservableList<Product> suppliedProducts = FXCollections.observableArrayList();
+
+    private final String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     private ObservableList<Product> allProducts= FXCollections.observableArrayList();
     private ObservableList<Supplier> allSuppliers= FXCollections.observableArrayList();
     private List<OrderItems> orderItems=new ArrayList<>();
+    List<TempOrderItems> tempOrderItemsList = new ArrayList<>();
+
 
     public Product getSelectedProductToEdit(){
         return selectedProductToEdit;
@@ -94,6 +101,12 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableView<Product> tblSuppliersSuppliedProducts;
 
     @FXML
+    private TableView<OrderItems> tblOrderItems;
+
+    @FXML
+    private TableView<Order> tblOrders;
+
+    @FXML
     public Button btnAddToCart;
 
     @FXML
@@ -121,10 +134,10 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableColumn<Supplier, Void> columnSuppliersAction;
 
     @FXML
-    private TableColumn<Product, String> columnSuppliersAddProductsItemID;
+    private TableColumn<Product, String> columnSuppliersAddProductsProductName;
 
     @FXML
-    private TableColumn<Product, String> columnSuppliersAddProductsSupplierID;
+    private TableColumn<Product, String> columnSuppliersAddProductsCategoryName;
 
     @FXML
     private TableColumn<Supplier, String> columnSuppliersEmail;
@@ -146,6 +159,36 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     private TableColumn<Product, String> columnSuppliersSuppliedProductsSupplierID;
+
+    @FXML
+    private TableColumn<OrderItems, String> columnOrderItemsProductID;
+
+    @FXML
+    private TableColumn<OrderItems, String> columnOrderItemsProductName;
+
+    @FXML
+    private TableColumn<OrderItems, String> columnOrderItemsProductSize;
+
+    @FXML
+    private TableColumn<Order, String> columnOrdersCustomerID;
+
+    @FXML
+    private TableColumn<Order, LocalDate> columnOrdersDate;
+
+    @FXML
+    private TableColumn<Order, String> columnOrdersID;
+
+    @FXML
+    private TableColumn<Order, Integer> columnOrdersItemCount;
+
+    @FXML
+    private TableColumn<Order, String> columnOrdersPaymentType;
+
+    @FXML
+    private TableColumn<Order, LocalTime> columnOrdersTime;
+
+    @FXML
+    private TableColumn<Order, Double> columnOrdersTotal;
 
     @FXML
     private AnchorPane anchorPaneCatalog;
@@ -190,6 +233,15 @@ public class EmployeeDashboardFormController implements Initializable {
     private Label lblCatalogUnitPrice;
 
     @FXML
+    private JFXTextField txtAddSupplierCompany;
+
+    @FXML
+    private JFXTextField txtAddSupplierEmail;
+
+    @FXML
+    private JFXTextField txtAddSupplierName;
+
+    @FXML
     void btnCloseOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         HomeFormController.homeStage.show();
@@ -216,31 +268,70 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     @FXML
+    void btnAddSupplierOnAction(ActionEvent event) {
+        String name = txtAddSupplierName.getText().trim();
+        String email = txtAddSupplierEmail.getText().trim();
+        String company = txtAddSupplierCompany.getText().trim();
+        if(!name.equals("") && isValidEmail(email) && !company.equals("")){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Supplier Added");
+            alert.setHeaderText(null);
+            alert.setContentText("Supplier added successfully!");
+            alert.show();
+            if(suppliedProducts.size()!=0){
+                suppliedProducts.forEach(product -> {
+                    product.setSupplier(new Supplier(null, name, company, email));
+                    productService.addProduct(product);
+                });
+            }else{
+                supplierService.addSupplier(new Supplier(null, name, company, email));
+            }
+            loadSuppliersTable(supplierService.getAllSuppliers());
+            loadCatalogProductsTable(productService.getAllProducts());
+            return;
+        }
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(null);
+        alert.setContentText("Please Enter All the Fields with Correct Data");
+        alert.show();
+        txtAddSupplierName.setText("");
+        txtAddSupplierCompany.setText("");
+        txtAddSupplierEmail.setText("");
+    }
+
+
+    @FXML
     void btnAddToCartOnAction(ActionEvent event) {
         try {
-            new Alert(Alert.AlertType.INFORMATION).show();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Product Added");
+            alert.setHeaderText(null);
+            alert.setContentText("Product added successfully!");
+            alert.show();
             Product selectedProduct = null;
-            L1:
+
             for (int index = 0; allProducts.size() > index; index++) {
                 if (allProducts.get(index).getProductId().equals(lblCatalogProductID.getText())) {
                     selectedProduct = allProducts.get(index);
                     allProducts.get(index).setQuantity(allProducts.get(index).getQuantity() - spinnerCatalogQuantity.getValue());
-                    break L1;
+                    break;
                 }
             }
-            for (int index = 0; orderItems.size() > index; index++) {
-                boolean isProductIdMatches= orderItems.get(index).getProduct().getProductId().equals(lblCatalogProductID.getText());
-                boolean isProductSizeMatches= orderItems.get(index).getSize().equals(cmbCatalogSize.getValue().toString());
+            for (int index = 0; tempOrderItemsList.size() > index; index++) {
+                boolean isProductIdMatches= tempOrderItemsList.get(index).getProduct().getProductId().equals(lblCatalogProductID.getText());
+                boolean isProductSizeMatches= tempOrderItemsList.get(index).getSize().equals(cmbCatalogSize.getValue().toString().trim());
                 if (isProductSizeMatches && isProductIdMatches){
-                    orderItems.get(index).setQuantity(orderItems.get(index).getQuantity()+spinnerCatalogQuantity.getValue());
+                    tempOrderItemsList.get(index).setQuantity(tempOrderItemsList.get(index).getQuantity()+spinnerCatalogQuantity.getValue());
                     return;
                 }
             }
-            orderItems.add(new OrderItems(null, selectedProduct, selectedProduct.getName(), spinnerCatalogQuantity.getValue(), spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(), cmbCatalogSize.getValue()));
+            tempOrderItemsList.add(new TempOrderItems(new Order(null,null,null,spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(),null,new Customer(),null), selectedProduct, selectedProduct.getName(), selectedProduct.getUnitPrice(), cmbCatalogSize.getValue().trim(), spinnerCatalogQuantity.getValue()));
         }finally {
             btnCheckOut.setDisable(false);
             loadCatalogProductsTable(allProducts);
             resetProductValuesDisplay();
+
+            System.out.println(tempOrderItemsList);
         }
     }
 
@@ -267,6 +358,34 @@ public class EmployeeDashboardFormController implements Initializable {
         enableScreen();
     }
 
+    @FXML
+    public void btnAddProductForTheSupplierOnAction(ActionEvent event) {
+        try {
+            setEmployeeDashboardStage(event);
+            Stage stage=new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/AddProductsBySupplier.fxml"));
+            Parent root = loader.load();
+            AddProductsBySupplierFormController controller = loader.getController();
+            controller.setMainController(this);
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+            stage.setResizable(false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        enableScreen();
+    }
+
+    @FXML
+    public void btnClearAddSupplierOnAction(ActionEvent event) {
+        suppliedProducts=FXCollections.observableArrayList();
+        tblSuppliersAddProducts.getItems().clear();
+        txtAddSupplierName.setText("");
+        txtAddSupplierCompany.setText("");
+        txtAddSupplierEmail.setText("");
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadDateAndTime();
@@ -275,14 +394,18 @@ public class EmployeeDashboardFormController implements Initializable {
         tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
                 addProductValuesToDisplay(newVal);
+                System.out.println(newVal);
             }
         });
         tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
-                System.out.println(newVal);
+                loadSuppliedProductsTable(productService.findProductsBySupplierID(newVal.getSupplierId()));
             }
         });
+
     }
+
+
 
     // MY IMPLEMENTATIONS
 
@@ -294,19 +417,39 @@ public class EmployeeDashboardFormController implements Initializable {
         loadSuppliersTable(allSuppliers);
     }
 
+    private void loadSuppliedProductsTable(ObservableList<Product> suppliedProducts) {
+        if (suppliedProducts!=null){
+            columnSuppliersSuppliedProductsName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            columnSuppliersSuppliedProductsID.setCellValueFactory(new PropertyValueFactory<>("productId"));
+
+            columnSuppliersSuppliedProductsSupplierID.setCellValueFactory(cellData -> {
+                Supplier supplier = cellData.getValue().getSupplier();
+                return new SimpleStringProperty(supplier != null ? supplier.getSupplierId() : "-");
+            });
+
+            columnSuppliersSuppliedProductsName.setStyle("-fx-alignment:center;");
+            columnSuppliersSuppliedProductsID.setStyle("-fx-alignment:center;");
+            columnSuppliersSuppliedProductsSupplierID.setStyle("-fx-alignment:center;");
+
+            tblSuppliersSuppliedProducts.setItems(suppliedProducts);
+        }
+    }
+
     public void loadSuppliersTable(ObservableList<Supplier> allSuppliers) {
-        columnSuppliersID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
-        columnSuppliersName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        columnSuppliersCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
-        columnSuppliersEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        if(allSuppliers!=null){
+            columnSuppliersID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
+            columnSuppliersName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            columnSuppliersCompany.setCellValueFactory(new PropertyValueFactory<>("company"));
+            columnSuppliersEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
 
-        columnSuppliersID.setStyle("-fx-alignment:center;");
-        columnSuppliersName.setStyle("-fx-alignment:center;");
-        columnSuppliersCompany.setStyle("-fx-alignment:center;");
-        columnSuppliersEmail.setStyle("-fx-alignment:center;");
+            columnSuppliersID.setStyle("-fx-alignment:center;");
+            columnSuppliersName.setStyle("-fx-alignment:center;");
+            columnSuppliersCompany.setStyle("-fx-alignment:center;");
+            columnSuppliersEmail.setStyle("-fx-alignment:center;");
 
-        setIconsToTables(ActionTableType.SUPPLIERS);
-        tblSuppliers.setItems(allSuppliers);
+            setIconsToTables(ActionTableType.SUPPLIERS);
+            tblSuppliers.setItems(allSuppliers);
+        }
     }
 
     private void handleDashboardSidePanelBtnClicks(DashboardViewType type){
@@ -407,30 +550,32 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     public void loadCatalogProductsTable(ObservableList<Product> allProducts) {
-        columnCatalogProductsID.setCellValueFactory(new PropertyValueFactory<>("productId"));
-        columnCatalogProductsName.setCellValueFactory(new PropertyValueFactory<>("name"));
-        columnCatalogProductsQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-        columnCatalogProductsUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+        if(allProducts!=null){
+            columnCatalogProductsID.setCellValueFactory(new PropertyValueFactory<>("productId"));
+            columnCatalogProductsName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            columnCatalogProductsQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+            columnCatalogProductsUnitPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
 
-        columnCatalogProductsSupplierID.setCellValueFactory(cellData -> {
-            Supplier supplier = cellData.getValue().getSupplier();
-            return new SimpleStringProperty(supplier != null ? supplier.getSupplierId() : "-");
-        });
+            columnCatalogProductsSupplierID.setCellValueFactory(cellData -> {
+                Supplier supplier = cellData.getValue().getSupplier();
+                return new SimpleStringProperty(supplier != null ? supplier.getSupplierId() : "-");
+            });
 
-        columnCatalogProductsCategoryID.setCellValueFactory(cellData -> {
-            Category category = cellData.getValue().getCategory();
-            return new SimpleStringProperty(category != null ? category.getCategoryId() : "-");
-        });
+            columnCatalogProductsCategoryID.setCellValueFactory(cellData -> {
+                Category category = cellData.getValue().getCategory();
+                return new SimpleStringProperty(category != null ? category.getCategoryId() : "-");
+            });
 
-        columnCatalogProductsID.setStyle("-fx-alignment:center;");
-        columnCatalogProductsName.setStyle("-fx-alignment:center;");
-        columnCatalogProductsCategoryID.setStyle("-fx-alignment:center;");
-        columnCatalogProductsQuantity.setStyle("-fx-alignment:center;");
-        columnCatalogProductsUnitPrice.setStyle("-fx-alignment:center;");
-        columnCatalogProductsSupplierID.setStyle("-fx-alignment:center;");
+            columnCatalogProductsID.setStyle("-fx-alignment:center;");
+            columnCatalogProductsName.setStyle("-fx-alignment:center;");
+            columnCatalogProductsCategoryID.setStyle("-fx-alignment:center;");
+            columnCatalogProductsQuantity.setStyle("-fx-alignment:center;");
+            columnCatalogProductsUnitPrice.setStyle("-fx-alignment:center;");
+            columnCatalogProductsSupplierID.setStyle("-fx-alignment:center;");
 
-        setIconsToTables(ActionTableType.PRODUCTS);
-        tblCatalogProducts.setItems(allProducts);
+            setIconsToTables(ActionTableType.PRODUCTS);
+            tblCatalogProducts.setItems(allProducts);
+        }
     }
 
     private void setIconsToTables(ActionTableType type){
@@ -590,6 +735,7 @@ public class EmployeeDashboardFormController implements Initializable {
                     Supplier supplier = (Supplier) object;
                     supplierService.deleteSupplier(supplier.getSupplierId());
                     loadSuppliersTable(supplierService.getAllSuppliers());
+                    loadCatalogProductsTable(productService.getAllProducts());
                     break;
             }
 
@@ -642,6 +788,31 @@ public class EmployeeDashboardFormController implements Initializable {
 
     private void resetSuppliersTables() {
         tblSuppliers.getSelectionModel().clearSelection();
+        tblSuppliersSuppliedProducts.getItems().clear();
+        tblSuppliersAddProducts.getItems().clear();
+        suppliedProducts.clear();
+        txtAddSupplierEmail.setText("");
+        txtAddSupplierCompany.setText("");
+        txtAddSupplierName.setText("");
     }
 
+    public void loadSuppliersAddProductsTable() {
+        if (suppliedProducts.size()!=0){
+            columnSuppliersAddProductsProductName.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+            columnSuppliersAddProductsCategoryName.setCellValueFactory(cellData -> {
+                Category category = cellData.getValue().getCategory();
+                return new SimpleStringProperty(category != null ? category.getName() : "-");
+            });
+            tblSuppliersAddProducts.setItems(suppliedProducts);
+            columnSuppliersAddProductsProductName.setStyle("-fx-alignment:center;");
+            columnSuppliersAddProductsCategoryName.setStyle("-fx-alignment:center;");
+        }
+    }
+
+    private boolean isValidEmail(String email) {
+        Pattern pattern = Pattern.compile(emailPattern);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
 }

@@ -125,4 +125,22 @@ public class SupplierRepositoryImpl implements SupplierRepository {
             session.close();
         }
     }
+
+    @Override
+    public void save(SupplierEntity supplierEntity) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session.save(supplierEntity);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+    }
 }
