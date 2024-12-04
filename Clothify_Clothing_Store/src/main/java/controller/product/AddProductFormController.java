@@ -31,7 +31,6 @@ import java.util.ResourceBundle;
 @Setter
 public class AddProductFormController implements Initializable {
     private EmployeeDashboardFormController employeeDashboardFormController;
-
     private final SupplierService supplierService = ServiceFactory.getInstance().getServiceType(Type.SUPPLIER);
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
     private final CategoryService categoryService = ServiceFactory.getInstance().getServiceType(Type.CATEGORY);
@@ -59,21 +58,21 @@ public class AddProductFormController implements Initializable {
             Double unitPrice = Double.parseDouble(txtSetProductUnitPrice.getText().trim());
             String supplier = cmbSetProductSupplier.getValue().trim();
             Integer quantity = spinnerSetProductQuantity.getValue();
-            if(!name.equals("") && !category.equals("") && unitPrice!=null){
+            if(!name.isEmpty() && !category.isEmpty()){
                 Supplier supplierObject = new Supplier();
-                if(!supplier.equals("")){
+                if(!supplier.isEmpty()){
                     supplierObject = supplierService.findSupplierByName(supplier);
                 }
 
-                Category categoryObject = categoryService.findCategoryByName(category);
-                if (categoryObject.getCategoryId()==null){
-                    categoryObject = new Category();
-                    categoryObject.setName(category);
+                Category newCategory = categoryService.findCategoryByName(category);
+                if (newCategory.getCategoryId()==null){
+                    newCategory = new Category();
+                    newCategory.setName(category);
                 }
 
-                productService.addProduct(new Product(null,name,categoryObject,quantity,unitPrice,supplierObject));
+                productService.addProduct(new Product(null,name,newCategory,quantity,unitPrice,supplierObject));
                 employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
-                employeeDashboardFormController.setLabels();
+                employeeDashboardFormController.setCatalogPaneLabels();
                 btnCancelAddProductsOnAction(event);
                 return;
             }
@@ -92,7 +91,7 @@ public class AddProductFormController implements Initializable {
     @FXML
     void btnCancelAddProductsOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
-        Scene scene = EmployeeDashboardFormController.employeeDashboardStage.getScene();
+        Scene scene = EmployeeDashboardFormController.getInstance().getEmployeeDashboardStage().getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
         VBox vbox = (VBox) root.getChildren().get(7);
         vbox.setVisible(false);
@@ -107,9 +106,9 @@ public class AddProductFormController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ObservableList<Supplier> supplierObservableList=supplierService.getAllSuppliers();
-        ObservableList<String> b= FXCollections.observableArrayList();
-        supplierObservableList.forEach(supplier -> b.add(supplier.getName()));
-        cmbSetProductSupplier.setItems(b);
+        ObservableList<String> supplierList= FXCollections.observableArrayList();
+        supplierObservableList.forEach(supplier -> supplierList.add(supplier.getName()));
+        cmbSetProductSupplier.setItems(supplierList);
 
         spinnerSetProductQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,750,1));
         cmbSetProductSupplier.setValue("");

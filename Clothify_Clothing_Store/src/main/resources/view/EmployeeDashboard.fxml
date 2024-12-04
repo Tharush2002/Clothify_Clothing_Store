@@ -20,7 +20,7 @@
 
 <AnchorPane prefHeight="651.0" prefWidth="1200.0" style="-fx-background-color: #fff;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.employee.EmployeeDashboardFormController">
    <children>
-      <AnchorPane fx:id="anchorPaneCatalog" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
+      <AnchorPane fx:id="anchorPaneCatalog" disable="true" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
          <children>
             <VBox alignment="TOP_CENTER" layoutX="674.4" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="309.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
                <children>
@@ -65,7 +65,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="lblTotalOrders" layoutX="10.0" layoutY="10.0">
+                              <Label fx:id="lblTotalOrdersCatalog" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="3.0" />
                                  </padding>
@@ -233,7 +233,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Label layoutX="81.0" layoutY="18.0" text="Welcome Back, Tharusha">
+            <Label layoutX="81.0" layoutY="18.0" text="Welcome Back, ">
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>
@@ -246,7 +246,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <TableView fx:id="tblCatalogProducts" layoutX="43.0" layoutY="128.0" prefHeight="432.0" prefWidth="591.0">
+            <TableView fx:id="tblCatalogProducts" layoutX="43.0" layoutY="82.0" prefHeight="478.0" prefWidth="591.0">
                <columns>
                   <TableColumn fx:id="columnCatalogProductsID" prefWidth="55.999996185302734" text="id" />
                   <TableColumn fx:id="columnCatalogProductsName" prefWidth="138.39999389648438" text="name" />
@@ -422,7 +422,7 @@
             </VBox>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneOrders" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
+      <AnchorPane fx:id="anchorPaneOrders" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
          <children>
             <Label layoutX="81.0" layoutY="18.0" text="ORDERS">
                <font>
@@ -472,7 +472,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="lblTotalOrderCount" layoutX="10.0" layoutY="10.0">
+                              <Label fx:id="lblTotalOrdersOrders" layoutX="10.0" layoutY="10.0">
                                  <padding>
                                     <Insets left="5.0" top="3.0" />
                                  </padding>
@@ -560,7 +560,7 @@
             </TableView>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneReports" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
+      <AnchorPane fx:id="anchorPaneReports" disable="true" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
          <children>
             <VBox alignment="TOP_CENTER" layoutX="674.4" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="309.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
                <children>
@@ -577,6 +577,30 @@
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>
             </Label>
+            <Button layoutX="162.0" layoutY="111.0" mnemonicParsing="false" onAction="#btnLoadInventoryReportOnAction" prefHeight="77.0" prefWidth="364.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Inventory Report" textFill="#e1dbbf">
+               <font>
+                  <Font name="Dubai Medium" size="31.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button layoutX="162.0" layoutY="221.0" mnemonicParsing="false" onAction="#btnLoadEmployeeReportOnAction" prefHeight="77.0" prefWidth="364.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Employee Report" textFill="#e1dbbf">
+               <font>
+                  <Font name="Dubai Medium" size="31.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button layoutX="162.0" layoutY="329.0" mnemonicParsing="false" onAction="#btnLoadCustomerReportOnAction" prefHeight="77.0" prefWidth="364.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Customer Report" textFill="#e1dbbf">
+               <font>
+                  <Font name="Dubai Medium" size="31.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
          </children>
       </AnchorPane>
       <VBox alignment="TOP_CENTER" layoutX="891.0" maxHeight="651.0" minHeight="142.0" prefHeight="142.0" prefWidth="310.0" stylesheets="@../styles/style.css">

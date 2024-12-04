@@ -29,4 +29,16 @@ public class CustomerServiceImpl implements CustomerService {
         });
         return customers;
     }
+
+    @Override
+    public boolean isValidPhoneNumber(String phoneNumber) {
+        String phoneNumberPattern = "^(\\+\\d{1,3}[- ]?)?\\(?\\d{3}\\)?[- ]?\\d{3}[- ]?\\d{4}$";
+        return phoneNumber.matches(phoneNumberPattern);
+    }
+
+    @Override
+    public boolean isValidEmail(String email) {
+        String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email.matches(emailPattern);
+    }
 }

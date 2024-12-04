@@ -17,9 +17,7 @@ import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Setter;
-import model.Category;
 import model.Product;
-import model.Supplier;
 import service.ServiceFactory;
 import service.custom.CategoryService;
 import service.custom.ProductService;
@@ -36,8 +34,7 @@ public class EditProductFormController implements Initializable {
     private final SupplierService supplierService = ServiceFactory.getInstance().getServiceType(Type.SUPPLIER);
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
     private final CategoryService categoryService = ServiceFactory.getInstance().getServiceType(Type.CATEGORY);
-
-    private final Product selectedProductToEdit = EmployeeDashboardFormController.selectedProductToEdit;
+    private final Product selectedProductToEdit = EmployeeDashboardFormController.getInstance().getSelectedProductToEdit();
 
     @FXML
     public JFXComboBox<String> cmbEditProductCategory;
@@ -65,7 +62,7 @@ public class EditProductFormController implements Initializable {
     @FXML
     void btnCancelEditProductsOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
-        Scene scene = EmployeeDashboardFormController.employeeDashboardStage.getScene();
+        Scene scene = EmployeeDashboardFormController.getInstance().getEmployeeDashboardStage().getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
         VBox vbox = (VBox) root.getChildren().get(7);
         vbox.setVisible(false);
@@ -79,19 +76,15 @@ public class EditProductFormController implements Initializable {
             String unitPrice = txtEditProductUnitPrice.getText().trim();
             String categoryName = cmbEditProductCategory.getValue().trim();
             String supplierName = cmbEditProductSupplier.getValue().trim();
-            if(!name.equals("") && !categoryName.equals("") && !unitPrice.equals("")){
+            if(!name.isEmpty() && !categoryName.isEmpty() && !unitPrice.isEmpty()){
                 selectedProductToEdit.setName(name);
                 selectedProductToEdit.setQuantity(spinnerEditProductQuantity.getValue());
                 selectedProductToEdit.setUnitPrice(Double.parseDouble(unitPrice));
                 selectedProductToEdit.setCategory(categoryService.findCategoryByName(categoryName));
 
-                if (supplierName!=null){
-                    if(!supplierName.equals("")){
-                        selectedProductToEdit.setSupplier(supplierService.findSupplierByName(cmbEditProductSupplier.getValue()));
-                    }else{
-                        selectedProductToEdit.setSupplier(null);
-                    }
-                }else{
+                if (!supplierName.isEmpty()) {
+                    selectedProductToEdit.setSupplier(supplierService.findSupplierByName(cmbEditProductSupplier.getValue()));
+                } else {
                     selectedProductToEdit.setSupplier(null);
                 }
             }else{
@@ -112,7 +105,7 @@ public class EditProductFormController implements Initializable {
         productService.updateProduct(selectedProductToEdit);
         btnCancelEditProductsOnAction(event);
         employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
-        employeeDashboardFormController.setLabels();
+        employeeDashboardFormController.setCatalogPaneLabels();
     }
 
     @Override
@@ -125,17 +118,15 @@ public class EditProductFormController implements Initializable {
         txtEditProductName.setText(selectedProductToEdit.getName());
         spinnerEditProductQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,750,selectedProductToEdit.getQuantity()));
         txtEditProductUnitPrice.setText(selectedProductToEdit.getUnitPrice().toString());
-
-        ObservableList<Category> categoryObservableList=categoryService.getAllCategories();
-        ObservableList<String> a= FXCollections.observableArrayList();
-        categoryObservableList.forEach(category -> a.add(category.getName()));
-        cmbEditProductCategory.setItems(a);
+        
+        ObservableList<String> categoryList= FXCollections.observableArrayList();
+        categoryService.getAllCategories().forEach(category -> categoryList.add(category.getName()));
+        cmbEditProductCategory.setItems(categoryList);
         if(selectedProductToEdit.getCategory()!=null) cmbEditProductCategory.setValue(selectedProductToEdit.getCategory().getName());
-
-        ObservableList<Supplier> supplierObservableList=supplierService.getAllSuppliers();
-        ObservableList<String> b= FXCollections.observableArrayList();
-        supplierObservableList.forEach(supplier -> b.add(supplier.getName()));
-        cmbEditProductSupplier.setItems(b);
+        
+        ObservableList<String> supplierList= FXCollections.observableArrayList();
+        supplierService.getAllSuppliers().forEach(supplier -> supplierList.add(supplier.getName()));
+        cmbEditProductSupplier.setItems(supplierList);
         if(selectedProductToEdit.getSupplier()!=null) cmbEditProductSupplier.setValue(selectedProductToEdit.getSupplier().getName());
     }
 }

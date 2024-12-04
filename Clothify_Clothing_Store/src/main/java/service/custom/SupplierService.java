@@ -15,4 +15,6 @@ public interface SupplierService extends SuperService {
     void updateSupplier(Supplier supplier);
 
     void addSupplier(Supplier supplier);
+
+    boolean isValidEmail(String email);
 }

@@ -7,6 +7,7 @@ import controller.product.AddProductFormController;
 import controller.product.AddProductsBySupplierFormController;
 import controller.product.EditProductFormController;
 import controller.supplier.EditSupplierFormController;
+import db.DBConnection;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -30,7 +31,15 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import lombok.Getter;
 import model.*;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
 import service.ServiceFactory;
 import service.custom.*;
 import util.ActionTableType;
@@ -42,38 +51,52 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static util.ActionTableType.PRODUCTS;
+import static util.ActionTableType.SUPPLIERS;
+
+@Getter
 public class EmployeeDashboardFormController implements Initializable {
 
-    public static Stage employeeDashboardStage;
+    private Stage employeeDashboardStage;
 
-    private void setEmployeeDashboardStage(MouseEvent event){
+    private static EmployeeDashboardFormController instance;
+
+    public static EmployeeDashboardFormController getInstance() {
+        return instance == null ? new EmployeeDashboardFormController() : instance;
+    }
+
+    private void setEmployeeDashboardStage(MouseEvent event) {
         employeeDashboardStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
 
-    private void setEmployeeDashboardStage(ActionEvent event){
+    private void setEmployeeDashboardStage(ActionEvent event) {
         employeeDashboardStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+    }
+
+    public EmployeeDashboardFormController() {
+        instance = this;
     }
 
     //VARIABLES ===============
 
-    public static Product selectedProductToEdit = new Product();
-    public static Supplier selectedSupplierToEdit = new Supplier();
-    public static ObservableList<Product> suppliedProducts = FXCollections.observableArrayList();
+    private Product selectedProductToEdit = new Product();
+    private Supplier selectedSupplierToEdit = new Supplier();
+    private ObservableList<Product> suppliedProducts = FXCollections.observableArrayList();
 
-    private final String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
-    public static ObservableList<Product> allProducts= FXCollections.observableArrayList();
-    private ObservableList<Supplier> allSuppliers= FXCollections.observableArrayList();
-    private ObservableList<Order> allOrders= FXCollections.observableArrayList();
-    public static List<TempOrderItems> tempOrderItemsList = new ArrayList<>();
+    private ObservableList<Product> allProducts = FXCollections.observableArrayList();
+    private ObservableList<Supplier> allSuppliers = FXCollections.observableArrayList();
+    private ObservableList<Order> allOrders = FXCollections.observableArrayList();
+    private List<TempOrderItem> tempOrderItemList = new ArrayList<>();
 
     //SERVICE-FACTORIES
-    private final ProductService productService=ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
-    private final SupplierService supplierService=ServiceFactory.getInstance().getServiceType(Type.SUPPLIER);
-    private final OrderItemsService orderItemsService=ServiceFactory.getInstance().getServiceType(Type.ORDERITEMS);
-    private final OrderService orderService=ServiceFactory.getInstance().getServiceType(Type.ORDER);
-    private final CustomerService customerSevice=ServiceFactory.getInstance().getServiceType(Type.CUSTOMER);
+    private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
+    private final SupplierService supplierService = ServiceFactory.getInstance().getServiceType(Type.SUPPLIER);
+    private final OrderItemsService orderItemsService = ServiceFactory.getInstance().getServiceType(Type.ORDERITEMS);
+    private final OrderService orderService = ServiceFactory.getInstance().getServiceType(Type.ORDER);
+    private final CustomerService customerService = ServiceFactory.getInstance().getServiceType(Type.CUSTOMER);
 
     @FXML
     public Button btnCheckOut;
@@ -97,7 +120,7 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableView<Product> tblSuppliersSuppliedProducts;
 
     @FXML
-    private TableView<OrderItems> tblOrderItems;
+    private TableView<OrderItem> tblOrderItems;
 
     @FXML
     private TableView<Order> tblOrders;
@@ -157,13 +180,13 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableColumn<Product, String> columnSuppliersSuppliedProductsSupplierID;
 
     @FXML
-    private TableColumn<OrderItems, String> columnOrderItemsProductID;
+    private TableColumn<OrderItem, String> columnOrderItemsProductID;
 
     @FXML
-    private TableColumn<OrderItems, String> columnOrderItemsProductName;
+    private TableColumn<OrderItem, String> columnOrderItemsProductName;
 
     @FXML
-    private TableColumn<OrderItems, String> columnOrderItemsProductSize;
+    private TableColumn<OrderItem, String> columnOrderItemsProductSize;
 
     @FXML
     private TableColumn<Order, String> columnOrdersCustomerID;
@@ -232,10 +255,10 @@ public class EmployeeDashboardFormController implements Initializable {
     private Label lblTotalCustomerCount;
 
     @FXML
-    private Label lblTotalOrderCount;
+    private Label lblTotalOrdersOrders;
 
     @FXML
-    private Label lblTotalOrders;
+    private Label lblTotalOrdersCatalog;
 
     @FXML
     private Label lblTotalProducts;
@@ -264,7 +287,7 @@ public class EmployeeDashboardFormController implements Initializable {
     @FXML
     void btnCloseOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
-        HomeFormController.homeStage.show();
+        HomeFormController.getInstance().getHomeStage().show();
     }
 
     @FXML
@@ -292,34 +315,33 @@ public class EmployeeDashboardFormController implements Initializable {
         String name = txtAddSupplierName.getText().trim();
         String email = txtAddSupplierEmail.getText().trim();
         String company = txtAddSupplierCompany.getText().trim();
-        if(!name.equals("") && isValidEmail(email) && !company.equals("")){
+        if (!name.isEmpty() && supplierService.isValidEmail(email) && !company.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Supplier Added");
             alert.setHeaderText(null);
             alert.setContentText("Supplier added successfully!");
             alert.show();
-            if(suppliedProducts.size()!=0){
+            if (!suppliedProducts.isEmpty()) {
                 suppliedProducts.forEach(product -> {
                     product.setSupplier(new Supplier(null, name, company, email));
                     productService.addProduct(product);
                 });
-            }else{
+            } else {
                 supplierService.addSupplier(new Supplier(null, name, company, email));
             }
             loadSuppliersTable(supplierService.getAllSuppliers());
             loadCatalogProductsTable(productService.getAllProducts());
-            setLabels();
-            return;
+            setSuppliersPaneLabels();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle(null);
+            alert.setContentText("Please Enter All the Fields with Correct Data");
+            alert.show();
+            txtAddSupplierName.setText("");
+            txtAddSupplierCompany.setText("");
+            txtAddSupplierEmail.setText("");
         }
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(null);
-        alert.setContentText("Please Enter All the Fields with Correct Data");
-        alert.show();
-        txtAddSupplierName.setText("");
-        txtAddSupplierCompany.setText("");
-        txtAddSupplierEmail.setText("");
     }
-
 
     @FXML
     void btnAddToCartOnAction(ActionEvent event) {
@@ -331,35 +353,37 @@ public class EmployeeDashboardFormController implements Initializable {
             alert.show();
             Product selectedProduct = null;
 
-            for (int index = 0; allProducts.size() > index; index++) {
-                if (allProducts.get(index).getProductId().equals(lblCatalogProductID.getText())) {
-                    selectedProduct = allProducts.get(index);
-                    allProducts.get(index).setQuantity(allProducts.get(index).getQuantity() - spinnerCatalogQuantity.getValue());
+            for (Product product : allProducts) {
+                if (product.getProductId().equals(lblCatalogProductID.getText())) {
+                    selectedProduct = product;
+                    product.setQuantity(product.getQuantity() - spinnerCatalogQuantity.getValue());
                     break;
                 }
             }
-            for (int index = 0; tempOrderItemsList.size() > index; index++) {
-                boolean isProductIdMatches= tempOrderItemsList.get(index).getOrderItem().getProductId().equals(lblCatalogProductID.getText());
-                boolean isProductSizeMatches= tempOrderItemsList.get(index).getOrderItem().getSize().equals(cmbCatalogSize.getValue().toString().trim());
-                if (isProductSizeMatches && isProductIdMatches){
-                    tempOrderItemsList.get(index).setQuantity(tempOrderItemsList.get(index).getQuantity()+spinnerCatalogQuantity.getValue());
+            for (TempOrderItem tempOrderItem : tempOrderItemList) {
+                boolean isProductIdMatches = tempOrderItem.getOrderItem().getProductId().equals(lblCatalogProductID.getText());
+                boolean isProductSizeMatches = tempOrderItem.getOrderItem().getSize().equals(cmbCatalogSize.getValue().trim());
+                if (isProductSizeMatches && isProductIdMatches) {
+                    tempOrderItem.setQuantity(tempOrderItem.getQuantity() + spinnerCatalogQuantity.getValue());
                     return;
                 }
             }
-            tempOrderItemsList.add(new TempOrderItems(
-                    new OrderItems(
-                            new Order(null, null, null,spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(),null,new Customer(),null),
-                            selectedProduct.getName(),
-                            selectedProduct.getProductId(),
-                            selectedProduct.getCategory().getCategoryId(),
-                            selectedProduct.getCategory().getName(),
-                            selectedProduct.getSupplier().getSupplierId(),
-                            selectedProduct.getSupplier().getName(),
-                            selectedProduct.getUnitPrice(),
-                            cmbCatalogSize.getValue().trim()),
-                    spinnerCatalogQuantity.getValue())
-            );
-        }finally {
+            if (selectedProduct != null) {
+                tempOrderItemList.add(new TempOrderItem(
+                        new OrderItem(
+                                new Order(null, null, null, spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(), null, new Customer(), null),
+                                selectedProduct.getName(),
+                                selectedProduct.getProductId(),
+                                selectedProduct.getCategory().getCategoryId(),
+                                selectedProduct.getCategory().getName(),
+                                selectedProduct.getSupplier().getSupplierId(),
+                                selectedProduct.getSupplier().getName(),
+                                selectedProduct.getUnitPrice(),
+                                cmbCatalogSize.getValue().trim()),
+                        spinnerCatalogQuantity.getValue())
+                );
+            }
+        } finally {
             btnCheckOut.setDisable(false);
             loadCatalogProductsTable(allProducts);
             resetProductValuesDisplay();
@@ -370,7 +394,7 @@ public class EmployeeDashboardFormController implements Initializable {
     public void btnCheckoutOnAction(ActionEvent event) {
         try {
             setEmployeeDashboardStage(event);
-            Stage stage=new Stage();
+            Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/CheckOut.fxml"));
             Parent root = loader.load();
             CheckOutFormController controller = loader.getController();
@@ -390,7 +414,7 @@ public class EmployeeDashboardFormController implements Initializable {
     public void btnCatalogAddProductOnAction(ActionEvent event) {
         try {
             setEmployeeDashboardStage(event);
-            Stage stage=new Stage();
+            Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/AddProducts.fxml"));
             Parent root = loader.load();
             AddProductFormController controller = loader.getController();
@@ -409,7 +433,7 @@ public class EmployeeDashboardFormController implements Initializable {
     public void btnAddProductForTheSupplierOnAction(ActionEvent event) {
         try {
             setEmployeeDashboardStage(event);
-            Stage stage=new Stage();
+            Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/AddProductsBySupplier.fxml"));
             Parent root = loader.load();
             AddProductsBySupplierFormController controller = loader.getController();
@@ -426,18 +450,40 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     public void btnClearAddSupplierOnAction(ActionEvent event) {
-        suppliedProducts=FXCollections.observableArrayList();
+        suppliedProducts = FXCollections.observableArrayList();
         tblSuppliersAddProducts.getItems().clear();
         txtAddSupplierName.setText("");
         txtAddSupplierCompany.setText("");
         txtAddSupplierEmail.setText("");
     }
 
+    @FXML
+    void btnLoadCustomerReportOnAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void btnLoadEmployeeReportOnAction(ActionEvent event) {
+
+    }
+
+    @FXML
+    void btnLoadInventoryReportOnAction(ActionEvent event) {
+        try {
+            JasperDesign jasperDesign = JRXmlLoader.load("src/main/resources/reports/products.jrxml");
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, DBConnection.getInstance().getConnection());
+            JasperViewer.viewReport(jasperPrint, false);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadDateAndTime();
         loadTables();
-        setLabels();
+        setAllLabels();
         handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
         tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
@@ -456,20 +502,19 @@ public class EmployeeDashboardFormController implements Initializable {
         });
     }
 
-
-    // MY IMPLEMENTATIONS
+    //====================== MY IMPLEMENTATIONS =======================
 
     //LOAD TABLES
 
-    private void loadTables(){
+    private void loadTables() {
         loadCatalogProductsTable(productService.getAllProducts());
         loadSuppliersTable(supplierService.getAllSuppliers());
         loadOrdersTable(orderService.getAllOrders());
     }
 
     public void loadOrdersTable(ObservableList<Order> allOrders) {
-        if(allOrders!=null){
-            this.allOrders=allOrders;
+        if (allOrders != null) {
+            this.allOrders = allOrders;
 
             columnOrdersID.setCellValueFactory(new PropertyValueFactory<>("orderId"));
             columnOrdersTime.setCellValueFactory(new PropertyValueFactory<>("time"));
@@ -495,8 +540,8 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
-    private void loadOrderItemsTable(ObservableList<OrderItems> orderItems){
-        if(orderItems!=null){
+    private void loadOrderItemsTable(ObservableList<OrderItem> orderItems) {
+        if (orderItems != null) {
             columnOrderItemsProductName.setCellValueFactory(new PropertyValueFactory<>("productName"));
             columnOrderItemsProductSize.setCellValueFactory(new PropertyValueFactory<>("size"));
             columnOrderItemsProductID.setCellValueFactory(new PropertyValueFactory<>("productId"));
@@ -510,7 +555,7 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     private void loadSuppliedProductsTable(ObservableList<Product> suppliedProducts) {
-        if (suppliedProducts!=null){
+        if (suppliedProducts != null) {
             columnSuppliersSuppliedProductsName.setCellValueFactory(new PropertyValueFactory<>("name"));
             columnSuppliersSuppliedProductsID.setCellValueFactory(new PropertyValueFactory<>("productId"));
 
@@ -528,8 +573,8 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     public void loadSuppliersTable(ObservableList<Supplier> allSuppliers) {
-        if(allSuppliers!=null){
-            this.allSuppliers=allSuppliers;
+        if (allSuppliers != null) {
+            this.allSuppliers = allSuppliers;
 
             columnSuppliersID.setCellValueFactory(new PropertyValueFactory<>("supplierId"));
             columnSuppliersName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -541,13 +586,13 @@ public class EmployeeDashboardFormController implements Initializable {
             columnSuppliersCompany.setStyle("-fx-alignment:center;");
             columnSuppliersEmail.setStyle("-fx-alignment:center;");
 
-            setActionsToTables(ActionTableType.SUPPLIERS);
+            setActionsToTables(SUPPLIERS);
             tblSuppliers.setItems(allSuppliers);
         }
     }
 
     public void loadSuppliersAddProductsTable() {
-        if (suppliedProducts.size()!=0){
+        if (!suppliedProducts.isEmpty()) {
             columnSuppliersAddProductsProductName.setCellValueFactory(new PropertyValueFactory<>("name"));
 
             columnSuppliersAddProductsCategoryName.setCellValueFactory(cellData -> {
@@ -561,7 +606,7 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     public void loadCatalogProductsTable(ObservableList<Product> allProducts) {
-        if(allProducts!=null){
+        if (allProducts != null) {
             this.allProducts = allProducts;
 
             columnCatalogProductsID.setCellValueFactory(new PropertyValueFactory<>("productId"));
@@ -586,15 +631,18 @@ public class EmployeeDashboardFormController implements Initializable {
             columnCatalogProductsUnitPrice.setStyle("-fx-alignment:center;");
             columnCatalogProductsSupplierID.setStyle("-fx-alignment:center;");
 
-            setActionsToTables(ActionTableType.PRODUCTS);
+            setActionsToTables(PRODUCTS);
             tblCatalogProducts.setItems(allProducts);
         }
     }
 
     //=============
 
-    private void handleDashboardSidePanelBtnClicks(DashboardViewType type){
-        switch(type){
+
+    //OTHER IMPLEMENTATIONS
+
+    private void handleDashboardSidePanelBtnClicks(DashboardViewType type) {
+        switch (type) {
             case CATALOG:
 //                HANDLE BUTTON STYLES WHEN CLICKED
                 btnCatalog.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
@@ -672,17 +720,19 @@ public class EmployeeDashboardFormController implements Initializable {
         SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
         lblDate.setText(f.format(date));
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
         Timeline timeline = new Timeline(new KeyFrame(Duration.ZERO, e -> {
             LocalTime now = LocalTime.now();
-            lblTime.setText(now.getHour() + ":" + now.getMinute() + ":" + now.getSecond());
+            String formattedTime = now.format(formatter).replace("am", " A.M").replace("pm", " P.M");
+            lblTime.setText(formattedTime);
         }),
-            new KeyFrame(Duration.seconds(1))
+                new KeyFrame(Duration.seconds(1))
         );
         timeline.setCycleCount(Animation.INDEFINITE);
         timeline.play();
     }
 
-    private void setActionsToTables(ActionTableType type){
+    private void setActionsToTables(ActionTableType type) {
         Callback<TableColumn<Product, Void>, TableCell<Product, Void>> productCellFactory = new Callback<>() {
             @Override
             public TableCell<Product, Void> call(final TableColumn<Product, Void> param) {
@@ -753,7 +803,7 @@ public class EmployeeDashboardFormController implements Initializable {
             }
         };
 
-        switch(type){
+        switch (type) {
             case PRODUCTS:
                 columnCatalogProductsAction.setCellFactory(productCellFactory);
                 break;
@@ -763,30 +813,24 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
-    private void handleEditActions(ActionTableType type, MouseEvent event){
+    private void handleEditActions(ActionTableType type, MouseEvent event) {
         setEmployeeDashboardStage(event);
         try {
-            Stage stage=new Stage();
-            FXMLLoader loader = new FXMLLoader();
-            switch(type){
-                case PRODUCTS:
-                    loader = new FXMLLoader(getClass().getResource("../../view/EditProducts.fxml"));
-                    break;
-                case SUPPLIERS:
-                    loader = new FXMLLoader(getClass().getResource("../../view/EditSupplier.fxml"));
-                    break;
-            }
+            Stage stage = new Stage();
+            new FXMLLoader();
+            FXMLLoader loader = switch (type) {
+                case PRODUCTS -> new FXMLLoader(getClass().getResource("../../view/EditProducts.fxml"));
+                case SUPPLIERS -> new FXMLLoader(getClass().getResource("../../view/EditSupplier.fxml"));
+            };
             Parent root = loader.load();
-            switch(type){
-                case PRODUCTS:
-                    EditProductFormController editProductFormController = loader.getController();
-                    editProductFormController.setEmployeeDashboardFormController(this);
-                    break;
-                case SUPPLIERS:
-                    EditSupplierFormController editSupplierFormController  = loader.getController();
-                    editSupplierFormController.setEmployeeDashboardFormController(this);
-                    break;
+            if (type == PRODUCTS) {
+                EditProductFormController editProductFormController = loader.getController();
+                editProductFormController.setEmployeeDashboardFormController(this);
+            } else {
+                EditSupplierFormController editSupplierFormController = loader.getController();
+                editSupplierFormController.setEmployeeDashboardFormController(this);
             }
+
             stage.setScene(new Scene(root));
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
@@ -797,7 +841,7 @@ public class EmployeeDashboardFormController implements Initializable {
         enableScreen();
     }
 
-    private void handleDeleteActions(ActionTableType type, Object object){
+    private void handleDeleteActions(ActionTableType type, Object object) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Confirmation Dialog");
         alert.setHeaderText("Are you sure you want to delete the selected Item?");
@@ -805,18 +849,15 @@ public class EmployeeDashboardFormController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            switch(type){
-                case PRODUCTS:
-                    Product product = (Product) object;
-                    productService.deleteProduct(product.getProductId());
-                    loadCatalogProductsTable(productService.getAllProducts());
-                    break;
-                case SUPPLIERS:
-                    Supplier supplier = (Supplier) object;
-                    supplierService.deleteSupplier(supplier.getSupplierId());
-                    loadSuppliersTable(supplierService.getAllSuppliers());
-                    loadCatalogProductsTable(productService.getAllProducts());
-                    break;
+            if (type == PRODUCTS) {
+                Product product = (Product) object;
+                productService.deleteProduct(product.getProductId());
+                loadCatalogProductsTable(productService.getAllProducts());
+            } else if (type == SUPPLIERS) {
+                Supplier supplier = (Supplier) object;
+                supplierService.deleteSupplier(supplier.getSupplierId());
+                loadSuppliersTable(supplierService.getAllSuppliers());
+                loadCatalogProductsTable(productService.getAllProducts());
             }
 
             Alert completionAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -835,7 +876,7 @@ public class EmployeeDashboardFormController implements Initializable {
     private void addProductValuesToDisplay(Product newVal) {
         lblCatalogProductID.setText(newVal.getProductId());
         lblCatalogProductName.setText(newVal.getName());
-        lblCatalogUnitPrice.setText("Rs. "+newVal.getUnitPrice().toString());
+        lblCatalogUnitPrice.setText("Rs. " + newVal.getUnitPrice().toString());
 
         ObservableList<String> sizeList = FXCollections.observableArrayList();
         sizeList.add("XS");
@@ -848,21 +889,13 @@ public class EmployeeDashboardFormController implements Initializable {
         cmbCatalogSize.setValue("M");
         cmbCatalogSize.setVisible(true);
 
-        spinnerCatalogQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,newVal.getQuantity(),1));
+        spinnerCatalogQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, newVal.getQuantity(), 1));
         spinnerCatalogQuantity.setVisible(true);
 
-        if (newVal.getQuantity()!=0){
-            btnAddToCart.setDisable(false);
-        }else{
-            btnAddToCart.setDisable(true);
-        }
+        btnAddToCart.setDisable(newVal.getQuantity() == 0);
     }
 
-    private boolean isValidEmail(String email) {
-        return email.matches(emailPattern);
-    }
-
-    private void resetTables(){
+    private void resetTables() {
         resetProductValuesDisplay();
         resetSuppliersTables();
         resetOrdersTables();
@@ -888,46 +921,46 @@ public class EmployeeDashboardFormController implements Initializable {
         txtAddSupplierName.setText("");
     }
 
-    private void resetOrdersTables(){
+    private void resetOrdersTables() {
         tblOrderItems.getItems().clear();
         tblOrders.getSelectionModel().clearSelection();
     }
 
-    public void setLabels() {
-        ObservableList<Customer> customers = customerSevice.getAllCustomers();
-        if(customers!=null){
-            lblTotalCustomerCount.setText(String.valueOf(customers.size()));
-        }else{
-            lblTotalCustomerCount.setText("");
-        }
+    private void setAllLabels() {
+        setCatalogPaneLabels();
+        setSuppliersPaneLabels();
+        setOrdersPaneLabels();
+    }
 
-        if(allOrders!=null){
-            lblTotalOrderCount.setText(String.valueOf(allOrders.size()));
-            lblTotalOrders.setText(String.valueOf(allOrders.size()));
-        }else{
-            lblTotalOrderCount.setText("");
-            lblTotalOrders.setText("");
-        }
-
-        if(allSuppliers!=null){
-            lblTotalSuppliers.setText(String.valueOf(allSuppliers.size()));
-            lblTotalCompanies.setText(String.valueOf(allSuppliers.size()));
-        }else{
-            lblTotalSuppliers.setText("");
-            lblTotalCompanies.setText("");
-        }
-
-        if(allProducts!=null){
+    public void setCatalogPaneLabels() {
+        lblTotalOrdersCatalog.setText(allOrders != null ? String.valueOf(allOrders.size()) : "");
+        if (allProducts != null) {
             lblTotalProducts.setText(String.valueOf(allProducts.size()));
 
             Integer totalStock = 0;
-            for(int index=0;index<allProducts.size();index++){
-                totalStock+=allProducts.get(index).getQuantity();
+            for (Product allProduct : allProducts) {
+                totalStock += allProduct.getQuantity();
             }
             lblTotalStock.setText(String.valueOf(totalStock));
-        }else{
+        } else {
             lblTotalProducts.setText("");
             lblTotalStock.setText("");
         }
+    }
+
+    public void setSuppliersPaneLabels() {
+        if (allSuppliers != null) {
+            lblTotalSuppliers.setText(String.valueOf(allSuppliers.size()));
+            lblTotalCompanies.setText(String.valueOf(allSuppliers.size()));
+        } else {
+            lblTotalSuppliers.setText("");
+            lblTotalCompanies.setText("");
+        }
+    }
+
+    public void setOrdersPaneLabels() {
+        ObservableList<Customer> customers = customerService.getAllCustomers();
+        lblTotalCustomerCount.setText(customers != null ? String.valueOf(customers.size()) : "");
+        lblTotalOrdersOrders.setText(allOrders != null ? String.valueOf(allOrders.size()) : "");
     }
 }

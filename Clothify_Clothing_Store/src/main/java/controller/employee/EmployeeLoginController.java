@@ -16,7 +16,7 @@ public class EmployeeLoginController {
     @FXML
     void btnCloseOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
-        HomeFormController.homeStage.show();
+        HomeFormController.getInstance().getHomeStage().show();
     }
 
     @FXML

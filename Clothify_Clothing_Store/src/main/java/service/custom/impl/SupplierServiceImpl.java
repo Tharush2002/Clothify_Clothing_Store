@@ -64,4 +64,10 @@ public class SupplierServiceImpl implements SupplierService {
             supplierRepository.save(new SupplierEntity(null, null, supplier.getName(), supplier.getCompany(),supplier.getEmail()));
         }
     }
+
+    @Override
+    public boolean isValidEmail(String email) {
+        String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email.matches(emailPattern);
+    }
 }
