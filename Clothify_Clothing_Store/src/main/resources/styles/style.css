@@ -100,3 +100,15 @@
 .updateProductsTitleBar{
     -fx-background-color: linear-gradient(to right,  #5c522f, #6e6546);
 }
+
+.searchBar{
+    -fx-background-radius: 12;
+}
+
+.searchBarContainer{
+    -fx-background-radius:0 12 12 0;
+    -fx-background-color: #f5f0df;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width:1;
+    -fx-border-radius:0 12 12 0;
+}

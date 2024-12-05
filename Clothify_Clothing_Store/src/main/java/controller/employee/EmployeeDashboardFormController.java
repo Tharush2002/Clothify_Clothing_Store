@@ -1,5 +1,6 @@
 package controller.employee;
 
+import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXTextField;
 import controller.CheckOutFormController;
 import controller.HomeFormController;
@@ -11,6 +12,7 @@ import db.DBConnection;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -23,6 +25,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -89,7 +93,7 @@ public class EmployeeDashboardFormController implements Initializable {
     private ObservableList<Product> allProducts = FXCollections.observableArrayList();
     private ObservableList<Supplier> allSuppliers = FXCollections.observableArrayList();
     private ObservableList<Order> allOrders = FXCollections.observableArrayList();
-    private List<TempOrderItem> tempOrderItemList = new ArrayList<>();
+    private final List<TempOrderItem> tempOrderItemList = new ArrayList<>();
 
     //SERVICE-FACTORIES
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
@@ -97,36 +101,94 @@ public class EmployeeDashboardFormController implements Initializable {
     private final OrderItemsService orderItemsService = ServiceFactory.getInstance().getServiceType(Type.ORDERITEMS);
     private final OrderService orderService = ServiceFactory.getInstance().getServiceType(Type.ORDER);
     private final CustomerService customerService = ServiceFactory.getInstance().getServiceType(Type.CUSTOMER);
+    //=================
+
+    @FXML
+    private AnchorPane anchorPaneCatalog;
+
+    @FXML
+    private AnchorPane anchorPaneOrders;
+
+    @FXML
+    private AnchorPane anchorPaneReports;
+
+    @FXML
+    private AnchorPane anchorPaneSuppliers;
+
+    @FXML
+    public Button btnAddToCart;
+
+    @FXML
+    private Button btnCatalog;
 
     @FXML
     public Button btnCheckOut;
 
     @FXML
+    private Button btnOrders;
+
+    @FXML
+    private Button btnReports;
+
+    @FXML
+    private Button btnSuppliers;
+
+    @FXML
+    private ComboBox<String> cmbCatalogSize;
+
+    @FXML
+    public JFXButton btnCloseSearch;
+
+    @FXML
+    private JFXTextField txtAddSupplierCompany;
+
+    @FXML
+    private JFXTextField txtAddSupplierEmail;
+
+    @FXML
+    private JFXTextField txtAddSupplierName;
+
+    @FXML
+    private Label lblCatalogProductID;
+
+    @FXML
+    private Label lblCatalogProductName;
+
+    @FXML
+    private Label lblCatalogUnitPrice;
+
+    @FXML
+    private Label lblDate;
+
+    @FXML
+    private Label lblTime;
+
+    @FXML
+    private Label lblTotalCompanies;
+
+    @FXML
+    private Label lblTotalCustomerCount;
+
+    @FXML
+    private Label lblTotalOrdersOrders;
+
+    @FXML
+    private Label lblTotalOrdersCatalog;
+
+    @FXML
+    private Label lblTotalProducts;
+
+    @FXML
+    private Label lblTotalReturnOrderCount;
+
+    @FXML
+    private Label lblTotalStock;
+
+    @FXML
+    private Label lblTotalSuppliers;
+
+    @FXML
     public Spinner<Integer> spinnerCatalogQuantity;
-
-    @FXML
-    public VBox screen;
-
-    @FXML
-    public TableView<Product> tblCatalogProducts;
-
-    @FXML
-    private TableView<Supplier> tblSuppliers;
-
-    @FXML
-    private TableView<Product> tblSuppliersAddProducts;
-
-    @FXML
-    private TableView<Product> tblSuppliersSuppliedProducts;
-
-    @FXML
-    private TableView<OrderItem> tblOrderItems;
-
-    @FXML
-    private TableView<Order> tblOrders;
-
-    @FXML
-    public Button btnAddToCart;
 
     @FXML
     private TableColumn<Product, Void> columnCatalogProductsAction;
@@ -210,79 +272,28 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableColumn<Order, Double> columnOrdersTotal;
 
     @FXML
-    private AnchorPane anchorPaneCatalog;
+    public TableView<Product> tblCatalogProducts;
 
     @FXML
-    private AnchorPane anchorPaneOrders;
+    private TableView<Supplier> tblSuppliers;
 
     @FXML
-    private AnchorPane anchorPaneReports;
+    private TableView<Product> tblSuppliersAddProducts;
 
     @FXML
-    private AnchorPane anchorPaneSuppliers;
+    private TableView<Product> tblSuppliersSuppliedProducts;
 
     @FXML
-    private Button btnCatalog;
+    private TableView<OrderItem> tblOrderItems;
 
     @FXML
-    private Button btnOrders;
+    private TableView<Order> tblOrders;
 
     @FXML
-    private Button btnReports;
+    public TextField searchInput;
 
     @FXML
-    private Button btnSuppliers;
-
-    @FXML
-    private Label lblCatalogProductID;
-
-    @FXML
-    private Label lblCatalogProductName;
-
-    @FXML
-    private Label lblCatalogUnitPrice;
-
-    @FXML
-    private Label lblDate;
-
-    @FXML
-    private Label lblTime;
-
-    @FXML
-    private Label lblTotalCompanies;
-
-    @FXML
-    private Label lblTotalCustomerCount;
-
-    @FXML
-    private Label lblTotalOrdersOrders;
-
-    @FXML
-    private Label lblTotalOrdersCatalog;
-
-    @FXML
-    private Label lblTotalProducts;
-
-    @FXML
-    private Label lblTotalReturnOrderCount;
-
-    @FXML
-    private Label lblTotalStock;
-
-    @FXML
-    private Label lblTotalSuppliers;
-
-    @FXML
-    private JFXTextField txtAddSupplierCompany;
-
-    @FXML
-    private JFXTextField txtAddSupplierEmail;
-
-    @FXML
-    private JFXTextField txtAddSupplierName;
-
-    @FXML
-    private ComboBox<String> cmbCatalogSize;
+    public VBox screen;
 
     @FXML
     void btnCloseOnAction(ActionEvent event) {
@@ -458,14 +469,10 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     @FXML
-    void btnLoadCustomerReportOnAction(ActionEvent event) {
-
-    }
+    void btnLoadCustomerReportOnAction(ActionEvent event) {}
 
     @FXML
-    void btnLoadEmployeeReportOnAction(ActionEvent event) {
-
-    }
+    void btnLoadEmployeeReportOnAction(ActionEvent event) {}
 
     @FXML
     void btnLoadInventoryReportOnAction(ActionEvent event) {
@@ -479,14 +486,57 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
+    @FXML
+    public void searchProduct(KeyEvent keyEvent) {
+        String search = searchInput.getText().trim();
+        boolean found = false;
+
+        if (!search.isEmpty()) {
+            enableCloseSearch();
+
+            for (Product product : tblCatalogProducts.getItems()) {
+                if (product.getProductId().equalsIgnoreCase(search)) {
+                    int index = tblCatalogProducts.getItems().indexOf(product); // Get the index of the matching item
+                    Platform.runLater(() -> {
+                        tblCatalogProducts.getSelectionModel().clearAndSelect(index); // Clear and select the row
+                        tblCatalogProducts.scrollTo(index); // Scroll to the selected row
+                        tblCatalogProducts.requestFocus(); // Ensure the table has focus
+                    });
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                tblCatalogProducts.getSelectionModel().clearSelection();
+                tblCatalogProducts.scrollTo(0);
+                resetProductValuesDisplay();
+            }
+        }else{
+            resetProductValuesDisplay();
+            disableCloseSearch();
+        }
+    }
+
+    @FXML
+    public void btnCloseSearchOnAction(ActionEvent event) {
+        searchInput.setText("");
+        btnCloseSearch.setDisable(true);
+        btnCloseSearch.setVisible(false);
+        tblCatalogProducts.getSelectionModel().clearSelection();
+        tblCatalogProducts.scrollTo(0);
+        resetProductValuesDisplay();
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadDateAndTime();
         loadTables();
         setAllLabels();
+        disableCloseSearch();
         handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
         tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
+                resetSearch();
                 addProductValuesToDisplay(newVal);
             }
         });
@@ -676,6 +726,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 anchorPaneCatalog.setVisible(false);
                 anchorPaneReports.setVisible(false);
                 anchorPaneSuppliers.setVisible(false);
+                resetSearch();
                 break;
             case SUPPLIERS:
 //                HANDLE BUTTON STYLES WHEN CLICKED
@@ -693,6 +744,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 anchorPaneOrders.setVisible(false);
                 anchorPaneReports.setVisible(false);
                 anchorPaneCatalog.setVisible(false);
+                resetSearch();
                 break;
             case REPORTS:
 //                HANDLE BUTTON STYLES WHEN CLICKED
@@ -710,6 +762,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 anchorPaneOrders.setVisible(false);
                 anchorPaneCatalog.setVisible(false);
                 anchorPaneSuppliers.setVisible(false);
+                resetSearch();
                 break;
         }
         resetTables();
@@ -962,5 +1015,24 @@ public class EmployeeDashboardFormController implements Initializable {
         ObservableList<Customer> customers = customerService.getAllCustomers();
         lblTotalCustomerCount.setText(customers != null ? String.valueOf(customers.size()) : "");
         lblTotalOrdersOrders.setText(allOrders != null ? String.valueOf(allOrders.size()) : "");
+    }
+
+    private void enableCloseSearch(){
+        if(btnCloseSearch.isDisable() || !btnCloseSearch.isVisible()){
+            btnCloseSearch.setDisable(false);
+            btnCloseSearch.setVisible(true);
+        }
+    }
+
+    private void disableCloseSearch(){
+        if(!btnCloseSearch.isDisable() || btnCloseSearch.isVisible()){
+            btnCloseSearch.setDisable(true);
+            btnCloseSearch.setVisible(false);
+        }
+    }
+
+    private void resetSearch(){
+        searchInput.setText("");
+        disableCloseSearch();
     }
 }
