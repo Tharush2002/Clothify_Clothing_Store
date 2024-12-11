@@ -24,6 +24,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
@@ -50,13 +53,16 @@ import util.ActionTableType;
 import util.DashboardViewType;
 import util.Type;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 import static util.ActionTableType.PRODUCTS;
 import static util.ActionTableType.SUPPLIERS;
@@ -526,6 +532,35 @@ public class EmployeeDashboardFormController implements Initializable {
         tblCatalogProducts.scrollTo(0);
         resetProductValuesDisplay();
     }
+
+    @FXML
+    public void openInstagramOnAction(MouseEvent event) {
+    }
+
+    @FXML
+    public void openLinkedinOnAction(MouseEvent event) {
+        try {
+            URI uri = new URI("https://www.linkedin.com/in/tharusha-gunarathne-5b0b88330/");
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(uri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void openGithubOnAction(MouseEvent event) {
+        try {
+            URI uri = new URI("https://github.com/Tharush2002");
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(uri);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
