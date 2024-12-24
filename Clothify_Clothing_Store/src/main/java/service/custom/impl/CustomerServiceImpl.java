@@ -19,14 +19,12 @@ public class CustomerServiceImpl implements CustomerService {
         ObservableList<Customer> customers = FXCollections.observableArrayList();
         List<CustomerEntity> customerEntityList = customerRepository.findAll();
 
-        customerEntityList.forEach(customerEntity -> {
-            customers.add(new Customer(
-                    customerEntity.getCustomerId(),
-                    customerEntity.getName(),
-                    customerEntity.getEmail(),
-                    customerEntity.getPhoneNumber())
-            );
-        });
+        customerEntityList.forEach(customerEntity -> customers.add(new Customer(
+                customerEntity.getCustomerId(),
+                customerEntity.getName(),
+                customerEntity.getEmail(),
+                customerEntity.getPhoneNumber())
+        ));
         return customers;
     }
 

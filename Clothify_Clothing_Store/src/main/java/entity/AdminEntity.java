@@ -15,11 +15,13 @@ public class AdminEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String adminId;
     private String firstName;
     private String lastName;
+    @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false, unique = true)
     private String userName;
     private String phoneNumber;
     private String password;

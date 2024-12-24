@@ -4,6 +4,7 @@
 <?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
@@ -236,7 +237,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Label layoutX="81.0" layoutY="24.0" text="Welcome Back, ">
+            <Label fx:id="lblWelcomeEmployee" layoutX="81.0" layoutY="24.0" text="Welcome Back, ">
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>
@@ -590,7 +591,7 @@
             </TableView>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneReports" layoutX="217.0" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
+      <AnchorPane fx:id="anchorPaneReports" disable="true" layoutX="217.0" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
          <children>
             <VBox alignment="TOP_CENTER" layoutX="674.4" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="309.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
                <children>
@@ -688,6 +689,7 @@
                </children></HBox>
             <HBox layoutY="291.0" prefHeight="270.0" prefWidth="674.0" styleClass="employeeDetailsPane" stylesheets="@../styles/style.css">
                <children>
+                  <HBox prefHeight="270.0" prefWidth="96.0" />
                   <VBox prefHeight="270.0" prefWidth="675.0">
                      <children>
                         <HBox prefHeight="36.0" prefWidth="674.0" />
@@ -696,9 +698,124 @@
                               <Font name="System Bold" size="22.0" />
                            </font>
                            <VBox.margin>
-                              <Insets left="45.0" />
+                              <Insets />
                            </VBox.margin>
                         </Label>
+                        <Pane prefHeight="24.0" prefWidth="627.0" />
+                        <HBox prefHeight="139.0" prefWidth="554.0">
+                           <children>
+                              <VBox prefHeight="139.0" prefWidth="111.0">
+                                 <children>
+                                    <Label text="ID : ">
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Name :">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="NIC : ">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Email Address : ">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Phone Number : ">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Address : ">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                              <VBox layoutX="10.0" layoutY="10.0" prefHeight="139.0" prefWidth="240.0">
+                                 <children>
+                                    <Label fx:id="lblEmployeeID" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblEmployeeName" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblEmployeeNIC" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblEmployeeEmail" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblEmployeeContact" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblEmployeeAddress" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <padding>
+                              <Insets left="20.0" />
+                           </padding>
+                        </HBox>
                      </children>
                   </VBox>
                </children>
@@ -707,24 +824,24 @@
       </AnchorPane>
       <VBox alignment="TOP_CENTER" layoutX="891.0" maxHeight="651.0" minHeight="142.0" prefHeight="142.0" prefWidth="310.0" stylesheets="@../styles/style.css">
          <children>
-            <JFXButton ellipsisString="" maxWidth="39.0" minWidth="21.0" onAction="#btnCloseOnAction" prefHeight="40.0" prefWidth="39.0">
-               <graphic>
-                  <ImageView fitHeight="28.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
+            <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="310.0">
+               <children>
+                  <ImageView fitHeight="24.0" fitWidth="35.0" onMouseClicked="#btnCloseOnAction" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../img/closeBtnAdmin.png" />
                      </image>
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
+                     <HBox.margin>
+                        <Insets right="10.0" />
+                     </HBox.margin>
+                     <viewport>
+                        <Rectangle2D />
+                     </viewport>
                   </ImageView>
-               </graphic>
-               <cursor>
-                  <Cursor fx:constant="HAND" />
-               </cursor>
-               <VBox.margin>
-                  <Insets left="270.0" />
-               </VBox.margin>
-            </JFXButton>
+               </children>
+            </HBox>
             <Pane prefHeight="4.0" prefWidth="264.0" style="-fx-background-color: #b6b6b6;" />
             <Pane prefHeight="20.0" prefWidth="310.0" />
             <HBox alignment="CENTER_LEFT" prefHeight="55.0" prefWidth="310.0">

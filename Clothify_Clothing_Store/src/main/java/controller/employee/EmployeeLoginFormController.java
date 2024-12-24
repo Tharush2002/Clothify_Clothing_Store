@@ -1,14 +1,13 @@
-package controller.admin;
+package controller.employee;
 
 import com.jfoenix.controls.JFXCheckBox;
 import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import controller.HomeFormController;
 import controller.auth.ForgotPasswordController;
-import controller.employee.EmployeeDashboardFormController;
-import controller.product.AddProductsBySupplierFormController;
 import exceptions.EmptyFieldsException;
 import exceptions.NoAdminFoundException;
+import exceptions.NoEmployeeFoundException;
 import exceptions.NoPasswordMatchFoundException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -25,8 +24,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Getter;
 import model.Admin;
+import model.Employee;
 import service.ServiceFactory;
-import service.custom.AdminService;
+import service.custom.EmployeeService;
 import util.Type;
 import util.UserType;
 
@@ -35,12 +35,12 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 @Getter
-public class AdminLoginFormController implements Initializable {
-    private Stage adminLoginStage;
-    private static AdminLoginFormController instance;
-    private final AdminService adminService = ServiceFactory.getInstance().getServiceType(Type.ADMIN);
+public class EmployeeLoginFormController implements Initializable {
+    private Stage employeeLoginStage;
+    private static EmployeeLoginFormController instance;
+    private final EmployeeService employeeService = ServiceFactory.getInstance().getServiceType(Type.EMPLOYEE);
 
-    public static AdminLoginFormController getInstance() {
+    public static EmployeeLoginFormController getInstance() {
         if (instance != null){
             return instance;
         }else{
@@ -48,11 +48,11 @@ public class AdminLoginFormController implements Initializable {
         }
     }
 
-    private void setAdminLoginStage(ActionEvent event) {
-        adminLoginStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+    private void setEmployeeLoginStage(ActionEvent event) {
+        employeeLoginStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
     }
 
-    public AdminLoginFormController() {
+    public EmployeeLoginFormController() {
         instance = this;
     }
 
@@ -78,46 +78,11 @@ public class AdminLoginFormController implements Initializable {
     }
 
     @FXML
-    public void openForgotPasswordOnAction(ActionEvent event) {
-        try {
-            setAdminLoginStage(event);
-            Stage stage = new Stage();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/ForgotPassword.fxml"));
-            Parent root = loader.load();
-            ForgotPasswordController controller = loader.getController();
-            controller.setAdminLoginFormController(this);
-            controller.setUserType(UserType.ADMIN);
-            stage.setScene(new Scene(root));
-            stage.initStyle(StageStyle.UNDECORATED);
-            stage.show();
-            stage.setResizable(false);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        enableScreen();
-    }
-
-    @FXML
-    void showPasswordOnAction(ActionEvent event) {
-        if(showPasswordCheckBox.isSelected()){
-            enableTxtPassword(true);
-            enablePwdPassword(false);
-            txtPassword.requestFocus();
-            txtPassword.positionCaret(txtPassword.getText().length());
-        }else{
-            enableTxtPassword(false);
-            enablePwdPassword(true);
-            pwdPassword.requestFocus();
-            pwdPassword.positionCaret(pwdPassword.getText().length());
-        }
-    }
-
-    @FXML
     public void btnLoginOnAction(ActionEvent event) {
 //        ((Stage) ((Node) (event.getSource())).getScene().getWindow()).close();
 //        try {
 //            Stage stage=new Stage();
-//            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../../view/AdminDashboard.fxml"))));
+//            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../../view/EmployeeDashboard.fxml"))));
 //            stage.initStyle(StageStyle.UNDECORATED);
 //            stage.show();
 //            stage.setResizable(false);
@@ -128,19 +93,23 @@ public class AdminLoginFormController implements Initializable {
         alert.setHeaderText(null);
         try {
             if(pwdPassword.getText().isEmpty() || txtUserName.getText().isEmpty()) throw new EmptyFieldsException("Please Enter user-name password to continue");
-            Admin admin = adminService.findByUserName(txtUserName.getText().trim());
-            if(!admin.getPassword().equals(pwdPassword.getText().trim())) throw new NoPasswordMatchFoundException("No Matched Password Found");
+            Employee employee = employeeService.findByUserName(txtUserName.getText().trim());
+            if(!employee.getPassword().equals(pwdPassword.getText().trim())) throw new NoPasswordMatchFoundException("No Matched Password Found");
 
             ((Stage) ((Node) (event.getSource())).getScene().getWindow()).close();
             Stage stage=new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../../view/AdminDashboard.fxml"))));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/EmployeeDashboard.fxml"));
+            Parent root = loader.load();
+            EmployeeDashboardFormController controller = loader.getController();
+            controller.loadEmployeeDetails(employee);
+            stage.setScene(new Scene(root));
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
             stage.setResizable(false);
 
-        } catch (NoAdminFoundException e) {
-            alert.setTitle("No Admin Found");
-            alert.setContentText("No admin account found under the provided user name");
+        } catch (NoEmployeeFoundException e) {
+            alert.setTitle("No Employee Found");
+            alert.setContentText("No employee account found under the provided user name");
             alert.show();
         } catch (NoPasswordMatchFoundException e) {
             alert.setTitle("Invalid Password !");
@@ -155,11 +124,24 @@ public class AdminLoginFormController implements Initializable {
         }
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        pwdPassword.textProperty().bindBidirectional(txtPassword.textProperty());
-        enablePwdPassword(true);
-        enableTxtPassword(false);
+    @FXML
+    void openForgotPasswordOnAction(ActionEvent event) {
+        try {
+            setEmployeeLoginStage(event);
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/ForgotPassword.fxml"));
+            Parent root = loader.load();
+            ForgotPasswordController controller = loader.getController();
+            controller.setEmployeeLoginFormController(this);
+            controller.setUserType(UserType.EMPLOYEE);
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+            stage.setResizable(false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        enableScreen();
     }
 
     private void enableScreen(){
@@ -180,5 +162,27 @@ public class AdminLoginFormController implements Initializable {
     private void enableTxtPassword(boolean state){
         txtPassword.setDisable(!state);
         txtPassword.setVisible(state);
+    }
+
+    @FXML
+    void showPasswordOnAction(ActionEvent event) {
+        if(showPasswordCheckBox.isSelected()){
+            enableTxtPassword(true);
+            enablePwdPassword(false);
+            txtPassword.requestFocus();
+            txtPassword.positionCaret(txtPassword.getText().length());
+        }else{
+            enableTxtPassword(false);
+            enablePwdPassword(true);
+            pwdPassword.requestFocus();
+            pwdPassword.positionCaret(pwdPassword.getText().length());
+        }
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        pwdPassword.textProperty().bindBidirectional(txtPassword.textProperty());
+        enablePwdPassword(true);
+        enableTxtPassword(false);
     }
 }

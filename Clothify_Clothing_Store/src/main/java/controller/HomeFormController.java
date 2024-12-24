@@ -3,16 +3,14 @@ package controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Getter;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
 @Getter
 public class HomeFormController{
@@ -34,7 +32,7 @@ public class HomeFormController{
     }
 
     @FXML
-    void btnCloseOnAction(ActionEvent event) {
+    void btnCloseOnAction(MouseEvent event) {
         System.exit(0);
     }
 

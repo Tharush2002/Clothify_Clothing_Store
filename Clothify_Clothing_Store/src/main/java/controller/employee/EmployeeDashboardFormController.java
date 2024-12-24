@@ -23,12 +23,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -39,6 +38,7 @@ import javafx.stage.StageStyle;
 import javafx.util.Callback;
 import javafx.util.Duration;
 import lombok.Getter;
+import lombok.Setter;
 import model.*;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -61,21 +61,26 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static util.ActionTableType.PRODUCTS;
 import static util.ActionTableType.SUPPLIERS;
 
 @Getter
+@Setter
 public class EmployeeDashboardFormController implements Initializable {
-
+    private Employee loggedEmployee;
     private Stage employeeDashboardStage;
 
     private static EmployeeDashboardFormController instance;
 
     public static EmployeeDashboardFormController getInstance() {
-        return instance == null ? new EmployeeDashboardFormController() : instance;
+        if (instance != null){
+            return instance;
+        }else{
+            throw new IllegalStateException("Instance not created!");
+        }
     }
 
     private void setEmployeeDashboardStage(MouseEvent event) {
@@ -87,7 +92,7 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     public EmployeeDashboardFormController() {
-        instance = this;
+        if (instance == null) instance = this;
     }
 
     //VARIABLES ===============
@@ -167,6 +172,24 @@ public class EmployeeDashboardFormController implements Initializable {
     private Label lblDate;
 
     @FXML
+    private Label lblEmployeeAddress;
+
+    @FXML
+    private Label lblEmployeeContact;
+
+    @FXML
+    private Label lblEmployeeEmail;
+
+    @FXML
+    private Label lblEmployeeID;
+
+    @FXML
+    private Label lblEmployeeNIC;
+
+    @FXML
+    private Label lblEmployeeName;
+
+    @FXML
     private Label lblTime;
 
     @FXML
@@ -176,10 +199,10 @@ public class EmployeeDashboardFormController implements Initializable {
     private Label lblTotalCustomerCount;
 
     @FXML
-    private Label lblTotalOrdersOrders;
+    private Label lblTotalOrdersCatalog;
 
     @FXML
-    private Label lblTotalOrdersCatalog;
+    private Label lblTotalOrdersOrders;
 
     @FXML
     private Label lblTotalProducts;
@@ -192,6 +215,9 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     private Label lblTotalSuppliers;
+
+    @FXML
+    private Label lblWelcomeEmployee;
 
     @FXML
     public Spinner<Integer> spinnerCatalogQuantity;
@@ -302,7 +328,7 @@ public class EmployeeDashboardFormController implements Initializable {
     public VBox screen;
 
     @FXML
-    void btnCloseOnAction(ActionEvent event) {
+    void btnCloseOnAction(MouseEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         HomeFormController.getInstance().getHomeStage().show();
     }
@@ -547,6 +573,7 @@ public class EmployeeDashboardFormController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @FXML
@@ -568,23 +595,7 @@ public class EmployeeDashboardFormController implements Initializable {
         loadTables();
         setAllLabels();
         disableCloseSearch();
-        handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
-        tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
-            if (newVal != null) {
-                resetSearch();
-                addProductValuesToDisplay(newVal);
-            }
-        });
-        tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
-            if (newVal != null) {
-                loadSuppliedProductsTable(productService.findProductsBySupplierID(newVal.getSupplierId()));
-            }
-        });
-        tblOrders.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
-            if (newVal != null) {
-                loadOrderItemsTable(orderItemsService.findOrderItemsByOrderID(newVal.getOrderId()));
-            }
-        });
+        setTablesInitializationStates();
     }
 
     //====================== MY IMPLEMENTATIONS =======================
@@ -1069,5 +1080,41 @@ public class EmployeeDashboardFormController implements Initializable {
     private void resetSearch(){
         searchInput.setText("");
         disableCloseSearch();
+    }
+
+    private void setTablesInitializationStates(){
+        handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
+        tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                resetSearch();
+                addProductValuesToDisplay(newVal);
+            }
+        });
+        tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                loadSuppliedProductsTable(productService.findProductsBySupplierID(newVal.getSupplierId()));
+            }
+        });
+        tblOrders.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                loadOrderItemsTable(orderItemsService.findOrderItemsByOrderID(newVal.getOrderId()));
+            }
+        });
+    }
+
+    public void loadEmployeeDetails(Employee employee) {
+        lblWelcomeEmployee.setText(String.format("Welcome Back, %s",getEmployeeName(employee)));
+        lblEmployeeName.setText(getEmployeeName(employee));
+        lblEmployeeID.setText(employee.getEmployeeId() != null ? employee.getEmployeeId():"");
+        lblEmployeeNIC.setText(employee.getNic() != null ? employee.getNic():"");
+        lblEmployeeEmail.setText(employee.getEmail() != null ? employee.getEmail():"");
+        lblEmployeeContact.setText(employee.getPhoneNumber() != null ? employee.getPhoneNumber():"");
+        lblEmployeeAddress.setText(employee.getAddress() != null ? employee.getAddress():"");
+    }
+
+    private String getEmployeeName(Employee employee){
+        String firstName = employee.getFirstName() != null ? employee.getFirstName() : "";
+        String lastName = employee.getLastName() != null ? employee.getLastName() : "";
+        return firstName + " " + lastName;
     }
 }

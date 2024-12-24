@@ -125,3 +125,11 @@
     -fx-opacity: 1.0;
 }
 
+.hyperlink, .check-box {
+    -fx-border-color: transparent;
+}
+
+.pass-icons:hover{
+    -fx-cursor: hand;
+}
+
