@@ -501,21 +501,18 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     @FXML
-    void btnLoadCustomerReportOnAction(ActionEvent event) {}
+    void btnLoadCustomerReportOnAction(ActionEvent event) {
+        openReports("src/main/resources/reports/customer.jrxml");
+    }
 
     @FXML
-    void btnLoadEmployeeReportOnAction(ActionEvent event) {}
+    void btnLoadEmployeeReportOnAction(ActionEvent event) {
+        openReports("src/main/resources/reports/employee.jrxml");
+    }
 
     @FXML
     void btnLoadInventoryReportOnAction(ActionEvent event) {
-        try {
-            JasperDesign jasperDesign = JRXmlLoader.load("src/main/resources/reports/products.jrxml");
-            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, DBConnection.getInstance().getConnection());
-            JasperViewer.viewReport(jasperPrint, false);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        openReports("src/main/resources/reports/products.jrxml");
     }
 
     @FXML
@@ -1116,5 +1113,18 @@ public class EmployeeDashboardFormController implements Initializable {
         String firstName = employee.getFirstName() != null ? employee.getFirstName() : "";
         String lastName = employee.getLastName() != null ? employee.getLastName() : "";
         return firstName + " " + lastName;
+    }
+
+    private void openReports(String fileName){
+        try {
+            JasperDesign jasperDesign = JRXmlLoader.load(fileName);
+            JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, DBConnection.getInstance().getConnection());
+            JasperViewer viewer = new JasperViewer(jasperPrint, false);
+            viewer.setZoomRatio(0.5f);
+            viewer.setVisible(true);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while generating the report.", e);
+        }
     }
 }
