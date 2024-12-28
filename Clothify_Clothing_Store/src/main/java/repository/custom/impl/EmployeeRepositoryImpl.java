@@ -89,4 +89,24 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
             session.close();
         }
     }
+
+    @Override
+    public boolean update(EmployeeEntity employeeEntity) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session.update(employeeEntity);
+            transaction.commit();
+            return true;
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            session.close();
+        }
+    }
 }

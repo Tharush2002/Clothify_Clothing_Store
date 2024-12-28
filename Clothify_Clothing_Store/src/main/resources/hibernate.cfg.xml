@@ -26,6 +26,6 @@
         <mapping class="entity.EmployeeEntity"/>
         <mapping class="entity.OrderEntity"/>
         <mapping class="entity.ReturnOrderEntity"/>
-        <mapping class="entity.OrderItemsEntity"/>
+        <mapping class="entity.OrderItemEntity"/>
     </session-factory>
 </hibernate-configuration>

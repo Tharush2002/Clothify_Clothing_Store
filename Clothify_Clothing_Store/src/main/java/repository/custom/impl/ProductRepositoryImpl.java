@@ -154,6 +154,65 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
+    public ProductEntity findByID(ProductEntity productEntity, Session session) {
+        ProductEntity entity = session.createQuery(
+                "FROM ProductEntity WHERE productId = :productId",
+                ProductEntity.class
+        ).setParameter("productId", productEntity.getProductId()).uniqueResult();
+
+        if (entity == null) {
+            save(productEntity, session);
+            entity = productEntity;
+        }
+
+        return entity ;
+    }
+
+    @Override
+    public ProductEntity findByID(String productId, Session session) {
+        ProductEntity entity = session.createQuery(
+                "FROM ProductEntity WHERE productId = :productId",
+                ProductEntity.class
+        ).setParameter("productId", productId).uniqueResult();
+
+        if (entity == null) {
+            throw new RuntimeException("Inventory not found for productId: " + productId);
+        }
+
+        return entity;
+    }
+
+    @Override
+    public void save(ProductEntity entity, Session session){
+        if (entity.getCategoryEntity() != null) {
+            CategoryEntity existingCategory = session.createQuery("FROM CategoryEntity WHERE name = :name", CategoryEntity.class)
+                    .setParameter("name", entity.getCategoryEntity().getName())
+                    .uniqueResult();
+
+            if (existingCategory != null) {
+                entity.setCategoryEntity(existingCategory);
+            } else {
+                session.save(entity.getCategoryEntity());
+                session.flush();
+            }
+        }
+        if (entity.getSupplierEntity() != null) {
+            SupplierEntity existingSupplier = session.createQuery("FROM SupplierEntity WHERE name = :name", SupplierEntity.class)
+                    .setParameter("name", entity.getSupplierEntity().getName())
+                    .uniqueResult();
+
+            if (existingSupplier != null) {
+                entity.setSupplierEntity(existingSupplier);
+            } else {
+                session.save(entity.getSupplierEntity());
+                session.flush();
+            }
+        }
+
+        session.save(entity);
+    }
+
+    @Override
     public void deleteByID(String productId) {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;

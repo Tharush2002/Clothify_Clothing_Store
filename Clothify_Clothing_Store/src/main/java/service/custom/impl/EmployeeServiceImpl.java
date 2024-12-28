@@ -1,11 +1,7 @@
 package service.custom.impl;
 
-import entity.AdminEntity;
 import entity.EmployeeEntity;
-import exceptions.NoAdminFoundException;
 import exceptions.NoEmployeeFoundException;
-import exceptions.NoPasswordMatchFoundException;
-import model.Admin;
 import model.Employee;
 import repository.RepositoryFactory;
 import repository.custom.EmployeeRepository;
@@ -55,6 +51,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         } else {
             throw new NoEmployeeFoundException("No Employee found");
         }
+    }
+
+    @Override
+    public boolean updateEmployeePassword(String email, String password){
+        EmployeeEntity employeeEntity = employeeRepository.findByEmail(email);
+        employeeEntity.setPassword(password);
+        return employeeRepository.update(employeeEntity);
     }
 
     @Override

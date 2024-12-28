@@ -7,6 +7,7 @@ import controller.HomeFormController;
 import controller.product.AddProductFormController;
 import controller.product.AddProductsBySupplierFormController;
 import controller.product.EditProductFormController;
+import controller.returnOrders.ReturnOrderFormController;
 import controller.supplier.EditSupplierFormController;
 import db.DBConnection;
 import javafx.animation.Animation;
@@ -32,6 +33,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -104,7 +106,8 @@ public class EmployeeDashboardFormController implements Initializable {
     private ObservableList<Product> allProducts = FXCollections.observableArrayList();
     private ObservableList<Supplier> allSuppliers = FXCollections.observableArrayList();
     private ObservableList<Order> allOrders = FXCollections.observableArrayList();
-    private final List<TempOrderItem> tempOrderItemList = new ArrayList<>();
+    private ObservableList<ReturnOrder> allReturnOrderItems = FXCollections.observableArrayList();
+    private final List<OrderItemWithQuantity> orderItemWithQuantityList = new ArrayList<>();
 
     //SERVICE-FACTORIES
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
@@ -112,6 +115,8 @@ public class EmployeeDashboardFormController implements Initializable {
     private final OrderItemsService orderItemsService = ServiceFactory.getInstance().getServiceType(Type.ORDERITEMS);
     private final OrderService orderService = ServiceFactory.getInstance().getServiceType(Type.ORDER);
     private final CustomerService customerService = ServiceFactory.getInstance().getServiceType(Type.CUSTOMER);
+    private final EmployeeService employeeService = ServiceFactory.getInstance().getServiceType(Type.EMPLOYEE);
+    private final ReturnOrderService returnOrderService = ServiceFactory.getInstance().getServiceType(Type.RETURNORDER);
     //=================
 
     @FXML
@@ -140,6 +145,9 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     private Button btnReports;
+
+    @FXML
+    private Button btnResetPassword;
 
     @FXML
     private Button btnSuppliers;
@@ -190,6 +198,9 @@ public class EmployeeDashboardFormController implements Initializable {
     private Label lblEmployeeName;
 
     @FXML
+    private Label lblEmployeeUserName;
+
+    @FXML
     private Label lblTime;
 
     @FXML
@@ -220,6 +231,27 @@ public class EmployeeDashboardFormController implements Initializable {
     private Label lblWelcomeEmployee;
 
     @FXML
+    private Pane pwdConfirmNewPasswordPane;
+
+    @FXML
+    private Pane pwdSetNewPasswordPane;
+
+    @FXML
+    private Pane txtConfirmNewPasswordPane;
+
+    @FXML
+    private Pane txtSetNewPasswordPane;
+
+    @FXML
+    private Pane resetPasswordPane;
+
+    @FXML
+    private PasswordField pwdConfirmNewPassword;
+
+    @FXML
+    private PasswordField pwdSetNewPassword;
+
+    @FXML
     public Spinner<Integer> spinnerCatalogQuantity;
 
     @FXML
@@ -242,6 +274,24 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     private TableColumn<Product, Double> columnCatalogProductsUnitPrice;
+
+    @FXML
+    private TableColumn<ReturnOrder, String> columnReturnsOrderID;
+
+    @FXML
+    private TableColumn<ReturnOrder, Double> columnReturnsPrice;
+
+    @FXML
+    private TableColumn<ReturnOrder, String> columnReturnsProductID;
+
+    @FXML
+    private TableColumn<ReturnOrder, LocalDate> columnReturnsReturnDate;
+
+    @FXML
+    private TableColumn<ReturnOrder, String> columnReturnsReturnID;
+
+    @FXML
+    private TableColumn<ReturnOrder, String> columnReturnsSize;
 
     @FXML
     private TableColumn<Supplier, Void> columnSuppliersAction;
@@ -322,7 +372,16 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableView<Order> tblOrders;
 
     @FXML
+    private TableView<ReturnOrder> tblReturnOrders;
+
+    @FXML
     public TextField searchInput;
+
+    @FXML
+    private TextField txtConfirmNewPassword;
+
+    @FXML
+    private TextField txtSetNewPassword;
 
     @FXML
     public VBox screen;
@@ -403,16 +462,18 @@ public class EmployeeDashboardFormController implements Initializable {
                     break;
                 }
             }
-            for (TempOrderItem tempOrderItem : tempOrderItemList) {
-                boolean isProductIdMatches = tempOrderItem.getOrderItem().getProductId().equals(lblCatalogProductID.getText());
-                boolean isProductSizeMatches = tempOrderItem.getOrderItem().getSize().equals(cmbCatalogSize.getValue().trim());
+
+            for (OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList) {
+                boolean isProductIdMatches = orderItemWithQuantity.getOrderItem().getProductId().equals(lblCatalogProductID.getText());
+                boolean isProductSizeMatches = orderItemWithQuantity.getOrderItem().getSize().equals(cmbCatalogSize.getValue().trim());
                 if (isProductSizeMatches && isProductIdMatches) {
-                    tempOrderItem.setQuantity(tempOrderItem.getQuantity() + spinnerCatalogQuantity.getValue());
+                    orderItemWithQuantity.setQuantity(orderItemWithQuantity.getQuantity() + spinnerCatalogQuantity.getValue());
                     return;
                 }
             }
+
             if (selectedProduct != null) {
-                tempOrderItemList.add(new TempOrderItem(
+                orderItemWithQuantityList.add(new OrderItemWithQuantity(
                         new OrderItem(
                                 new Order(null, null, null, spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(), null, new Customer(), null),
                                 selectedProduct.getName(),
@@ -430,6 +491,7 @@ public class EmployeeDashboardFormController implements Initializable {
             btnCheckOut.setDisable(false);
             loadCatalogProductsTable(allProducts);
             resetProductValuesDisplay();
+            setCatalogPaneLabels();
         }
     }
 
@@ -585,14 +647,106 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
+    @FXML
+    void showPwdConfirmNewPasswordOnAction(MouseEvent event) {
+        enablePwdConfirmNewPassword(true);
+        enableTxtConfirmNewPassword(false);
+        pwdConfirmNewPassword.requestFocus();
+        pwdConfirmNewPassword.positionCaret(pwdConfirmNewPassword.getText().length());
+    }
+
+    @FXML
+    void showPwdSetNewPasswordOnAction(MouseEvent event) {
+        enablePwdSetNewPassword(true);
+        enableTxtSetNewPassword(false);
+        pwdSetNewPassword.requestFocus();
+        pwdSetNewPassword.positionCaret(pwdSetNewPassword.getText().length());
+    }
+
+    @FXML
+    void showTxtConfirmNewPasswordOnAction(MouseEvent event) {
+        enablePwdConfirmNewPassword(false);
+        enableTxtConfirmNewPassword(true);
+        txtConfirmNewPassword.requestFocus();
+        txtConfirmNewPassword.positionCaret(txtConfirmNewPassword.getText().length());
+    }
+
+    @FXML
+    void showTxtSetNewPasswordOnAction(MouseEvent event) {
+        enablePwdSetNewPassword(false);
+        enableTxtSetNewPassword(true);
+        txtSetNewPassword.requestFocus();
+        txtSetNewPassword.positionCaret(txtSetNewPassword.getText().length());
+    }
+
+    @FXML
+    void btnResetPasswordOnAction(ActionEvent event) {
+        btnResetPassword.setDisable(true);
+        enableResetPasswordPane(true);
+        setPwdInitializationStates();
+    }
+
+    @FXML
+    void btnConfirmResetPasswordOnAction(ActionEvent event) {
+        if(pwdSetNewPassword.getText().equals(pwdConfirmNewPassword.getText())){
+            if(!pwdSetNewPassword.getText().trim().isEmpty() && !pwdConfirmNewPassword.getText().trim().isEmpty()){
+                employeeService.updateEmployeePassword(loggedEmployee.getEmail(), pwdSetNewPassword.getText().trim());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Password Update");
+                alert.setHeaderText("Success!");
+                alert.setContentText("Your password has been successfully changed.");
+                alert.showAndWait();
+                btnResetPassword.setDisable(false);
+                enableResetPasswordPane(false);
+            }else{
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText("Password Field is Empty");
+                alert.setContentText("Please enter your password before proceeding.");
+                alert.showAndWait();
+            }
+        }else{
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Passwords Do Not Match");
+            alert.setContentText("The passwords entered do not match. Please try again.");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    void btnCancelResetPasswordOnAction(ActionEvent event) {
+        cancelResetPassword();
+    }
+
+    @FXML
+    void btnReturnOrdersOnAction(ActionEvent event) {
+        try {
+            setEmployeeDashboardStage(event);
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/ReturnOrders.fxml"));
+            Parent root = loader.load();
+            ReturnOrderFormController controller = loader.getController();
+            controller.setEmployeeDashboardFormController(this);
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+            stage.setResizable(false);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        enableScreen();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         loadDateAndTime();
         loadTables();
+
         setAllLabels();
         disableCloseSearch();
         setTablesInitializationStates();
+        enableResetPasswordPane(false);
     }
 
     //====================== MY IMPLEMENTATIONS =======================
@@ -603,6 +757,7 @@ public class EmployeeDashboardFormController implements Initializable {
         loadCatalogProductsTable(productService.getAllProducts());
         loadSuppliersTable(supplierService.getAllSuppliers());
         loadOrdersTable(orderService.getAllOrders());
+        loadReturnOrdersTable(returnOrderService.getAllReturnedItems());
     }
 
     public void loadOrdersTable(ObservableList<Order> allOrders) {
@@ -729,6 +884,32 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
+    public void loadReturnOrdersTable(ObservableList<ReturnOrder> allReturnOrderItems){
+        if(!allReturnOrderItems.isEmpty()){
+            this.allReturnOrderItems = allReturnOrderItems;
+
+            columnReturnsOrderID.setCellValueFactory(cellData -> {
+                Order order = cellData.getValue().getOrder();
+                return new SimpleStringProperty(order != null ? order.getOrderId() : "-");
+            });
+
+            columnReturnsReturnID.setCellValueFactory(new PropertyValueFactory<>("returnOrderId"));
+            columnReturnsPrice.setCellValueFactory(new PropertyValueFactory<>("unitPrice"));
+            columnReturnsReturnDate.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
+            columnReturnsProductID.setCellValueFactory(new PropertyValueFactory<>("productId"));
+            columnReturnsSize.setCellValueFactory(new PropertyValueFactory<>("size"));
+
+            columnReturnsOrderID.setStyle("-fx-alignment:center;");
+            columnReturnsReturnID.setStyle("-fx-alignment:center;");
+            columnReturnsPrice.setStyle("-fx-alignment:center;");
+            columnReturnsReturnDate.setStyle("-fx-alignment:center;");
+            columnReturnsProductID.setStyle("-fx-alignment:center;");
+            columnReturnsSize.setStyle("-fx-alignment:center;");
+
+            tblReturnOrders.setItems(allReturnOrderItems);
+        }
+    }
+
     //=============
 
 
@@ -752,6 +933,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 anchorPaneOrders.setVisible(false);
                 anchorPaneReports.setVisible(false);
                 anchorPaneSuppliers.setVisible(false);
+                cancelResetPassword();
                 break;
             case ORDERS:
 //                HANDLE BUTTON STYLES WHEN CLICKED
@@ -770,6 +952,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 anchorPaneReports.setVisible(false);
                 anchorPaneSuppliers.setVisible(false);
                 resetSearch();
+                cancelResetPassword();
                 break;
             case SUPPLIERS:
 //                HANDLE BUTTON STYLES WHEN CLICKED
@@ -788,6 +971,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 anchorPaneReports.setVisible(false);
                 anchorPaneCatalog.setVisible(false);
                 resetSearch();
+                cancelResetPassword();
                 break;
             case REPORTS:
 //                HANDLE BUTTON STYLES WHEN CLICKED
@@ -1034,8 +1218,9 @@ public class EmployeeDashboardFormController implements Initializable {
             lblTotalProducts.setText(String.valueOf(allProducts.size()));
 
             Integer totalStock = 0;
-            for (Product allProduct : allProducts) {
-                totalStock += allProduct.getQuantity();
+            ObservableList<Product> items = tblCatalogProducts.getItems();
+            for (Product product : items) {
+                totalStock += product.getQuantity();
             }
             lblTotalStock.setText(String.valueOf(totalStock));
         } else {
@@ -1058,6 +1243,7 @@ public class EmployeeDashboardFormController implements Initializable {
         ObservableList<Customer> customers = customerService.getAllCustomers();
         lblTotalCustomerCount.setText(customers != null ? String.valueOf(customers.size()) : "");
         lblTotalOrdersOrders.setText(allOrders != null ? String.valueOf(allOrders.size()) : "");
+        lblTotalReturnOrderCount.setText(allReturnOrderItems != null ? String.valueOf(allReturnOrderItems.size()) : "");
     }
 
     private void enableCloseSearch(){
@@ -1100,6 +1286,7 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     public void loadEmployeeDetails(Employee employee) {
+        loggedEmployee = employee;
         lblWelcomeEmployee.setText(String.format("Welcome Back, %s",getEmployeeName(employee)));
         lblEmployeeName.setText(getEmployeeName(employee));
         lblEmployeeID.setText(employee.getEmployeeId() != null ? employee.getEmployeeId():"");
@@ -1107,6 +1294,7 @@ public class EmployeeDashboardFormController implements Initializable {
         lblEmployeeEmail.setText(employee.getEmail() != null ? employee.getEmail():"");
         lblEmployeeContact.setText(employee.getPhoneNumber() != null ? employee.getPhoneNumber():"");
         lblEmployeeAddress.setText(employee.getAddress() != null ? employee.getAddress():"");
+        lblEmployeeUserName.setText(employee.getUserName() != null ? employee.getUserName():"");
     }
 
     private String getEmployeeName(Employee employee){
@@ -1126,5 +1314,49 @@ public class EmployeeDashboardFormController implements Initializable {
         } catch (Exception e) {
             throw new RuntimeException("An error occurred while generating the report.", e);
         }
+    }
+
+//    PASSWORD FIELD VALIDATIONS
+
+    private void enableTxtSetNewPassword(boolean state){
+        txtSetNewPasswordPane.setDisable(!state);
+        txtSetNewPasswordPane.setVisible(state);
+    }
+
+    private void enableTxtConfirmNewPassword(boolean state){
+        txtConfirmNewPasswordPane.setDisable(!state);
+        txtConfirmNewPasswordPane.setVisible(state);
+    }
+
+    private void enablePwdSetNewPassword(boolean state){
+        pwdSetNewPasswordPane.setDisable(!state);
+        pwdSetNewPasswordPane.setVisible(state);
+    }
+
+    private void enablePwdConfirmNewPassword(boolean state){
+        pwdConfirmNewPasswordPane.setDisable(!state);
+        pwdConfirmNewPasswordPane.setVisible(state);
+    }
+
+    private void enableResetPasswordPane(boolean state){
+        resetPasswordPane.setDisable(!state);
+        resetPasswordPane.setVisible(state);
+    }
+
+    private void setPwdInitializationStates(){
+        enableTxtConfirmNewPassword(false);
+        enableTxtSetNewPassword(false);
+        enablePwdConfirmNewPassword(true);
+        enablePwdSetNewPassword(true);
+        txtSetNewPassword.textProperty().bindBidirectional(pwdSetNewPassword.textProperty());
+        txtConfirmNewPassword.textProperty().bindBidirectional(pwdConfirmNewPassword.textProperty());
+        pwdConfirmNewPassword.setText("");
+        pwdSetNewPassword.setText("");
+    }
+
+    private void cancelResetPassword() {
+        btnResetPassword.setDisable(false);
+        enableResetPasswordPane(false);
+        setPwdInitializationStates();
     }
 }

@@ -3,6 +3,8 @@ package entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,16 +20,21 @@ public class ReturnOrderEntity {
     @Column(unique = true)
     private String returnOrderId;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "order_id", referencedColumnName = "orderId")
+    @ManyToOne(cascade = {CascadeType.MERGE})
+    @JoinColumn(name = "order_id", referencedColumnName = "orderID")
     private OrderEntity orderEntity;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "product_id", referencedColumnName = "productId")
-    private ProductEntity productEntity;
+    private String productName;
+    private String productId;
+    private String categoryId;
+    private String categoryName;
+    private String supplierId;
+    private String supplierName;
 
-    private Integer quantity;
-    private Double amount;
+    private Double unitPrice;
+    private String size;
+
+    private LocalDate returnDate;
 
     @PostPersist
     public void addPrefixToId() {

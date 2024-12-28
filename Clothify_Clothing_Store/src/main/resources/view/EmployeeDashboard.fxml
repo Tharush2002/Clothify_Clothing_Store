@@ -9,6 +9,7 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -229,7 +230,7 @@
                   </Button>
                </children>
             </VBox>
-            <Button layoutX="42.0" layoutY="588.0" mnemonicParsing="false" prefHeight="42.0" prefWidth="170.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Return Orders" textFill="#e1dbbf">
+            <Button layoutX="42.0" layoutY="588.0" mnemonicParsing="false" onAction="#btnReturnOrdersOnAction" prefHeight="42.0" prefWidth="170.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Return Orders" textFill="#e1dbbf">
                <font>
                   <Font name="Dubai Medium" size="17.0" />
                </font>
@@ -252,12 +253,12 @@
             </Button>
             <TableView fx:id="tblCatalogProducts" layoutX="43.0" layoutY="140.0" prefHeight="420.0" prefWidth="591.0">
                <columns>
-                  <TableColumn fx:id="columnCatalogProductsID" prefWidth="55.999996185302734" text="id" />
-                  <TableColumn fx:id="columnCatalogProductsName" prefWidth="138.39999389648438" text="name" />
-                  <TableColumn fx:id="columnCatalogProductsCategoryID" prefWidth="70.40003967285156" text="category_id" />
-                  <TableColumn fx:id="columnCatalogProductsQuantity" prefWidth="52.00006103515625" text="quantity" />
-                  <TableColumn fx:id="columnCatalogProductsUnitPrice" prefWidth="64.79998779296875" text="unitPrice" />
-                  <TableColumn fx:id="columnCatalogProductsSupplierID" prefWidth="69.5999755859375" text="supplier_id" />
+                  <TableColumn fx:id="columnCatalogProductsID" prefWidth="55.999996185302734" text="Id" />
+                  <TableColumn fx:id="columnCatalogProductsName" prefWidth="138.39999389648438" text="Name" />
+                  <TableColumn fx:id="columnCatalogProductsCategoryID" prefWidth="70.40003967285156" text="CategoryID" />
+                  <TableColumn fx:id="columnCatalogProductsQuantity" prefWidth="52.00006103515625" text="Qty" />
+                  <TableColumn fx:id="columnCatalogProductsUnitPrice" prefWidth="64.79998779296875" text="Price" />
+                  <TableColumn fx:id="columnCatalogProductsSupplierID" prefWidth="69.5999755859375" text="SupplierID" />
                   <TableColumn fx:id="columnCatalogProductsAction" prefWidth="136.0" />
                </columns>
             </TableView>
@@ -290,14 +291,14 @@
             </Group>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneSuppliers" disable="true" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
+      <AnchorPane fx:id="anchorPaneSuppliers" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
          <children>
             <TableView fx:id="tblSuppliers" layoutX="43.0" layoutY="352.0" prefHeight="270.0" prefWidth="591.0">
                <columns>
-                  <TableColumn fx:id="columnSuppliersID" prefWidth="47.999996185302734" text="id" />
-                  <TableColumn fx:id="columnSuppliersName" prefWidth="140.79998779296875" text="name" />
-                  <TableColumn fx:id="columnSuppliersCompany" prefWidth="117.59999084472656" text="company" />
-                  <TableColumn fx:id="columnSuppliersEmail" prefWidth="141.5999755859375" text="email" />
+                  <TableColumn fx:id="columnSuppliersID" prefWidth="47.999996185302734" text="Id" />
+                  <TableColumn fx:id="columnSuppliersName" prefWidth="140.79998779296875" text="Name" />
+                  <TableColumn fx:id="columnSuppliersCompany" prefWidth="117.59999084472656" text="Company" />
+                  <TableColumn fx:id="columnSuppliersEmail" prefWidth="141.5999755859375" text="Email" />
                   <TableColumn fx:id="columnSuppliersAction" prefWidth="138.39996337890625" />
                </columns>
             </TableView>
@@ -374,9 +375,9 @@
                   <Pane layoutX="10.0" layoutY="275.0" prefHeight="13.0" prefWidth="310.0" />
                   <TableView fx:id="tblSuppliersSuppliedProducts" maxWidth="260.0" prefHeight="300.0" prefWidth="260.0">
                     <columns>
-                      <TableColumn fx:id="columnSuppliersSuppliedProductsSupplierID" prefWidth="67.99999505281448" text="supplier_id" />
-                      <TableColumn fx:id="columnSuppliersSuppliedProductsID" prefWidth="60.79993438720703" text="id" />
-                        <TableColumn fx:id="columnSuppliersSuppliedProductsName" prefWidth="128.00001525878906" text="name" />
+                      <TableColumn fx:id="columnSuppliersSuppliedProductsSupplierID" prefWidth="67.99999505281448" text="SupplierID" />
+                      <TableColumn fx:id="columnSuppliersSuppliedProductsID" prefWidth="60.79993438720703" text="Id" />
+                        <TableColumn fx:id="columnSuppliersSuppliedProductsName" prefWidth="128.00001525878906" text="Name" />
                     </columns>
                   </TableView>
                </children>
@@ -441,8 +442,8 @@
                               <Pane prefHeight="18.0" prefWidth="295.0" />
                               <TableView fx:id="tblSuppliersAddProducts" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="166.0" prefWidth="262.0">
                                 <columns>
-                                  <TableColumn fx:id="columnSuppliersAddProductsCategoryName" prefWidth="129.59996682405472" text="category" />
-                                  <TableColumn fx:id="columnSuppliersAddProductsProductName" prefWidth="131.2000274658203" text="product" />
+                                  <TableColumn fx:id="columnSuppliersAddProductsCategoryName" prefWidth="129.59996682405472" text="Category" />
+                                  <TableColumn fx:id="columnSuppliersAddProductsProductName" prefWidth="131.2000274658203" text="Product" />
                                 </columns>
                               </TableView>
                            </children>
@@ -553,9 +554,9 @@
                   <Pane prefHeight="13.0" prefWidth="310.0" />
                   <TableView fx:id="tblOrderItems" maxWidth="260.0" prefHeight="299.0" prefWidth="260.0">
                      <columns>
-                        <TableColumn fx:id="columnOrderItemsProductID" prefWidth="46.399962246418" text="id" />
-                        <TableColumn fx:id="columnOrderItemsProductName" prefWidth="122.40008926391602" text="name" />
-                        <TableColumn fx:id="columnOrderItemsProductSize" prefWidth="88.80006408691406" text="size" />
+                        <TableColumn fx:id="columnOrderItemsProductID" prefWidth="46.399962246418" text="Id" />
+                        <TableColumn fx:id="columnOrderItemsProductName" prefWidth="122.40008926391602" text="Name" />
+                        <TableColumn fx:id="columnOrderItemsProductSize" prefWidth="88.80006408691406" text="Size" />
                      </columns>
                   </TableView>
                </children>
@@ -579,19 +580,19 @@
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
-            <TableView layoutX="43.0" layoutY="470.0" maxWidth="590.0" prefHeight="149.0" prefWidth="590.0">
+            <TableView fx:id="tblReturnOrders" layoutX="43.0" layoutY="470.0" maxWidth="590.0" prefHeight="149.0" prefWidth="590.0">
                <columns>
-                  <TableColumn prefWidth="87.19994735717773" text="ReturnID" />
-                  <TableColumn prefWidth="109.60003662109375" text="OrderID" />
-                  <TableColumn prefWidth="98.39997863769531" text="ProductID" />
-                  <TableColumn prefWidth="101.5999755859375" text="Amount" />
-                  <TableColumn prefWidth="87.199951171875" text="Quantity" />
-                  <TableColumn prefWidth="108.7999267578125" text="Return Date" />
+                  <TableColumn fx:id="columnReturnsReturnID" prefWidth="87.19994735717773" text="ReturnID" />
+                  <TableColumn fx:id="columnReturnsOrderID" prefWidth="109.60003662109375" text="OrderID" />
+                  <TableColumn fx:id="columnReturnsProductID" prefWidth="114.39997863769531" text="ProductID" />
+                  <TableColumn fx:id="columnReturnsPrice" prefWidth="112.0" text="Amount" />
+                  <TableColumn fx:id="columnReturnsSize" prefWidth="42.4000244140625" text="Size" />
+                  <TableColumn fx:id="columnReturnsReturnDate" prefWidth="121.60009765625" text="Return Date" />
                </columns>
             </TableView>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneReports" disable="true" layoutX="217.0" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
+      <AnchorPane fx:id="anchorPaneReports" disable="true" layoutX="217.0" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
          <children>
             <VBox alignment="TOP_CENTER" layoutX="674.4" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="309.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
                <children>
@@ -608,7 +609,7 @@
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>
             </Label>
-            <Button layoutX="252.0" layoutY="74.0" mnemonicParsing="false" onAction="#btnLoadInventoryReportOnAction" prefHeight="42.0" prefWidth="170.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Inventory Report" textFill="#e1dbbf">
+            <Button layoutX="252.0" layoutY="74.0" mnemonicParsing="false" onAction="#btnLoadInventoryReportOnAction" prefHeight="42.0" prefWidth="170.0" styleClass="btnReports" stylesheets="@../styles/style.css" text="Inventory Report" textFill="#e1dbbf">
                <font>
                   <Font name="Dubai Medium" size="18.0" />
                </font>
@@ -616,7 +617,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Button layoutX="252.0" layoutY="136.0" mnemonicParsing="false" onAction="#btnLoadEmployeeReportOnAction" prefHeight="45.0" prefWidth="170.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Employee Report" textFill="#e1dbbf">
+            <Button layoutX="252.0" layoutY="136.0" mnemonicParsing="false" onAction="#btnLoadEmployeeReportOnAction" prefHeight="45.0" prefWidth="170.0" styleClass="btnReports" stylesheets="@../styles/style.css" text="Employee Report" textFill="#e1dbbf">
                <font>
                   <Font name="Dubai Medium" size="18.0" />
                </font>
@@ -624,7 +625,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Button layoutX="252.0" layoutY="201.0" mnemonicParsing="false" onAction="#btnLoadCustomerReportOnAction" prefHeight="14.0" prefWidth="170.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Customer Report" textFill="#e1dbbf">
+            <Button layoutX="252.0" layoutY="201.0" mnemonicParsing="false" onAction="#btnLoadCustomerReportOnAction" prefHeight="14.0" prefWidth="170.0" styleClass="btnReports" stylesheets="@../styles/style.css" text="Customer Report" textFill="#e1dbbf">
                <font>
                   <Font name="Dubai Medium" size="18.0" />
                </font>
@@ -689,10 +690,10 @@
                </children></HBox>
             <HBox layoutY="291.0" prefHeight="270.0" prefWidth="674.0" styleClass="employeeDetailsPane" stylesheets="@../styles/style.css">
                <children>
-                  <HBox prefHeight="270.0" prefWidth="96.0" />
-                  <VBox prefHeight="270.0" prefWidth="675.0">
+                  <HBox prefHeight="270.0" prefWidth="52.0" />
+                  <VBox prefHeight="270.0" prefWidth="377.0">
                      <children>
-                        <HBox prefHeight="36.0" prefWidth="674.0" />
+                        <HBox prefHeight="27.0" prefWidth="627.0" />
                         <Label opacity="0.69" prefHeight="32.0" prefWidth="194.0" text="Employee Details" textFill="#2d2a20">
                            <font>
                               <Font name="System Bold" size="22.0" />
@@ -702,7 +703,7 @@
                            </VBox.margin>
                         </Label>
                         <Pane prefHeight="24.0" prefWidth="627.0" />
-                        <HBox prefHeight="139.0" prefWidth="554.0">
+                        <HBox prefHeight="163.0" prefWidth="389.0">
                            <children>
                               <VBox prefHeight="139.0" prefWidth="111.0">
                                  <children>
@@ -713,6 +714,14 @@
                                        <font>
                                           <Font size="13.0" />
                                        </font>
+                                    </Label>
+                                    <Label layoutX="10.0" layoutY="10.0" text="User Name : ">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
                                     </Label>
                                     <Label text="Name :">
                                        <VBox.margin>
@@ -756,7 +765,7 @@
                                     </Label>
                                  </children>
                               </VBox>
-                              <VBox layoutX="10.0" layoutY="10.0" prefHeight="139.0" prefWidth="240.0">
+                              <VBox layoutX="10.0" layoutY="10.0" prefHeight="163.0" prefWidth="248.0">
                                  <children>
                                     <Label fx:id="lblEmployeeID" opacity="0.7">
                                        <font>
@@ -764,6 +773,14 @@
                                        </font>
                                        <VBox.margin>
                                           <Insets />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblEmployeeUserName" layoutX="10.0" layoutY="130.0" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
                                        </VBox.margin>
                                     </Label>
                                     <Label fx:id="lblEmployeeName" opacity="0.7">
@@ -816,6 +833,104 @@
                               <Insets left="20.0" />
                            </padding>
                         </HBox>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="163.0" prefWidth="242.0">
+                     <children>
+                        <Pane layoutX="10.0" layoutY="48.0" prefHeight="23.0" prefWidth="242.0" />
+                        <Button fx:id="btnResetPassword" mnemonicParsing="false" onAction="#btnResetPasswordOnAction" prefHeight="38.0" prefWidth="190.0" styleClass="btnResetPassword" stylesheets="@../styles/style.css" text="Reset Password" textFill="#fcefc7">
+                           <font>
+                              <Font name="Dubai Medium" size="15.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                        <Pane fx:id="resetPasswordPane">
+                           <children>
+                              <Pane prefHeight="23.0" prefWidth="242.0" />
+                              <Label layoutY="23.20000457763672" text="New Password :" />
+                              <Pane fx:id="txtSetNewPasswordPane" layoutY="41.0">
+                                 <children>
+                                    <TextField fx:id="txtSetNewPassword" maxWidth="190.0" minWidth="190.0" prefHeight="25.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                                       </padding>
+                                    </TextField>
+                                    <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/hide-password.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showPwdSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" />
+                                 </children>
+                              </Pane>
+                              <Pane fx:id="pwdSetNewPasswordPane" layoutY="41.0" prefHeight="26.0" prefWidth="189.0">
+                                 <children>
+                                    <PasswordField fx:id="pwdSetNewPassword" maxWidth="234.4" minWidth="190.0" prefHeight="25.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                                       </padding>
+                                    </PasswordField>
+                                    <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/show-password.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showTxtSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutY="68.00000762939453" prefHeight="14.0" prefWidth="242.0" />
+                              <Label layoutY="82.4000015258789" text="Confirm New Password :" />
+                              <Pane fx:id="txtConfirmNewPasswordPane" layoutY="101.0">
+                                 <children>
+                                    <TextField fx:id="txtConfirmNewPassword" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                                       </padding>
+                                    </TextField>
+                                    <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/hide-password.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showPwdConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" />
+                                 </children>
+                              </Pane>
+                              <Pane fx:id="pwdConfirmNewPasswordPane" layoutY="101.0">
+                                 <children>
+                                    <PasswordField fx:id="pwdConfirmNewPassword" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                                       <padding>
+                                          <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                                       </padding>
+                                    </PasswordField>
+                                    <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/show-password.png" />
+                                       </image>
+                                    </ImageView>
+                                    <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showTxtConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutY="126.4000015258789" prefHeight="22.0" prefWidth="242.0" />
+                              <Button layoutY="148.0" mnemonicParsing="false" onAction="#btnConfirmResetPasswordOnAction" prefHeight="38.0" prefWidth="83.0" styleClass="btnConfirmResetPassword" stylesheets="@../styles/style.css" text="Confirm" textFill="#fcefc7">
+                                 <font>
+                                    <Font name="Dubai Medium" size="15.0" />
+                                 </font>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                              <Button layoutX="107.0" layoutY="148.0" mnemonicParsing="false" onAction="#btnCancelResetPasswordOnAction" prefHeight="38.0" prefWidth="83.0" styleClass="btnCancelResetPassword" stylesheets="@../styles/style.css" text="Cancel" textFill="#f2e9d0">
+                                 <font>
+                                    <Font name="Dubai Medium" size="15.0" />
+                                 </font>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                           </children>
+                        </Pane>
                      </children>
                   </VBox>
                </children>

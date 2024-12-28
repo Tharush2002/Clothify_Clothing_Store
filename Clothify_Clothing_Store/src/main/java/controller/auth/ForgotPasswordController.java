@@ -81,6 +81,18 @@ public class ForgotPasswordController implements Initializable {
     private VBox resetPasswordPane;
 
     @FXML
+    private Pane showPwdConfirmNewPasswordPane;
+
+    @FXML
+    private Pane showPwdSetNewPasswordPane;
+
+    @FXML
+    private Pane showTxtConfirmNewPasswordPane;
+
+    @FXML
+    private Pane showTxtSetNewPasswordPane;
+
+    @FXML
     private TextField txtConfirmNewPassword;
 
     @FXML
@@ -182,7 +194,11 @@ public class ForgotPasswordController implements Initializable {
                 alert.setHeaderText("Success!");
                 alert.setContentText("Your password has been successfully changed.");
                 alert.showAndWait();
-                adminService.updateAdminPassword(txtInputEmail.getText(), pwdSetNewPassword.getText());
+                if(userType.equals(UserType.EMPLOYEE)){
+                    employeeService.updateEmployeePassword(txtInputEmail.getText().trim(), pwdSetNewPassword.getText().trim());
+                }else{
+                    adminService.updateAdminPassword(txtInputEmail.getText().trim(), pwdSetNewPassword.getText().trim());
+                }
                 closeForgotPassword(event);
             }else{
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -345,21 +361,25 @@ public class ForgotPasswordController implements Initializable {
     private void enableTxtSetNewPassword(boolean state){
         txtSetNewPasswordPane.setDisable(!state);
         txtSetNewPasswordPane.setVisible(state);
+        showPwdSetNewPasswordPane.setDisable(!state);
     }
 
     private void enableTxtConfirmNewPassword(boolean state){
         txtConfirmNewPasswordPane.setDisable(!state);
         txtConfirmNewPasswordPane.setVisible(state);
+        showPwdConfirmNewPasswordPane.setDisable(!state);
     }
 
     private void enablePwdSetNewPassword(boolean state){
         pwdSetNewPasswordPane.setDisable(!state);
         pwdSetNewPasswordPane.setVisible(state);
+        showTxtSetNewPasswordPane.setDisable(!state);
     }
 
     private void enablePwdConfirmNewPassword(boolean state){
         pwdConfirmNewPasswordPane.setDisable(!state);
         pwdConfirmNewPasswordPane.setVisible(state);
+        showTxtConfirmNewPasswordPane.setDisable(!state);
     }
 
     private void pwdInitialize(){
@@ -367,8 +387,11 @@ public class ForgotPasswordController implements Initializable {
         enablePwdConfirmNewPassword(true);
         enableTxtSetNewPassword(false);
         enableTxtConfirmNewPassword(false);
+
         pwdConfirmNewPassword.setDisable(true);
+        showTxtConfirmNewPasswordPane.setDisable(true);
         pwdSetNewPassword.setDisable(true);
+        showTxtSetNewPasswordPane.setDisable(true);
 
         txtSetNewPassword.textProperty().bindBidirectional(pwdSetNewPassword.textProperty());
         txtConfirmNewPassword.textProperty().bindBidirectional(pwdConfirmNewPassword.textProperty());

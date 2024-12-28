@@ -12,5 +12,7 @@ public interface EmployeeService extends SuperService {
 
     Employee findByUserName(String trim) throws NoEmployeeFoundException;
 
+    boolean updateEmployeePassword(String email, String password);
+
     boolean saveOrUpdate(Employee employee, int i);
 }

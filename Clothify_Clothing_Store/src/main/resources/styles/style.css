@@ -36,12 +36,12 @@
     -fx-background-color: #f5f0df;
 }
 
-.btnDashboardPanel,.btn{
+.btnDashboardPanel,.btn,.btnReports{
     -fx-background-radius: 8;
     -fx-background-color:  #80795d;
 }
 
-.btnDashboardPanel:hover,.btn:hover{
+.btnDashboardPanel:hover,.btn:hover,.btnReports:hover{
     -fx-background-color: #5c522f;
 }
 
@@ -129,7 +129,23 @@
     -fx-border-color: transparent;
 }
 
-.pass-icons:hover{
+.elementPointer:hover{
     -fx-cursor: hand;
 }
 
+.btnResetPassword,.btnConfirmResetPassword,.btnReturnItem{
+    -fx-background-color: #bdab6f;
+}
+
+.btnResetPassword:hover,.btnConfirmResetPassword:hover,btnReturnItem:hover{
+    -fx-background-color: #9a8b5a;
+}
+
+.btnCancelResetPassword{
+    -fx-background-color: #908254;
+}
+
+
+.btnCancelResetPassword:hover{
+    -fx-background-color: #716642;
+}

@@ -9,4 +9,6 @@ public interface EmployeeRepository extends SuperRepository {
     EmployeeEntity findByUserName(String userName);
 
     boolean saveOrUpdate(EmployeeEntity employeeEntity);
+
+    boolean update(EmployeeEntity employeeEntity);
 }
