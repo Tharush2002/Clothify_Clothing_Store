@@ -1,6 +1,7 @@
 package service.custom.impl;
 
 import entity.*;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Customer;
@@ -25,7 +26,7 @@ public class ReturnOrderServiceImpl implements ReturnOrderService {
     private final OrderItemsRepository orderItemsRepository = RepositoryFactory.getInstance().getRepositoryType(Type.ORDERITEMS);
 
     @Override
-    public boolean save(ReturnOrder returnOrder){
+    public void save(ReturnOrder returnOrder) throws RepositoryException {
 
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
@@ -64,43 +65,23 @@ public class ReturnOrderServiceImpl implements ReturnOrderService {
             );
 
             returnOrderRepository.save(returnOrderEntity, session);
-            ProductEntity productEntity = productRepository.findByID(new ProductEntity(
-                    null,
-                    returnOrder.getProductId(),
-                    returnOrder.getProductName(),
-                    new CategoryEntity(
-                            null,
-                            returnOrder.getCategoryId(),
-                            returnOrder.getCategoryName()
-                    ),
-                    1,
-                    returnOrderEntity.getUnitPrice(),
-                    new SupplierEntity(
-                            null,
-                            returnOrder.getSupplierId(),
-                            returnOrder.getSupplierName(),
-                            null,
-                            null
-                    )
-            ), session);
+            ProductEntity productEntity = productRepository.findByID(returnOrder.getProductId(), session);
 
             productEntity.setQuantity(productEntity.getQuantity() + 1);
-            session.update(productEntity);
+            productRepository.update(session, productEntity);
 
-            orderItemsRepository.deleteBySizeAndId(returnOrder.getOrder().getOrderId(),returnOrder.getProductId(),returnOrder.getSize(),session);
+            orderItemsRepository.deleteBySizeId(returnOrder.getOrder().getOrderId(),returnOrder.getProductId(),returnOrder.getSize(),session);
             transaction.commit();
-            return true;
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-            return false;
+            throw new RepositoryException("Failed to save the specific return order entity record.");
         } finally {
             session.close();
         }
     }
 
     @Override
-    public ObservableList<ReturnOrder> getAllReturnedItems(){
+    public ObservableList<ReturnOrder> getAllReturnedItems() throws RepositoryException {
         List<ReturnOrderEntity> returnOrderEntityList = returnOrderRepository.findAll();
         ObservableList<ReturnOrder> returnOrderObservableList = FXCollections.observableArrayList();
         if (returnOrderEntityList!=null){

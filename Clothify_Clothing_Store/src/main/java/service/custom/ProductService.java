@@ -1,18 +1,17 @@
 package service.custom;
 
+import exceptions.RepositoryException;
 import javafx.collections.ObservableList;
 import model.Product;
 import service.SuperService;
 
-import java.util.List;
-
 public interface ProductService extends SuperService {
-    boolean addProduct(Product product);
-    ObservableList<Product> getAllProducts();
-    void updateProduct(Product product);
-    void deleteProduct(String id);
+    void addProduct(Product product) throws RepositoryException;
+    ObservableList<Product> getAllProducts() throws RepositoryException;
+    void update(Product product) throws RepositoryException;
+    void deleteProduct(String id) throws RepositoryException;
 
-    ObservableList<Product> findProductsBySupplierID(String supplierId);
+    ObservableList<Product> findProductsBySupplierID(String supplierId) throws RepositoryException;
 
-    Product findProductByProductID(String productId);
+    Product findProductByProductID(String productId) throws RepositoryException;
 }

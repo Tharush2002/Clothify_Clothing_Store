@@ -141,6 +141,15 @@
     -fx-background-color: #9a8b5a;
 }
 
+.btnClearAdmin,.btnAdminReports,.btnCancel{
+    -fx-background-color: #bdab6f;
+    -fx-background-radius: 8;
+}
+
+btnClearAdmin:hover,.btnAdminReports:hover,.btnCancel:hover{
+    -fx-background-color: #9a8b5a;
+}
+
 .btnCancelResetPassword{
     -fx-background-color: #908254;
 }
@@ -148,4 +157,11 @@
 
 .btnCancelResetPassword:hover{
     -fx-background-color: #716642;
+}
+
+.inputFields{
+    -fx-background-color: white;
+    -fx-border-color: #dcdcdc;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
 }

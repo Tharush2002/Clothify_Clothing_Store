@@ -10,6 +10,7 @@ import controller.product.EditProductFormController;
 import controller.returnOrders.ReturnOrderFormController;
 import controller.supplier.EditSupplierFormController;
 import db.DBConnection;
+import exceptions.RepositoryException;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -52,7 +53,8 @@ import net.sf.jasperreports.view.JasperViewer;
 import service.ServiceFactory;
 import service.custom.*;
 import util.ActionTableType;
-import util.DashboardViewType;
+import util.AlertType;
+import util.EmployeeDashboardViewType;
 import util.Type;
 
 import java.awt.*;
@@ -394,22 +396,22 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     void btnCatalogOnAction(ActionEvent event) {
-        handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
+        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.CATALOG);
     }
 
     @FXML
     void btnOrdersOnAction(ActionEvent event) {
-        handleDashboardSidePanelBtnClicks(DashboardViewType.ORDERS);
+        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.ORDERS);
     }
 
     @FXML
     void btnReportsOnAction(ActionEvent event) {
-        handleDashboardSidePanelBtnClicks(DashboardViewType.REPORTS);
+        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.REPORTS);
     }
 
     @FXML
     void btnSuppliersOnAction(ActionEvent event) {
-        handleDashboardSidePanelBtnClicks(DashboardViewType.SUPPLIERS);
+        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.SUPPLIERS);
     }
 
     @FXML
@@ -418,27 +420,27 @@ public class EmployeeDashboardFormController implements Initializable {
         String email = txtAddSupplierEmail.getText().trim();
         String company = txtAddSupplierCompany.getText().trim();
         if (!name.isEmpty() && supplierService.isValidEmail(email) && !company.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Supplier Added");
-            alert.setHeaderText(null);
-            alert.setContentText("Supplier added successfully!");
-            alert.show();
-            if (!suppliedProducts.isEmpty()) {
-                suppliedProducts.forEach(product -> {
-                    product.setSupplier(new Supplier(null, name, company, email));
-                    productService.addProduct(product);
-                });
-            } else {
-                supplierService.addSupplier(new Supplier(null, name, company, email));
+            showAlert(Alert.AlertType.INFORMATION, "Supplier Added", "Success", "Supplier added successfully!", AlertType.SHOW);
+
+            try{
+                if (!suppliedProducts.isEmpty()) {
+                    for(Product product : suppliedProducts){
+                        product.setSupplier(new Supplier(null, name, company, email));
+                        productService.addProduct(product);
+                    }
+                } else {
+                    supplierService.addSupplier(new Supplier(null, name, company, email));
+                }
+                loadSuppliersTable(supplierService.getAllSuppliers());
+                loadCatalogProductsTable(productService.getAllProducts());
+                setSuppliersPaneLabels();
+            } catch (RepositoryException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
             }
-            loadSuppliersTable(supplierService.getAllSuppliers());
-            loadCatalogProductsTable(productService.getAllProducts());
-            setSuppliersPaneLabels();
+
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(null);
-            alert.setContentText("Please Enter All the Fields with Correct Data");
-            alert.show();
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", "Please Enter All the Fields with Correct Data",AlertType.SHOW);
+
             txtAddSupplierName.setText("");
             txtAddSupplierCompany.setText("");
             txtAddSupplierEmail.setText("");
@@ -448,11 +450,7 @@ public class EmployeeDashboardFormController implements Initializable {
     @FXML
     void btnAddToCartOnAction(ActionEvent event) {
         try {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Product Added");
-            alert.setHeaderText(null);
-            alert.setContentText("Product added successfully!");
-            alert.show();
+            showAlert(Alert.AlertType.INFORMATION,"Product Added","Success","Product added successfully!",AlertType.SHOW);
             Product selectedProduct = null;
 
             for (Product product : allProducts) {
@@ -587,11 +585,11 @@ public class EmployeeDashboardFormController implements Initializable {
 
             for (Product product : tblCatalogProducts.getItems()) {
                 if (product.getProductId().equalsIgnoreCase(search)) {
-                    int index = tblCatalogProducts.getItems().indexOf(product); // Get the index of the matching item
+                    int index = tblCatalogProducts.getItems().indexOf(product);
                     Platform.runLater(() -> {
-                        tblCatalogProducts.getSelectionModel().clearAndSelect(index); // Clear and select the row
-                        tblCatalogProducts.scrollTo(index); // Scroll to the selected row
-                        tblCatalogProducts.requestFocus(); // Ensure the table has focus
+                        tblCatalogProducts.getSelectionModel().clearAndSelect(index);
+                        tblCatalogProducts.scrollTo(index);
+                        tblCatalogProducts.requestFocus();
                     });
                     found = true;
                     break;
@@ -688,29 +686,21 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     void btnConfirmResetPasswordOnAction(ActionEvent event) {
-        if(pwdSetNewPassword.getText().equals(pwdConfirmNewPassword.getText())){
-            if(!pwdSetNewPassword.getText().trim().isEmpty() && !pwdConfirmNewPassword.getText().trim().isEmpty()){
-                employeeService.updateEmployeePassword(loggedEmployee.getEmail(), pwdSetNewPassword.getText().trim());
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Password Update");
-                alert.setHeaderText("Success!");
-                alert.setContentText("Your password has been successfully changed.");
-                alert.showAndWait();
-                btnResetPassword.setDisable(false);
-                enableResetPasswordPane(false);
+        try{
+            if(pwdSetNewPassword.getText().equals(pwdConfirmNewPassword.getText())){
+                if(!pwdSetNewPassword.getText().trim().isEmpty() && !pwdConfirmNewPassword.getText().trim().isEmpty()){
+                    employeeService.updateEmployeePassword(loggedEmployee.getEmail(), pwdSetNewPassword.getText().trim());
+                    showAlert(Alert.AlertType.INFORMATION,"Password Update","Success!","Your password has been successfully changed.",AlertType.SHOWANDWAIT);
+                    btnResetPassword.setDisable(false);
+                    enableResetPasswordPane(false);
+                }else{
+                    showAlert(Alert.AlertType.ERROR,"Error","Password Field is Empty","Please enter your password before proceeding.",AlertType.SHOWANDWAIT);
+                }
             }else{
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Password Field is Empty");
-                alert.setContentText("Please enter your password before proceeding.");
-                alert.showAndWait();
+                showAlert(Alert.AlertType.ERROR,"Error","Passwords Do Not Match","The passwords entered do not match. Please try again.",AlertType.SHOWANDWAIT);
             }
-        }else{
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Passwords Do Not Match");
-            alert.setContentText("The passwords entered do not match. Please try again.");
-            alert.showAndWait();
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -746,6 +736,8 @@ public class EmployeeDashboardFormController implements Initializable {
         setAllLabels();
         disableCloseSearch();
         setTablesInitializationStates();
+
+        bindResetPasswordFields();
         enableResetPasswordPane(false);
     }
 
@@ -754,10 +746,14 @@ public class EmployeeDashboardFormController implements Initializable {
     //LOAD TABLES
 
     private void loadTables() {
-        loadCatalogProductsTable(productService.getAllProducts());
-        loadSuppliersTable(supplierService.getAllSuppliers());
-        loadOrdersTable(orderService.getAllOrders());
-        loadReturnOrdersTable(returnOrderService.getAllReturnedItems());
+        try{
+            loadCatalogProductsTable(productService.getAllProducts());
+            loadSuppliersTable(supplierService.getAllSuppliers());
+            loadOrdersTable(orderService.getAllOrders());
+            loadReturnOrdersTable(returnOrderService.getAllReturnedItems());
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
     }
 
     public void loadOrdersTable(ObservableList<Order> allOrders) {
@@ -915,7 +911,7 @@ public class EmployeeDashboardFormController implements Initializable {
 
     //OTHER IMPLEMENTATIONS
 
-    private void handleDashboardSidePanelBtnClicks(DashboardViewType type) {
+    private void handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType type) {
         switch (type) {
             case CATALOG:
 //                HANDLE BUTTON STYLES WHEN CLICKED
@@ -1129,22 +1125,21 @@ public class EmployeeDashboardFormController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            if (type == PRODUCTS) {
-                Product product = (Product) object;
-                productService.deleteProduct(product.getProductId());
-                loadCatalogProductsTable(productService.getAllProducts());
-            } else if (type == SUPPLIERS) {
-                Supplier supplier = (Supplier) object;
-                supplierService.deleteSupplier(supplier.getSupplierId());
-                loadSuppliersTable(supplierService.getAllSuppliers());
-                loadCatalogProductsTable(productService.getAllProducts());
+            try{
+                if (type == PRODUCTS) {
+                    Product product = (Product) object;
+                    productService.deleteProduct(product.getProductId());
+                    loadCatalogProductsTable(productService.getAllProducts());
+                } else if (type == SUPPLIERS) {
+                    Supplier supplier = (Supplier) object;
+                    supplierService.deleteSupplier(supplier.getSupplierId());
+                    loadSuppliersTable(supplierService.getAllSuppliers());
+                    loadCatalogProductsTable(productService.getAllProducts());
+                }
+            } catch (RepositoryException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
             }
-
-            Alert completionAlert = new Alert(Alert.AlertType.INFORMATION);
-            completionAlert.setTitle("Deletion Successful");
-            completionAlert.setHeaderText(null);
-            completionAlert.setContentText("Selected property has been successfully deleted.");
-            completionAlert.showAndWait();
+            showAlert(Alert.AlertType.INFORMATION,"Deletion Successful","Success","Selected property has been successfully deleted.",AlertType.SHOWANDWAIT);
         }
     }
 
@@ -1240,10 +1235,14 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     public void setOrdersPaneLabels() {
-        ObservableList<Customer> customers = customerService.getAllCustomers();
-        lblTotalCustomerCount.setText(customers != null ? String.valueOf(customers.size()) : "");
-        lblTotalOrdersOrders.setText(allOrders != null ? String.valueOf(allOrders.size()) : "");
-        lblTotalReturnOrderCount.setText(allReturnOrderItems != null ? String.valueOf(allReturnOrderItems.size()) : "");
+        try{
+            ObservableList<Customer> customers = customerService.getAllCustomers();
+            lblTotalCustomerCount.setText(customers != null ? String.valueOf(customers.size()) : "");
+            lblTotalOrdersOrders.setText(allOrders != null ? String.valueOf(allOrders.size()) : "");
+            lblTotalReturnOrderCount.setText(allReturnOrderItems != null ? String.valueOf(allReturnOrderItems.size()) : "");
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
     }
 
     private void enableCloseSearch(){
@@ -1266,7 +1265,7 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     private void setTablesInitializationStates(){
-        handleDashboardSidePanelBtnClicks(DashboardViewType.CATALOG);
+        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.CATALOG);
         tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
                 resetSearch();
@@ -1275,12 +1274,20 @@ public class EmployeeDashboardFormController implements Initializable {
         });
         tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
-                loadSuppliedProductsTable(productService.findProductsBySupplierID(newVal.getSupplierId()));
+                try {
+                    loadSuppliedProductsTable(productService.findProductsBySupplierID(newVal.getSupplierId()));
+                } catch (RepositoryException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+                }
             }
         });
         tblOrders.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
-                loadOrderItemsTable(orderItemsService.findOrderItemsByOrderID(newVal.getOrderId()));
+                try {
+                    loadOrderItemsTable(orderItemsService.findOrderItemsByOrderID(newVal.getOrderId()));
+                } catch (RepositoryException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+                }
             }
         });
     }
@@ -1312,7 +1319,7 @@ public class EmployeeDashboardFormController implements Initializable {
             viewer.setZoomRatio(0.5f);
             viewer.setVisible(true);
         } catch (Exception e) {
-            throw new RuntimeException("An error occurred while generating the report.", e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred while generating the report.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -1348,15 +1355,30 @@ public class EmployeeDashboardFormController implements Initializable {
         enableTxtSetNewPassword(false);
         enablePwdConfirmNewPassword(true);
         enablePwdSetNewPassword(true);
-        txtSetNewPassword.textProperty().bindBidirectional(pwdSetNewPassword.textProperty());
-        txtConfirmNewPassword.textProperty().bindBidirectional(pwdConfirmNewPassword.textProperty());
         pwdConfirmNewPassword.setText("");
         pwdSetNewPassword.setText("");
+    }
+
+    private void bindResetPasswordFields(){
+        txtSetNewPassword.textProperty().bindBidirectional(pwdSetNewPassword.textProperty());
+        txtConfirmNewPassword.textProperty().bindBidirectional(pwdConfirmNewPassword.textProperty());
     }
 
     private void cancelResetPassword() {
         btnResetPassword.setDisable(false);
         enableResetPasswordPane(false);
         setPwdInitializationStates();
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

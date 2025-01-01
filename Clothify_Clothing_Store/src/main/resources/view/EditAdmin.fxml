@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="471.0" prefWidth="380.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.admin.EditAdminFormController">
+   <children>
+      <HBox alignment="CENTER" maxHeight="65.0" maxWidth="-Infinity" minHeight="59.0" minWidth="-Infinity" prefHeight="65.0" prefWidth="380.0" styleClass="updateProductsTitleBar" stylesheets="@../styles/style.css" AnchorPane.bottomAnchor="406.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label style="-fx-text-fill: #c9c5ba;" text="Edit Admin">
+               <font>
+                  <Font name="System Bold" size="25.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+      <VBox layoutY="90.0" maxWidth="380.0" minWidth="-Infinity" prefHeight="376.0" prefWidth="380.0">
+         <children>
+            <HBox maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="17.6" prefWidth="200.0">
+               <children>
+                  <Label text="ID : ">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblAdminID" layoutX="10.0" layoutY="10.0">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                     <padding>
+                        <Insets left="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </HBox>
+            <HBox prefHeight="50.0" prefWidth="294.0">
+               <children>
+                  <VBox prefHeight="42.0" prefWidth="166.0">
+                     <children>
+                        <Label text="First Name : " />
+                        <TextField fx:id="txtSetAdminFirstName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </TextField>
+                     </children>
+                  </VBox>
+                  <VBox layoutX="10.0" layoutY="10.0" prefHeight="54.0" prefWidth="137.0">
+                     <children>
+                        <Label text="Last Name : " />
+                        <TextField fx:id="txtSetAdminLastName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </TextField>
+                     </children>
+                  </VBox>
+               </children>
+               <padding>
+                  <Insets top="15.0" />
+               </padding>
+            </HBox>
+            <Label text="Email :">
+               <VBox.margin>
+                  <Insets top="8.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="txtSetAdminEmail" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="294.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </TextField>
+            <Label layoutX="50.0" layoutY="125.0" text="Contact Number : ">
+               <VBox.margin>
+                  <Insets top="8.0" />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="txtSetAdminContactNumber" layoutX="50.0" layoutY="148.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="294.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </TextField>
+            <Line endX="193.0" opacity="0.16" startX="-100.0" strokeWidth="2.0">
+               <VBox.margin>
+                  <Insets bottom="16.0" top="16.0" />
+               </VBox.margin>
+            </Line>
+            <HBox prefHeight="70.0" prefWidth="300.0">
+               <children>
+                  <VBox prefHeight="75.0" prefWidth="300.0">
+                     <children>
+                        <Label text="User Name : " />
+                        <TextField fx:id="txtSetAdminUserName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="165.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                           <VBox.margin>
+                              <Insets top="5.0" />
+                           </VBox.margin>
+                        </TextField>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="TOP_CENTER" prefHeight="73.0" prefWidth="300.0">
+               <children>
+                  <JFXButton onAction="#btnSaveChangesOnAction" prefHeight="43.0" prefWidth="150.0" styleClass="btn" stylesheets="@../styles/style.css" text="SAVE CHANGES" textFill="#feffda">
+                     <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                     </padding>
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </JFXButton>
+                  <JFXButton layoutX="98.0" layoutY="10.0" onAction="#btnCloseFormOnAction" prefHeight="43.0" prefWidth="150.0" styleClass="btnClearAdmin" stylesheets="@../styles/style.css" text="CANCEL" textFill="#feffda">
+                     <padding>
+                        <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                     </padding>
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="20.0" />
+                     </HBox.margin>
+                  </JFXButton>
+               </children>
+               <padding>
+                  <Insets top="5.0" />
+               </padding>
+            </HBox>
+         </children>
+         <padding>
+            <Insets left="40.0" right="40.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>

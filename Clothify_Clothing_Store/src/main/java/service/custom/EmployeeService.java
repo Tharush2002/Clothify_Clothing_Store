@@ -1,18 +1,31 @@
 package service.custom;
 
 import exceptions.NoEmployeeFoundException;
-import exceptions.NoPasswordMatchFoundException;
+import exceptions.RepositoryException;
+import javafx.collections.ObservableList;
 import model.Employee;
 import service.SuperService;
 
 public interface EmployeeService extends SuperService {
     boolean isValidEmail(String email);
 
-    Employee findByEmail(String email) throws NoEmployeeFoundException;
+    boolean isValidContactNumber(String contactNumber);
 
-    Employee findByUserName(String trim) throws NoEmployeeFoundException;
+    boolean isValidNIC(String nic);
 
-    boolean updateEmployeePassword(String email, String password);
+    Employee findByEmail(String email) throws NoEmployeeFoundException, RepositoryException;
+
+    Employee findByUserName(String trim) throws NoEmployeeFoundException, RepositoryException;
+
+    void updateEmployeePassword(String email, String password) throws RepositoryException;
 
     boolean saveOrUpdate(Employee employee, int i);
+
+    ObservableList<Employee> getAll() throws RepositoryException;
+
+    void deleteById(String employeeId) throws RepositoryException;
+
+    void save(Employee employee) throws RepositoryException;
+
+    void update(Employee employee) throws RepositoryException;
 }

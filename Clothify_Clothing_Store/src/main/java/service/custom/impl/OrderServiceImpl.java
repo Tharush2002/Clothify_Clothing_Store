@@ -2,6 +2,7 @@ package service.custom.impl;
 
 import entity.CustomerEntity;
 import entity.OrderEntity;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Customer;
@@ -17,7 +18,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderItemsRepository= RepositoryFactory.getInstance().getRepositoryType(Type.ORDER);
 
     @Override
-    public ObservableList<Order> getAllOrders() {
+    public ObservableList<Order> getAllOrders() throws RepositoryException {
         ObservableList<Order> orderObservableList = FXCollections.observableArrayList();
         List<OrderEntity> orderEntityList = orderItemsRepository.findAll();
 

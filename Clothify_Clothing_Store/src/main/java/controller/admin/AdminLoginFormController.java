@@ -10,6 +10,7 @@ import controller.product.AddProductsBySupplierFormController;
 import exceptions.EmptyFieldsException;
 import exceptions.NoAdminFoundException;
 import exceptions.NoPasswordMatchFoundException;
+import exceptions.RepositoryException;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,6 +28,7 @@ import lombok.Getter;
 import model.Admin;
 import service.ServiceFactory;
 import service.custom.AdminService;
+import util.AlertType;
 import util.Type;
 import util.UserType;
 
@@ -114,18 +116,6 @@ public class AdminLoginFormController implements Initializable {
 
     @FXML
     public void btnLoginOnAction(ActionEvent event) {
-//        ((Stage) ((Node) (event.getSource())).getScene().getWindow()).close();
-//        try {
-//            Stage stage=new Stage();
-//            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../../view/AdminDashboard.fxml"))));
-//            stage.initStyle(StageStyle.UNDECORATED);
-//            stage.show();
-//            stage.setResizable(false);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText(null);
         try {
             if(pwdPassword.getText().isEmpty() || txtUserName.getText().isEmpty()) throw new EmptyFieldsException("Please Enter user-name password to continue");
             Admin admin = adminService.findByUserName(txtUserName.getText().trim());
@@ -133,23 +123,23 @@ public class AdminLoginFormController implements Initializable {
 
             ((Stage) ((Node) (event.getSource())).getScene().getWindow()).close();
             Stage stage=new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../../view/AdminDashboard.fxml"))));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/AdminDashboard.fxml"));
+            Parent root = loader.load();
+            AdminDashboardFormController controller = loader.getController();
+            controller.loadAdminDetails(admin);
+            stage.setScene(new Scene(root));
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
             stage.setResizable(false);
 
         } catch (NoAdminFoundException e) {
-            alert.setTitle("No Admin Found");
-            alert.setContentText("No admin account found under the provided user name");
-            alert.show();
+            showAlert(Alert.AlertType.ERROR, "Error", "No Admin Found", "No admin account found under the provided user name", AlertType.SHOW);
         } catch (NoPasswordMatchFoundException e) {
-            alert.setTitle("Invalid Password !");
-            alert.setContentText("Password is invalid for the specific account");
-            alert.show();
-        }catch (EmptyFieldsException e){
-            alert.setTitle("Input Username & Password !");
-            alert.setContentText("Please input username & password to continue");
-            alert.show();
+            showAlert(Alert.AlertType.ERROR, "Error", "Invalid Password !", "Password is invalid for the specific account", AlertType.SHOW);
+        }catch (EmptyFieldsException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "Input Username & Password !", "Please input username & password to continue", AlertType.SHOW);
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(), AlertType.SHOW);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -180,5 +170,17 @@ public class AdminLoginFormController implements Initializable {
     private void enableTxtPassword(boolean state){
         txtPassword.setDisable(!state);
         txtPassword.setVisible(state);
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

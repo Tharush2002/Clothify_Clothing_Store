@@ -1,16 +1,15 @@
 package repository.custom;
 
 import entity.ReturnOrderEntity;
-import model.ReturnOrder;
+import exceptions.RepositoryException;
 import org.hibernate.Session;
 import repository.SuperRepository;
 
 import java.util.List;
 
 public interface ReturnOrderRepository extends SuperRepository {
-    boolean save(ReturnOrderEntity returnOrderEntity);
-
+    void save(ReturnOrderEntity returnOrderEntity) throws RepositoryException;
     void save(ReturnOrderEntity returnOrderEntity, Session session);
 
-    List<ReturnOrderEntity> findAll();
+    List<ReturnOrderEntity> findAll() throws RepositoryException;
 }

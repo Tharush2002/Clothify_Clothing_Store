@@ -3,6 +3,7 @@ package controller.returnOrders;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import controller.employee.EmployeeDashboardFormController;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -23,6 +24,7 @@ import service.custom.OrderItemsService;
 import service.custom.OrderService;
 import service.custom.ProductService;
 import service.custom.ReturnOrderService;
+import util.AlertType;
 import util.Type;
 
 import java.net.URL;
@@ -45,9 +47,6 @@ public class ReturnOrderFormController implements Initializable {
     private EmployeeDashboardFormController employeeDashboardFormController;
 
     private Double totalReturnCost;
-
-    @FXML
-    private JFXButton btnConfirmReturnOrder;
 
     @FXML
     private Button btnReturnItem;
@@ -111,44 +110,32 @@ public class ReturnOrderFormController implements Initializable {
 
     @FXML
     void btnConfirmReturnOrderOnAction(ActionEvent event) {
-        if(!allReturnOrderItemsList.isEmpty()){
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Order Confirmation");
-            alert.setHeaderText("Confirm Order");
-            alert.setContentText("Do you want to confirm the order?");
-            Optional<ButtonType> result = alert.showAndWait();
+        try{
+            if(!allReturnOrderItemsList.isEmpty()){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Order Confirmation");
+                alert.setHeaderText("Confirm Order");
+                alert.setContentText("Do you want to confirm the order?");
+                Optional<ButtonType> result = alert.showAndWait();
 
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                for(ReturnOrder returnOrder : allReturnOrderItemsList){
-
-                    if(!returnOrderService.save(returnOrder)){
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                        errorAlert.setTitle("Error");
-                        errorAlert.setContentText("Error in processing the return. Please Try again.");
-                        errorAlert.show();
-                        return;
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    for(ReturnOrder returnOrder : allReturnOrderItemsList){
+                        returnOrderService.save(returnOrder);
                     }
+                    showAlert(Alert.AlertType.INFORMATION,"Success","Return Order Success","Your items for return has been processed.",AlertType.SHOWANDWAIT);
+
+                    employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
+                    employeeDashboardFormController.loadReturnOrdersTable(returnOrderService.getAllReturnedItems());
+                    employeeDashboardFormController.setCatalogPaneLabels();
+                    employeeDashboardFormController.setOrdersPaneLabels();
+
+                    btnCloseReturnOrdersOnAction(event);
                 }
-                Alert alertSuccess = new Alert(Alert.AlertType.INFORMATION);
-                alertSuccess.setTitle("Success");
-                alertSuccess.setHeaderText("Return Order Success");
-                alertSuccess.setContentText("Your items for return has been processed.");
-                alertSuccess.showAndWait();
-
-                employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
-                employeeDashboardFormController.loadReturnOrdersTable(returnOrderService.getAllReturnedItems());
-                employeeDashboardFormController.setCatalogPaneLabels();
-                employeeDashboardFormController.setOrdersPaneLabels();
-
-                btnCloseReturnOrdersOnAction(event);
+            }else{
+                showAlert(Alert.AlertType.ERROR,"Error","No Return Orders Available","Please input the items to return for the order.",AlertType.SHOW);
             }
-
-        }else{
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("No Return Orders Available");
-            alert.setContentText("Please input the items to return for the order.");
-            alert.show();
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -179,18 +166,22 @@ public class ReturnOrderFormController implements Initializable {
 
     @FXML
     void setOrderDetailsOnAction(ActionEvent event) {
-        tblOrderItems.getItems().clear();
-        for (Order order : allOrderList) {
-            if (order.getOrderId().equals(cmbSetOrderToReturn.getValue())) {
-                lblCustomerName.setText(order.getCustomer().getName());
-                lblCustomerEmail.setText(order.getCustomer().getEmail());
+        try{
+            tblOrderItems.getItems().clear();
+            for (Order order : allOrderList) {
+                if (order.getOrderId().equals(cmbSetOrderToReturn.getValue())) {
+                    lblCustomerName.setText(order.getCustomer().getName());
+                    lblCustomerEmail.setText(order.getCustomer().getEmail());
+                }
             }
+            allOrderItemList = orderItemsService.findOrderItemsByOrderID(cmbSetOrderToReturn.getValue());
+            ObservableList<OrderItem> temp = FXCollections.observableArrayList(allOrderItemList);
+            loadOrderItemsTable(temp);
+            tblReturnedItems.getItems().clear();
+            resetTotalReturnCost();
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
-        allOrderItemList = orderItemsService.findOrderItemsByOrderID(cmbSetOrderToReturn.getValue());
-        ObservableList<OrderItem> temp = FXCollections.observableArrayList(allOrderItemList);
-        loadOrderItemsTable(temp);
-        tblReturnedItems.getItems().clear();
-        resetTotalReturnCost();
     }
 
     @Override
@@ -240,10 +231,14 @@ public class ReturnOrderFormController implements Initializable {
     }
 
     private void initializeComboBox(){
-        ObservableList<String> orderIdList = FXCollections.observableArrayList();
-        allOrderList = orderService.getAllOrders();
-        allOrderList.forEach(order -> orderIdList.add(order.getOrderId()));
-        cmbSetOrderToReturn.setItems(orderIdList);
+        try{
+            ObservableList<String> orderIdList = FXCollections.observableArrayList();
+            allOrderList = orderService.getAllOrders();
+            allOrderList.forEach(order -> orderIdList.add(order.getOrderId()));
+            cmbSetOrderToReturn.setItems(orderIdList);
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
     }
 
     private void setReturnItemButtonStatus(){
@@ -261,5 +256,17 @@ public class ReturnOrderFormController implements Initializable {
     private void resetTotalReturnCost(){
         totalReturnCost=0.0;
         lblTotalReturnCost.setText("");
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

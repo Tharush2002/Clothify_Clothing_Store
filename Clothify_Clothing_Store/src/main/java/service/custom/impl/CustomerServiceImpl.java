@@ -1,6 +1,7 @@
 package service.custom.impl;
 
 import entity.CustomerEntity;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Customer;
@@ -15,7 +16,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository= RepositoryFactory.getInstance().getRepositoryType(Type.CUSTOMER);
 
     @Override
-    public ObservableList<Customer> getAllCustomers() {
+    public ObservableList<Customer> getAllCustomers() throws RepositoryException {
         ObservableList<Customer> customers = FXCollections.observableArrayList();
         List<CustomerEntity> customerEntityList = customerRepository.findAll();
 

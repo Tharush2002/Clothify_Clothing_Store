@@ -25,7 +25,7 @@
 
 <AnchorPane prefHeight="651.0" prefWidth="1200.0" style="-fx-background-color: #fff;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.employee.EmployeeDashboardFormController">
    <children>
-      <AnchorPane fx:id="anchorPaneCatalog" disable="true" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
+      <AnchorPane fx:id="anchorPaneCatalog" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
          <children>
             <VBox alignment="TOP_CENTER" layoutX="674.4" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="309.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
                <children>
@@ -238,7 +238,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Label fx:id="lblWelcomeEmployee" layoutX="81.0" layoutY="24.0" text="Welcome Back, ">
+            <Label fx:id="lblWelcomeEmployee" layoutX="81.0" layoutY="24.0" text="Welcome Back, " textFill="#646258">
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>
@@ -291,7 +291,7 @@
             </Group>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneSuppliers" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0">
+      <AnchorPane fx:id="anchorPaneSuppliers" disable="true" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
          <children>
             <TableView fx:id="tblSuppliers" layoutX="43.0" layoutY="352.0" prefHeight="270.0" prefWidth="591.0">
                <columns>
@@ -382,7 +382,7 @@
                   </TableView>
                </children>
             </VBox>
-            <Label layoutX="81.0" layoutY="24.0" text="SUPPLIERS">
+            <Label layoutX="81.0" layoutY="24.0" text="SUPPLIERS" textFill="#646258">
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>
@@ -456,7 +456,7 @@
       </AnchorPane>
       <AnchorPane fx:id="anchorPaneOrders" disable="true" layoutX="216.8" maxHeight="651.0" minHeight="651.0" prefHeight="651.0" prefWidth="984.0" visible="false">
          <children>
-            <Label layoutX="81.0" layoutY="24.0" text="ORDERS">
+            <Label layoutX="81.0" layoutY="24.0" text="ORDERS" textFill="#646258">
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>
@@ -604,7 +604,7 @@
                   </ImageView>
                </children>
             </VBox>
-            <Label layoutX="81.0" layoutY="24.0" text="REPORTS">
+            <Label layoutX="81.0" layoutY="24.0" text="REPORTS" textFill="#646258">
                <font>
                   <Font name="Berlin Sans FB Demi Bold" size="26.0" />
                </font>

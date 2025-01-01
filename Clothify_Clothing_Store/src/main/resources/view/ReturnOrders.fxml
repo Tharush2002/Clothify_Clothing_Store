@@ -187,7 +187,7 @@
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" maxWidth="380.0" minWidth="366.0" prefHeight="52.0" prefWidth="366.0">
                      <children>
-                        <JFXButton fx:id="btnConfirmReturnOrder" onAction="#btnConfirmReturnOrderOnAction" prefHeight="43.0" prefWidth="200.0" styleClass="btn" stylesheets="@../styles/style.css" text="CONFIRM RETURN ORDER" textFill="#feffda">
+                        <JFXButton onAction="#btnConfirmReturnOrderOnAction" prefHeight="43.0" prefWidth="200.0" styleClass="btn" stylesheets="@../styles/style.css" text="CONFIRM RETURN ORDER" textFill="#feffda">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>
@@ -199,7 +199,7 @@
                            </font>
                         </JFXButton>
                         <Pane prefHeight="52.0" prefWidth="16.0" />
-                        <JFXButton onAction="#btnClearReturnOrderOnAction" styleClass="btn" stylesheets="@../styles/style.css" text="CLEAR RETURN" textFill="#feffda">
+                        <JFXButton onAction="#btnClearReturnOrderOnAction" styleClass="btnCancel" stylesheets="@../styles/style.css" text="CLEAR RETURN" textFill="#feffda">
                            <padding>
                               <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                            </padding>

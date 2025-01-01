@@ -5,10 +5,7 @@ import com.jfoenix.controls.JFXPasswordField;
 import com.jfoenix.controls.JFXTextField;
 import controller.HomeFormController;
 import controller.auth.ForgotPasswordController;
-import exceptions.EmptyFieldsException;
-import exceptions.NoAdminFoundException;
-import exceptions.NoEmployeeFoundException;
-import exceptions.NoPasswordMatchFoundException;
+import exceptions.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -27,6 +24,7 @@ import model.Admin;
 import model.Employee;
 import service.ServiceFactory;
 import service.custom.EmployeeService;
+import util.AlertType;
 import util.Type;
 import util.UserType;
 
@@ -79,16 +77,6 @@ public class EmployeeLoginFormController implements Initializable {
 
     @FXML
     public void btnLoginOnAction(ActionEvent event) {
-//        ((Stage) ((Node) (event.getSource())).getScene().getWindow()).close();
-//        try {
-//            Stage stage=new Stage();
-//            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../../view/EmployeeDashboard.fxml"))));
-//            stage.initStyle(StageStyle.UNDECORATED);
-//            stage.show();
-//            stage.setResizable(false);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setHeaderText(null);
         try {
@@ -115,10 +103,12 @@ public class EmployeeLoginFormController implements Initializable {
             alert.setTitle("Invalid Password !");
             alert.setContentText("Password is invalid for the specific account");
             alert.show();
-        }catch (EmptyFieldsException e){
+        }catch (EmptyFieldsException e) {
             alert.setTitle("Input Username & Password !");
             alert.setContentText("Please input username & password to continue");
             alert.show();
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -184,5 +174,17 @@ public class EmployeeLoginFormController implements Initializable {
         pwdPassword.textProperty().bindBidirectional(txtPassword.textProperty());
         enablePwdPassword(true);
         enableTxtPassword(false);
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

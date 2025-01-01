@@ -2,6 +2,7 @@ package controller.supplier;
 
 import com.jfoenix.controls.JFXTextField;
 import controller.employee.EmployeeDashboardFormController;
+import exceptions.RepositoryException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,6 +16,7 @@ import model.Supplier;
 import service.ServiceFactory;
 import service.custom.ProductService;
 import service.custom.SupplierService;
+import util.AlertType;
 import util.Type;
 
 import java.net.URL;
@@ -52,25 +54,26 @@ public class EditSupplierFormController implements Initializable {
 
     @FXML
     void btnSaveSupplierOnAction(ActionEvent event) {
-        String name = txtSetSupplierName.getText().trim();
-        String company = txtSetSetSupplierCompany.getText().trim();
-        String email = txtSetSupplierEmail.getText().trim();
-        if(!name.isEmpty() && isValidEmail(email) && !company.isEmpty()){
-            selectedSupplierToEdit.setName(name);
-            selectedSupplierToEdit.setCompany(company);
-            selectedSupplierToEdit.setEmail(email);
-            supplierService.updateSupplier(selectedSupplierToEdit);
-            btnCancelEditSupplierOnAction(event);
-            employeeDashboardFormController.loadSuppliersTable(supplierService.getAllSuppliers());
-            employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
-            employeeDashboardFormController.setSuppliersPaneLabels();
-            return;
+        try{
+            String name = txtSetSupplierName.getText().trim();
+            String company = txtSetSetSupplierCompany.getText().trim();
+            String email = txtSetSupplierEmail.getText().trim();
+            if(!name.isEmpty() && isValidEmail(email) && !company.isEmpty()){
+                selectedSupplierToEdit.setName(name);
+                selectedSupplierToEdit.setCompany(company);
+                selectedSupplierToEdit.setEmail(email);
+                supplierService.updateSupplier(selectedSupplierToEdit);
+                btnCancelEditSupplierOnAction(event);
+                employeeDashboardFormController.loadSuppliersTable(supplierService.getAllSuppliers());
+                employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
+                employeeDashboardFormController.setSuppliersPaneLabels();
+                return;
+            }
+            showAlert(Alert.AlertType.ERROR,"Error","Invallid Data !","Please Enter Correct Data",AlertType.SHOW);
+            setInitialState();
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(null);
-        alert.setContentText("Please Enter Correct Data");
-        alert.show();
-        setInitialState();
     }
 
     @Override
@@ -88,5 +91,17 @@ public class EditSupplierFormController implements Initializable {
         Pattern pattern = Pattern.compile(emailPattern);
         Matcher matcher = pattern.matcher(email);
         return matcher.matches();
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

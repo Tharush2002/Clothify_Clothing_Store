@@ -168,7 +168,7 @@
                               <Font name="System Bold" size="13.0" />
                            </font>
                         </JFXButton>
-                        <JFXButton onAction="#btnClearOrderOnAction" styleClass="btn" stylesheets="@../styles/style.css" text="CLEAR ORDER" textFill="#feffda">
+                        <JFXButton onAction="#btnClearOrderOnAction" prefWidth="131.2" styleClass="btnCancel" stylesheets="@../styles/style.css" text="CLEAR ORDER" textFill="#ffffeb">
                            <padding>
                               <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
                            </padding>
@@ -178,7 +178,7 @@
                         </JFXButton>
                      </children>
                      <padding>
-                        <Insets left="45.0" />
+                        <Insets left="23.0" />
                      </padding>
                   </HBox>
                </children>

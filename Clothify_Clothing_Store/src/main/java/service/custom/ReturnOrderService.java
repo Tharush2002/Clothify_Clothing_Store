@@ -1,13 +1,12 @@
 package service.custom;
 
+import exceptions.RepositoryException;
 import javafx.collections.ObservableList;
 import model.ReturnOrder;
 import service.SuperService;
 
-import java.util.List;
-
 public interface ReturnOrderService extends SuperService {
-    boolean save(ReturnOrder returnOrder);
+    void save(ReturnOrder returnOrder) throws RepositoryException;
 
-    ObservableList<ReturnOrder> getAllReturnedItems();
+    ObservableList<ReturnOrder> getAllReturnedItems() throws RepositoryException;
 }

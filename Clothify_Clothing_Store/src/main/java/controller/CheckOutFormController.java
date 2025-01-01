@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXTextField;
 import controller.employee.EmployeeDashboardFormController;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -27,6 +28,7 @@ import service.custom.CustomerService;
 import service.custom.OrderItemsService;
 import service.custom.OrderService;
 import service.custom.ProductService;
+import util.AlertType;
 import util.Type;
 
 import java.net.URL;
@@ -89,66 +91,63 @@ public class CheckOutFormController implements Initializable {
 
     @FXML
     void btnClearOrderOnAction(ActionEvent event) {
-        EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList().clear();
-        checkOutButton.setDisable(true);
-        employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
-        btnCloseCheckOutOnAction(event);
+        try{
+            EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList().clear();
+            checkOutButton.setDisable(true);
+            employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
+            btnCloseCheckOutOnAction(event);
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
     }
 
     @FXML
     void btnConfirmOrderOnAction(ActionEvent event) {
-        String name = txtSetCustomerName.getText().trim();
-        String email = txtSetCustomerEmail.getText().trim();
-        String phoneNumber = txtSetCustomerPhoneNumber.getText().trim();
-//        ObservableList<OrderItem> orderItems = tblOrderItems.getItems();
-        List<OrderItemWithQuantity> orderItemWithQuantityList = EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList();
+        try{
+            String name = txtSetCustomerName.getText().trim();
+            String email = txtSetCustomerEmail.getText().trim();
+            String phoneNumber = txtSetCustomerPhoneNumber.getText().trim();
 
-        if(!name.isEmpty() && customerService.isValidEmail(email) && customerService.isValidPhoneNumber(phoneNumber) && !orderItemWithQuantityList.isEmpty() && !cmbSetPaymentType.getValue().isEmpty()){
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Order Confirmation");
-            alert.setHeaderText("Confirm Order");
-            alert.setContentText("Do you want to confirm the order?");
-            Optional<ButtonType> result = alert.showAndWait();
+            List<OrderItemWithQuantity> orderItemWithQuantityList = EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList();
 
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                LocalDate date = LocalDate.now();
-                LocalTime time = LocalTime.now().withNano(0);
+            if(!name.isEmpty() && customerService.isValidEmail(email) && customerService.isValidPhoneNumber(phoneNumber) && !orderItemWithQuantityList.isEmpty() && !cmbSetPaymentType.getValue().isEmpty()){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Order Confirmation");
+                alert.setHeaderText("Confirm Order");
+                alert.setContentText("Do you want to confirm the order?");
+                Optional<ButtonType> result = alert.showAndWait();
 
-                for(OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList){
-                    Order tempOrder = orderItemWithQuantity.getOrderItem().getOrder();
-                    tempOrder.setDate(date);
-                    tempOrder.setTime(time);
-                    tempOrder.setPaymentType(cmbSetPaymentType.getValue());
-                    tempOrder.getCustomer().setName(name);
-                    tempOrder.getCustomer().setEmail(email);
-                    tempOrder.getCustomer().setPhoneNumber(phoneNumber);
-                    tempOrder.setOrderItemCount(tblOrderItems.getItems().size());
-                    if(!orderItemsService.saveOrder(orderItemWithQuantity.getOrderItem() , orderItemWithQuantity.getQuantity())){
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                        errorAlert.setTitle("Error");
-                        errorAlert.setContentText("Error in processing the order. Please Try again.");
-                        errorAlert.show();
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    LocalDate date = LocalDate.now();
+                    LocalTime time = LocalTime.now().withNano(0);
+
+                    for(OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList){
+                        Order tempOrder = orderItemWithQuantity.getOrderItem().getOrder();
+                        tempOrder.setDate(date);
+                        tempOrder.setTime(time);
+                        tempOrder.setPaymentType(cmbSetPaymentType.getValue());
+                        tempOrder.getCustomer().setName(name);
+                        tempOrder.getCustomer().setEmail(email);
+                        tempOrder.getCustomer().setPhoneNumber(phoneNumber);
+                        tempOrder.setOrderItemCount(tblOrderItems.getItems().size());
+                        orderItemsService.saveOrder(orderItemWithQuantity.getOrderItem() , orderItemWithQuantity.getQuantity());
                     }
+
+                    employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
+                    employeeDashboardFormController.loadOrdersTable(orderService.getAllOrders());
+                    employeeDashboardFormController.setCatalogPaneLabels();
+                    employeeDashboardFormController.setOrdersPaneLabels();
+
+                    showAlert(Alert.AlertType.INFORMATION,"Confirmation Successful","Success","Order Has Been Processed",AlertType.SHOWANDWAIT);
+
+                    btnClearOrderOnAction(event);
                 }
-
-                employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
-                employeeDashboardFormController.loadOrdersTable(orderService.getAllOrders());
-                employeeDashboardFormController.setCatalogPaneLabels();
-                employeeDashboardFormController.setOrdersPaneLabels();
-
-                Alert completionAlert = new Alert(Alert.AlertType.INFORMATION);
-                completionAlert.setTitle("Confirmation Successful");
-                completionAlert.setHeaderText(null);
-                completionAlert.setContentText("Order Has Been Processed");
-                completionAlert.showAndWait();
-                btnClearOrderOnAction(event);
+                return;
             }
-            return;
+            showAlert(Alert.AlertType.ERROR,"Error","Check All The Fields Correctly","Please Enter All the Fields with Correct Data",AlertType.SHOW);
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(null);
-        alert.setContentText("Please Enter All the Fields with Correct Data");
-        alert.show();
     }
 
     @FXML
@@ -240,11 +239,7 @@ public class CheckOutFormController implements Initializable {
                                 Optional<ButtonType> result = alert.showAndWait();
 
                                 if (result.isPresent() && result.get() == ButtonType.OK) {
-                                    Alert completionAlert = new Alert(Alert.AlertType.INFORMATION);
-                                    completionAlert.setTitle("Deletion Successful");
-                                    completionAlert.setHeaderText(null);
-                                    completionAlert.setContentText("Selected property has been successfully deleted.");
-                                    completionAlert.showAndWait();
+                                    showAlert(Alert.AlertType.INFORMATION,"Deletion Successful","Success","Selected property has been successfully deleted.",AlertType.SHOWANDWAIT);
 
                                     OrderItem orderItem = tblOrderItems.getItems().get(getIndex());
 
@@ -291,5 +286,17 @@ public class CheckOutFormController implements Initializable {
             }
         };
         columnOrdersAction.setCellFactory(orderItemsCellFactory);
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

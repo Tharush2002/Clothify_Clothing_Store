@@ -3,6 +3,7 @@ package repository.custom.impl;
 import entity.CategoryEntity;
 import entity.ProductEntity;
 import entity.SupplierEntity;
+import exceptions.RepositoryException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -13,7 +14,7 @@ import java.util.List;
 
 public class SupplierRepositoryImpl implements SupplierRepository {
     @Override
-    public List<SupplierEntity> findAll() {
+    public List<SupplierEntity> findAll() throws RepositoryException {
         Transaction transaction = null;
         List<SupplierEntity> supplierEntityList = null;
         Session session = sessionFactory.openSession();
@@ -23,7 +24,7 @@ public class SupplierRepositoryImpl implements SupplierRepository {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            throw new RepositoryException("Failed to fetch the supplier entity records.");
         }finally{
             session.close();
         }
@@ -31,23 +32,22 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
-    public SupplierEntity findBySupplierID(String supplierId) {
+    public SupplierEntity findByName(String name) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         SupplierEntity supplierEntity = null;
-
         try {
             transaction = session.beginTransaction();
-            String hql = "FROM SupplierEntity WHERE supplierId = :supplierId";
-            Query<SupplierEntity> query = session.createQuery(hql, SupplierEntity.class);
-            query.setParameter("supplierId", supplierId);
-            supplierEntity = query.uniqueResult();
+            supplierEntity = session
+                    .createQuery("FROM SupplierEntity WHERE name = :name", SupplierEntity.class)
+                    .setParameter("name", name)
+                    .uniqueResult();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to find the specific supplier entity record.");
         } finally {
             session.close();
         }
@@ -55,79 +55,34 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
-    public SupplierEntity findByName(String name) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        SupplierEntity supplierEntity = null;
-        try {
-            transaction = session.beginTransaction();
-            String hql = "FROM SupplierEntity WHERE name = :name";
-            Query<SupplierEntity> query = session.createQuery(hql, SupplierEntity.class);
-            query.setParameter("name", name);
-            supplierEntity = query.uniqueResult();
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
-        return supplierEntity;
-    }
-
-    @Override
-    public void deleteByID(String supplierId) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            String hql = "DELETE FROM SupplierEntity WHERE supplierId = :supplierId";
-            Query<SupplierEntity> query = session.createQuery(hql);
-            query.setParameter("supplierId", supplierId);
-
-            int result = query.executeUpdate();
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        } finally {
-            session.close();
-        }
-    }
-
-    @Override
-    public void update(SupplierEntity supplierEntity) {
+    public void update(SupplierEntity supplierEntity) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
 
         try {
             transaction = session.beginTransaction();
 
-            String hql = "UPDATE SupplierEntity s SET s.name = :name, s.company = :company, s.email = :email WHERE s.supplierId = :supplierId";
-            Query<SupplierEntity> query = session.createQuery(hql);
-            query.setParameter("name", supplierEntity.getName());
-            query.setParameter("company", supplierEntity.getCompany());
-            query.setParameter("email", supplierEntity.getEmail());
-            query.setParameter("supplierId", supplierEntity.getSupplierId());
+            session
+                    .createQuery("UPDATE SupplierEntity s SET s.name = :name, s.company = :company, s.email = :email WHERE s.supplierId = :supplierId")
+                    .setParameter("name", supplierEntity.getName())
+                    .setParameter("company", supplierEntity.getCompany())
+                    .setParameter("email", supplierEntity.getEmail())
+                    .setParameter("supplierId", supplierEntity.getSupplierId())
+                    .executeUpdate();
 
-            int result = query.executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to update the specific supplier entity record.");
         } finally {
             session.close();
         }
     }
 
     @Override
-    public void save(SupplierEntity supplierEntity) {
+    public void save(SupplierEntity supplierEntity) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
@@ -138,9 +93,47 @@ public class SupplierRepositoryImpl implements SupplierRepository {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to save the specific supplier entity record.");
         } finally {
             session.close();
         }
+    }
+
+    @Override
+    public SupplierEntity findByName(Session session, String name) {
+        return session.createQuery("FROM SupplierEntity WHERE name = :name", SupplierEntity.class)
+                .setParameter("name", name)
+                .uniqueResult();
+    }
+
+    @Override
+    public SupplierEntity findBySupplierID(Session session, String supplierId) {
+        return session.createQuery("FROM SupplierEntity WHERE supplierId = :supplierId", SupplierEntity.class)
+                .setParameter("supplierId", supplierId)
+                .uniqueResult();
+    }
+
+    @Override
+    public void deleteByID(Session session, String supplierId) {
+        session
+                .createQuery("DELETE FROM SupplierEntity WHERE supplierId = :supplierId")
+                .setParameter("supplierId", supplierId)
+                .executeUpdate();
+    }
+
+    @Override
+    public void update(Session session, SupplierEntity supplierEntity) {
+        session
+                .createQuery("UPDATE SupplierEntity s SET s.name = :name, s.company = :company, s.email = :email WHERE s.supplierId = :supplierId")
+                .setParameter("name", supplierEntity.getName())
+                .setParameter("company", supplierEntity.getCompany())
+                .setParameter("email", supplierEntity.getEmail())
+                .setParameter("supplierId", supplierEntity.getSupplierId())
+                .executeUpdate();
+    }
+
+    @Override
+    public void save(Session session, SupplierEntity newSupplier) {
+        session.save(newSupplier);
     }
 }

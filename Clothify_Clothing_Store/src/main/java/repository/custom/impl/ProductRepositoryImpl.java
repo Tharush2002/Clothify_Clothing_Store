@@ -3,24 +3,29 @@ package repository.custom.impl;
 import entity.CategoryEntity;
 import entity.ProductEntity;
 import entity.SupplierEntity;
+import exceptions.RepositoryException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
+import repository.RepositoryFactory;
+import repository.custom.CategoryRepository;
 import repository.custom.ProductRepository;
+import repository.custom.SupplierRepository;
+import util.Type;
 
 import java.util.List;
 
 public class ProductRepositoryImpl implements ProductRepository {
+    private final CategoryRepository categoryRepository = RepositoryFactory.getInstance().getRepositoryType(Type.CATEGORY);
+    private final SupplierRepository supplierRepository = RepositoryFactory.getInstance().getRepositoryType(Type.SUPPLIER);
+
     @Override
-    public boolean save(ProductEntity entity) {
+    public void save(ProductEntity entity) throws RepositoryException {
         Transaction transaction = null;
         Session session = sessionFactory.openSession();
         try {
             transaction = session.beginTransaction();
             if (entity.getCategoryEntity() != null) {
-                CategoryEntity existingCategory = session.createQuery("FROM CategoryEntity WHERE name = :name", CategoryEntity.class)
-                        .setParameter("name", entity.getCategoryEntity().getName())
-                        .uniqueResult();
+                CategoryEntity existingCategory = categoryRepository.findByName(session, entity.getCategoryEntity().getName());
 
                 if (existingCategory != null) {
                     entity.setCategoryEntity(existingCategory);
@@ -30,9 +35,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                 }
             }
             if (entity.getSupplierEntity() != null) {
-                SupplierEntity existingSupplier = session.createQuery("FROM SupplierEntity WHERE name = :name", SupplierEntity.class)
-                        .setParameter("name", entity.getSupplierEntity().getName())
-                        .uniqueResult();
+                SupplierEntity existingSupplier = supplierRepository.findByName(session, entity.getSupplierEntity().getName());
 
                 if (existingSupplier != null) {
                     entity.setSupplierEntity(existingSupplier);
@@ -44,30 +47,27 @@ public class ProductRepositoryImpl implements ProductRepository {
 
             session.save(entity);
             transaction.commit();
-            return true;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
-            return false;
+            throw new RepositoryException("Failed to save the specific product entity record.");
         } finally {
             session.close();
         }
     }
 
     @Override
-    public void update(ProductEntity entity) {
+    public void update(ProductEntity entity) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
 
         try {
             transaction = session.beginTransaction();
-            String productHql = "FROM ProductEntity WHERE productId = :productId";
-            Query<ProductEntity> productQuery = session.createQuery(productHql, ProductEntity.class);
-            productQuery.setParameter("productId", entity.getProductId());
-
-            ProductEntity existingProduct = productQuery.uniqueResult();
+            ProductEntity existingProduct = session
+                    .createQuery("FROM ProductEntity WHERE productId = :productId", ProductEntity.class)
+                    .setParameter("productId", entity.getProductId())
+                    .uniqueResult();
 
             if (existingProduct != null) {
                 existingProduct.setName(entity.getName());
@@ -75,10 +75,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                 existingProduct.setUnitPrice(entity.getUnitPrice());
 
                 if (entity.getCategoryEntity()!=null){
-                    String categoryHql = "FROM CategoryEntity WHERE categoryId = :name";
-                    Query<CategoryEntity> categoryQuery = session.createQuery(categoryHql, CategoryEntity.class);
-                    categoryQuery.setParameter("name", entity.getCategoryEntity().getName());
-                    CategoryEntity existingCategory = categoryQuery.uniqueResult();
+                    CategoryEntity existingCategory = categoryRepository.findByName(session, entity.getCategoryEntity().getName());
 
                     if (existingCategory != null) {
                         existingProduct.setCategoryEntity(existingCategory);
@@ -86,10 +83,7 @@ public class ProductRepositoryImpl implements ProductRepository {
                 }
 
                 if(entity.getSupplierEntity()!=null){
-                    String supplierHql = "FROM SupplierEntity WHERE supplierId = :supplierId";
-                    Query<SupplierEntity> supplierQuery = session.createQuery(supplierHql, SupplierEntity.class);
-                    supplierQuery.setParameter("supplierId", entity.getSupplierEntity().getSupplierId());
-                    SupplierEntity existingSupplier = supplierQuery.uniqueResult();
+                    SupplierEntity existingSupplier = supplierRepository.findBySupplierID(session, entity.getSupplierEntity().getSupplierId());
 
                     if (existingSupplier != null) {
                         existingProduct.setSupplierEntity(existingSupplier);
@@ -106,14 +100,14 @@ public class ProductRepositoryImpl implements ProductRepository {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to update the specific product entity record.");
         } finally {
             session.close();
         }
     }
 
     @Override
-    public List<ProductEntity> findAll() {
+    public List<ProductEntity> findAll() throws RepositoryException {
         Transaction transaction = null;
         List<ProductEntity> productEntityList = null;
         Session session = sessionFactory.openSession();
@@ -123,7 +117,7 @@ public class ProductRepositoryImpl implements ProductRepository {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            throw new RepositoryException("Failed to fetch the product entity records.");
         }finally{
             session.close();
         }
@@ -131,41 +125,26 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public ProductEntity findByID(String productId) {
+    public ProductEntity findByID(String productId) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         ProductEntity productEntity = null;
         try {
             transaction = session.beginTransaction();
-            String hql = "FROM ProductEntity WHERE productId = :productId";
-            Query<ProductEntity> query = session.createQuery(hql, ProductEntity.class);
-            query.setParameter("productId", productId);
-            productEntity = query.uniqueResult();
+            productEntity = session
+                    .createQuery("FROM ProductEntity WHERE productId = :productId", ProductEntity.class)
+                    .setParameter("productId", productId)
+                    .uniqueResult();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to find the specific product entity record.");
         } finally {
             session.close();
         }
         return productEntity;
-    }
-
-    @Override
-    public ProductEntity findByID(ProductEntity productEntity, Session session) {
-        ProductEntity entity = session.createQuery(
-                "FROM ProductEntity WHERE productId = :productId",
-                ProductEntity.class
-        ).setParameter("productId", productEntity.getProductId()).uniqueResult();
-
-        if (entity == null) {
-            save(productEntity, session);
-            entity = productEntity;
-        }
-
-        return entity ;
     }
 
     @Override
@@ -185,9 +164,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     @Override
     public void save(ProductEntity entity, Session session){
         if (entity.getCategoryEntity() != null) {
-            CategoryEntity existingCategory = session.createQuery("FROM CategoryEntity WHERE name = :name", CategoryEntity.class)
-                    .setParameter("name", entity.getCategoryEntity().getName())
-                    .uniqueResult();
+            CategoryEntity existingCategory = categoryRepository.findByName(session, entity.getCategoryEntity().getName());
 
             if (existingCategory != null) {
                 entity.setCategoryEntity(existingCategory);
@@ -197,9 +174,7 @@ public class ProductRepositoryImpl implements ProductRepository {
             }
         }
         if (entity.getSupplierEntity() != null) {
-            SupplierEntity existingSupplier = session.createQuery("FROM SupplierEntity WHERE name = :name", SupplierEntity.class)
-                    .setParameter("name", entity.getSupplierEntity().getName())
-                    .uniqueResult();
+            SupplierEntity existingSupplier = supplierRepository.findByName(session, entity.getSupplierEntity().getName());
 
             if (existingSupplier != null) {
                 entity.setSupplierEntity(existingSupplier);
@@ -213,48 +188,80 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public void deleteByID(String productId) {
+    public void deleteByID(String productId) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
-            String hql = "DELETE FROM ProductEntity WHERE productId = :productId";
-            Query<ProductEntity> query = session.createQuery(hql);
-            query.setParameter("productId", productId);
-
-            int result = query.executeUpdate();
+            session.createQuery("DELETE FROM ProductEntity WHERE productId = :productId")
+                    .setParameter("productId", productId)
+                    .executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to delete the specific product entity record.");
         } finally {
             session.close();
         }
     }
 
     @Override
-    public List<ProductEntity> findBySupplierID(String supplierId) {
+    public List<ProductEntity> findBySupplierID(String supplierId) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         List<ProductEntity> productEntityList = null;
         try {
             transaction = session.beginTransaction();
-            String hql = "FROM ProductEntity p WHERE p.supplierEntity.supplierId = :supplierId";
-            Query<ProductEntity> query = session.createQuery(hql, ProductEntity.class);
-            query.setParameter("supplierId", supplierId);
-            productEntityList = query.getResultList();
+            productEntityList = session
+                    .createQuery("FROM ProductEntity p WHERE p.supplierEntity.supplierId = :supplierId", ProductEntity.class)
+                    .setParameter("supplierId", supplierId)
+                    .getResultList();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to find the specific product entity record.");
         } finally {
             session.close();
         }
         return productEntityList;
+    }
+
+    @Override
+    public void update(Session session, ProductEntity entity) {
+        ProductEntity existingProduct = session
+                .createQuery("FROM ProductEntity WHERE productId = :productId", ProductEntity.class)
+                .setParameter("productId", entity.getProductId())
+                .uniqueResult();
+
+        if (existingProduct != null) {
+            existingProduct.setName(entity.getName());
+            existingProduct.setQuantity(entity.getQuantity());
+            existingProduct.setUnitPrice(entity.getUnitPrice());
+
+            if (entity.getCategoryEntity()!=null){
+                CategoryEntity existingCategory = categoryRepository.findByName(session, entity.getCategoryEntity().getName());
+
+                if (existingCategory != null) {
+                    existingProduct.setCategoryEntity(existingCategory);
+                }
+            }
+
+            if(entity.getSupplierEntity()!=null){
+                SupplierEntity existingSupplier = supplierRepository.findBySupplierID(session, entity.getSupplierEntity().getSupplierId());
+
+                if (existingSupplier != null) {
+                    existingProduct.setSupplierEntity(existingSupplier);
+                }
+            }else{
+                existingProduct.setSupplierEntity(null);
+            }
+
+            session.update(existingProduct);
+        }
     }
 
 }

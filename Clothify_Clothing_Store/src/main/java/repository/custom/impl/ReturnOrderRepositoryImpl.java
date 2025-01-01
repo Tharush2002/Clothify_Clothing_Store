@@ -1,39 +1,37 @@
 package repository.custom.impl;
 
 import entity.OrderEntity;
-import entity.ProductEntity;
 import entity.ReturnOrderEntity;
-import model.ReturnOrder;
+import exceptions.RepositoryException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
+import repository.RepositoryFactory;
+import repository.custom.OrderRepository;
 import repository.custom.ReturnOrderRepository;
+import util.Type;
 
 import java.util.List;
 
 public class ReturnOrderRepositoryImpl implements ReturnOrderRepository {
+    private final OrderRepository orderRepository = RepositoryFactory.getInstance().getRepositoryType(Type.ORDER);
 
     @Override
-    public boolean save(ReturnOrderEntity returnOrderEntity) {
+    public void save(ReturnOrderEntity returnOrderEntity) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
 
         try {
             transaction = session.beginTransaction();
 
-            Query<OrderEntity> orderEntityQuery = session.createQuery("FROM OrderEntity WHERE orderId = :orderId", OrderEntity.class);
-            orderEntityQuery.setParameter("orderId", returnOrderEntity.getOrderEntity().getOrderId());
-            OrderEntity orderEntity = orderEntityQuery.uniqueResult();
+            OrderEntity orderEntity = orderRepository.findByOrderId(session, returnOrderEntity.getOrderEntity().getOrderId());
 
             returnOrderEntity.setOrderEntity(orderEntity);
 
             session.save(returnOrderEntity);
             transaction.commit();
-            return true;
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
-            return false;
+            throw new RepositoryException("Failed to save the specific return order entity record.");
         } finally {
             session.close();
         }
@@ -55,7 +53,7 @@ public class ReturnOrderRepositoryImpl implements ReturnOrderRepository {
     }
 
     @Override
-    public List<ReturnOrderEntity> findAll(){
+    public List<ReturnOrderEntity> findAll() throws RepositoryException {
         Transaction transaction = null;
         List<ReturnOrderEntity> returnOrderEntityList = null;
         Session session = sessionFactory.openSession();
@@ -65,7 +63,7 @@ public class ReturnOrderRepositoryImpl implements ReturnOrderRepository {
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            throw new RepositoryException("Failed to fetch the return order entity records.");
         }finally{
             session.close();
         }

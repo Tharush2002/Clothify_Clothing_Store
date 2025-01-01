@@ -1,31 +1,33 @@
 package repository.custom.impl;
 
 import entity.AdminEntity;
+import exceptions.RepositoryException;
 import jakarta.persistence.OptimisticLockException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 import repository.custom.AdminRepository;
+
+import java.util.List;
 
 public class AdminRepositoryImpl implements AdminRepository {
     @Override
-    public AdminEntity findByEmail(String email) {
+    public AdminEntity findByEmail(String email) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
-        AdminEntity adminEntity = null;
+        AdminEntity adminEntity;
 
         try {
             transaction = session.beginTransaction();
-            String hql = "FROM AdminEntity WHERE email = :email";
-            Query<AdminEntity> query = session.createQuery(hql, AdminEntity.class);
-            query.setParameter("email", email);
-            adminEntity = query.uniqueResult();
+            adminEntity = session
+                    .createQuery("FROM AdminEntity WHERE email = :email", AdminEntity.class)
+                    .setParameter("email", email)
+                    .uniqueResult();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to find the specific admin entity record.");
         } finally {
             session.close();
         }
@@ -33,23 +35,23 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     @Override
-    public AdminEntity findByUserName(String userName) {
+    public AdminEntity findByUserName(String userName) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         AdminEntity adminEntity = null;
 
         try {
             transaction = session.beginTransaction();
-            String hql = "FROM AdminEntity WHERE userName = :userName";
-            Query<AdminEntity> query = session.createQuery(hql, AdminEntity.class);
-            query.setParameter("userName", userName);
-            adminEntity = query.uniqueResult();
+            adminEntity = session
+                    .createQuery("FROM AdminEntity WHERE userName = :userName", AdminEntity.class)
+                    .setParameter("userName", userName)
+                    .uniqueResult();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to find the specific admin entity record.");
         } finally {
             session.close();
         }
@@ -57,20 +59,18 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     @Override
-    public boolean update(AdminEntity adminEntity) {
+    public void update(AdminEntity adminEntity) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
             session.update(adminEntity);
             transaction.commit();
-            return true;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
-            return false;
+            throw new RepositoryException("Failed to update teh specific admin entity record.");
         } finally {
             session.close();
         }
@@ -109,4 +109,73 @@ public class AdminRepositoryImpl implements AdminRepository {
         }
     }
 
+    @Override
+    public List<AdminEntity> findAll() throws RepositoryException {
+        Transaction transaction = null;
+        List<AdminEntity> adminEntityList = null;
+        Session session = sessionFactory.openSession();
+        try{
+            transaction = session.beginTransaction();
+            adminEntityList = session.createQuery("from AdminEntity", AdminEntity.class).list();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw new RepositoryException("Failed to fetch admin entity records.");
+        }finally{
+            session.close();
+        }
+        return adminEntityList;
+    }
+
+    @Override
+    public void deleteById(String adminId) throws RepositoryException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session
+                    .createQuery("DELETE FROM AdminEntity WHERE adminId = :adminId")
+                    .setParameter("adminId", adminId)
+                    .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RepositoryException("Failed to delete the specific admin entity record.");
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public void save(AdminEntity adminEntity) throws RepositoryException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session.save(adminEntity);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RepositoryException("Failed to save admin entity records.");
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public AdminEntity findByEmail(Session session, String email) {
+        return session
+                .createQuery("FROM AdminEntity WHERE email = :email", AdminEntity.class)
+                .setParameter("email", email)
+                .uniqueResult();
+    }
+
+    @Override
+    public void update(Session session, AdminEntity adminEntity) {
+        session.update(adminEntity);
+    }
 }

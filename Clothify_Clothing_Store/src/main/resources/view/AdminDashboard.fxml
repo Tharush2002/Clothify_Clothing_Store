@@ -1,8 +1,1094 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.admin.AdminDashboardFormController">
-
+<AnchorPane maxHeight="692.0" maxWidth="648.0" minHeight="692.0" minWidth="592.0" prefHeight="692.0" prefWidth="648.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.admin.AdminDashboardFormController">
+   <children>
+      <AnchorPane fx:id="anchorPaneReports" disable="true" layoutX="244.0" layoutY="-1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="694.0" prefWidth="404.0" visible="false">
+         <children>
+            <Label layoutX="54.0" layoutY="182.0" text="REPORTS" textFill="#69665b">
+               <font>
+                  <Font name="Berlin Sans FB Demi Bold" size="26.0" />
+               </font>
+            </Label>
+            <Button layoutX="108.0" layoutY="384.0" mnemonicParsing="false" onAction="#btnLoadInventoryReportOnAction" prefHeight="42.0" prefWidth="190.0" styleClass="btnAdminReports" stylesheets="@../styles/style.css" text="Inventory Report" textFill="#fcf5d7">
+               <font>
+                  <Font name="Dubai Medium" size="18.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button layoutX="108.0" layoutY="262.0" mnemonicParsing="false" onAction="#btnLoadEmployeeReportOnAction" prefHeight="45.0" prefWidth="190.0" styleClass="btnAdminReports" stylesheets="@../styles/style.css" text="Employee Report" textFill="#fcf5d7">
+               <font>
+                  <Font name="Dubai Medium" size="18.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button layoutX="108.0" layoutY="323.0" mnemonicParsing="false" onAction="#btnLoadCustomerReportOnAction" prefHeight="14.0" prefWidth="190.0" styleClass="btnAdminReports" stylesheets="@../styles/style.css" text="Customer Report" textFill="#fcf5d7">
+               <font>
+                  <Font name="Dubai Medium" size="18.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Button layoutX="108.0" layoutY="446.0" mnemonicParsing="false" onAction="#btnLoadSalesReportOnAction" prefHeight="42.0" prefWidth="190.0" styleClass="btnAdminReports" stylesheets="@../styles/style.css" text="Sales Report" textFill="#fcf5d7">
+               <font>
+                  <Font name="Dubai Medium" size="18.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <HBox layoutY="595.0" opacity="0.89" prefHeight="98.0" prefWidth="404.0" styleClass="contactPane" stylesheets="@../styles/style.css">
+               <children>
+                  <VBox prefHeight="98.0" prefWidth="407.0">
+                     <children>
+                        <HBox prefHeight="17.0" prefWidth="674.0" />
+                        <HBox alignment="TOP_CENTER" prefHeight="38.0" prefWidth="544.0">
+                           <children>
+                              <Line startX="-100.0" stroke="#b1a57b" />
+                              <ImageView fitHeight="29.0" fitWidth="29.0" onMouseClicked="#openGithubOnAction" opacity="0.62" pickOnBounds="true" preserveRatio="true" styleClass="socialMediaIcons">
+                                 <image>
+                                    <Image url="@../img/github.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets left="20.0" right="10.0" top="-15.0" />
+                                 </HBox.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <ImageView fitHeight="25.0" fitWidth="25.0" onMouseClicked="#openLinkedinOnAction" opacity="0.62" pickOnBounds="true" preserveRatio="true" styleClass="socialMediaIcons">
+                                 <image>
+                                    <Image url="@../img/linkedin.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets left="10.0" right="10.0" top="-13.0" />
+                                 </HBox.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <ImageView fitHeight="24.0" fitWidth="24.0" onMouseClicked="#openInstagramOnAction" opacity="0.62" pickOnBounds="true" preserveRatio="true" styleClass="socialMediaIcons">
+                                 <image>
+                                    <Image url="@../img/instagram.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets left="10.0" right="20.0" top="-13.0" />
+                                 </HBox.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <Line layoutX="161.0" layoutY="26.0" startX="-100.0" stroke="#b1a57b" />
+                           </children>
+                           <padding>
+                              <Insets top="15.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER" prefHeight="30.0" prefWidth="674.0">
+                           <children>
+                              <Label opacity="0.45" text="Created by : Tharusha Gunarathne" textFill="#ffefbd" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="anchorPaneAddAdmin" disable="true" layoutX="244.0" layoutY="-1.0" prefHeight="694.0" prefWidth="404.0" visible="false">
+         <children>
+            <Label layoutX="54.0" layoutY="182.0" text="ADD ADMIN" textFill="#69665b">
+               <font>
+                  <Font name="Berlin Sans FB Demi Bold" size="26.0" />
+               </font>
+            </Label>
+            <VBox layoutX="12.0" layoutY="243.0" maxWidth="374.4" minWidth="374.0" prefHeight="405.0" prefWidth="374.0">
+               <children>
+                  <HBox prefHeight="50.0" prefWidth="294.0">
+                     <children>
+                        <VBox prefHeight="42.0" prefWidth="166.0">
+                           <children>
+                              <Label text="First Name : " />
+                              <TextField fx:id="txtAdminSetFirstName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="10.0" layoutY="10.0" prefHeight="54.0" prefWidth="137.0">
+                           <children>
+                              <Label text="Last Name : " />
+                              <TextField fx:id="txtAdminSetLastName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <Label text="Email :">
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="txtAdminSetEmail" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="294.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+                  <Label layoutX="50.0" layoutY="72.0" text="Contact Number : ">
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="txtAdminSetContactNumber" layoutX="50.0" layoutY="95.0" maxWidth="-Infinity" minWidth="-Infinity" onKeyTyped="#validateAdminContactNumberOnAction" prefHeight="26.0" prefWidth="294.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+                  <Line endX="193.0" opacity="0.16" startX="-100.0" strokeWidth="2.0">
+                     <VBox.margin>
+                        <Insets bottom="16.0" top="16.0" />
+                     </VBox.margin>
+                  </Line>
+                  <HBox prefHeight="157.0" prefWidth="294.0">
+                     <children>
+                        <VBox prefHeight="50.0" prefWidth="147.0">
+                           <children>
+                              <Label text="User Name : " />
+                              <TextField fx:id="txtAdminSetUserName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="116.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="147.0">
+                           <children>
+                              <Label text="Password : " />
+                              <Pane>
+                                 <children>
+                                    <Pane fx:id="txtAdminSetNewPasswordPane" maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="147.0">
+                                       <children>
+                                          <TextField fx:id="txtAdminSetNewPassword" maxWidth="234.4" minWidth="134.0" prefHeight="27.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                             <padding>
+                                                <Insets bottom="4.0" left="8.0" right="46.0" top="4.0" />
+                                             </padding>
+                                          </TextField>
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/hide-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showAdminPwdSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                    <Pane fx:id="pwdAdminSetNewPasswordPane">
+                                       <children>
+                                          <PasswordField fx:id="pwdAdminSetNewPassword" maxWidth="234.4" minWidth="147.0" prefHeight="25.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                             <padding>
+                                                <Insets bottom="4.0" left="8.0" right="46.0" top="4.0" />
+                                             </padding>
+                                          </PasswordField>
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/show-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showAdminTxtSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </Pane>
+                              <Label layoutX="10.0" layoutY="10.0" text="Confirm Password : ">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" top="8.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Pane layoutX="10.0" layoutY="32.0">
+                                 <children>
+                                    <Pane fx:id="txtAdminConfirmNewPasswordPane" maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="147.0">
+                                       <children>
+                                          <TextField fx:id="txtAdminConfirmNewPassword" maxWidth="234.4" minWidth="134.0" prefHeight="27.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                             <padding>
+                                                <Insets bottom="4.0" left="8.0" right="46.0" top="4.0" />
+                                             </padding>
+                                          </TextField>
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/hide-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showAdminPwdConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                    <Pane fx:id="pwdAdminConfirmNewPasswordPane">
+                                       <children>
+                                          <PasswordField fx:id="pwdAdminConfirmNewPassword" maxWidth="234.4" minWidth="147.0" prefHeight="25.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css" />
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/show-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showAdminTxtConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                 </children>
+                              </Pane>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox alignment="TOP_CENTER" prefHeight="98.0" prefWidth="294.0">
+                     <children>
+                        <JFXButton onAction="#btnSaveAdminOnAction" prefHeight="43.0" prefWidth="150.0" styleClass="btn" stylesheets="@../styles/style.css" text="SAVE ADMIN" textFill="#feffda">
+                           <padding>
+                              <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton layoutX="98.0" layoutY="10.0" onAction="#btnClearAdminOnAction" prefHeight="43.0" prefWidth="150.0" styleClass="btnClearAdmin" stylesheets="@../styles/style.css" text="CLEAR" textFill="#feffda">
+                           <padding>
+                              <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </JFXButton>
+                     </children>
+                     <padding>
+                        <Insets top="5.0" />
+                     </padding>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="40.0" right="40.0" />
+               </padding>
+            </VBox>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="anchorPaneAddEmployee" layoutX="244.0" layoutY="-1.0" prefHeight="694.0" prefWidth="404.0">
+         <children>
+            <Label layoutX="54.0" layoutY="182.0" text="ADD EMPLOYEE" textFill="#69665b">
+               <font>
+                  <Font name="Berlin Sans FB Demi Bold" size="26.0" />
+               </font>
+            </Label>
+            <VBox layoutX="12.0" layoutY="243.0" maxWidth="374.4" minWidth="374.0" prefHeight="450.0" prefWidth="398.0">
+               <children>
+                  <HBox prefHeight="50.0" prefWidth="294.0">
+                     <children>
+                        <VBox prefHeight="42.0" prefWidth="166.0">
+                           <children>
+                              <Label text="First Name : " />
+                              <TextField fx:id="txtSetEmployeeFirstName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="10.0" layoutY="10.0" prefHeight="54.0" prefWidth="137.0">
+                           <children>
+                              <Label text="Last Name : " />
+                              <TextField fx:id="txtSetEmployeeLastName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <Label text="Email :">
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="txtSetEmployeeEmail" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="294.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+                  <HBox layoutX="50.0" layoutY="10.0" prefHeight="50.0" prefWidth="294.0">
+                     <children>
+                        <VBox prefHeight="42.0" prefWidth="166.0">
+                           <children>
+                              <Label text="Contact Number : " />
+                              <TextField fx:id="txtSetEmployeeContactNumber" maxWidth="-Infinity" minWidth="-Infinity" onKeyTyped="#validateEmployeeContactNumberOnAction" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="10.0" layoutY="10.0" prefHeight="54.0" prefWidth="137.0">
+                           <children>
+                              <Label text="NIC : " />
+                              <TextField fx:id="txtSetEmployeeNIC" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="132.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <Label layoutX="50.0" layoutY="125.0" text="Address : ">
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="txtSetEmployeeAddress" layoutX="50.0" layoutY="148.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="26.0" prefWidth="294.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </TextField>
+                  <Line endX="193.0" opacity="0.16" startX="-100.0" strokeWidth="2.0">
+                     <VBox.margin>
+                        <Insets bottom="16.0" top="16.0" />
+                     </VBox.margin>
+                  </Line>
+                  <HBox prefHeight="157.0" prefWidth="294.0">
+                     <children>
+                        <VBox prefHeight="50.0" prefWidth="147.0">
+                           <children>
+                              <Label text="User Name : " />
+                              <TextField fx:id="txtSetEmployeeUserName" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="27.0" prefWidth="116.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </TextField>
+                           </children>
+                        </VBox>
+                        <VBox layoutX="10.0" layoutY="10.0" prefHeight="50.0" prefWidth="147.0">
+                           <children>
+                              <Label text="Password : " />
+                              <Pane>
+                                 <children>
+                                    <Pane fx:id="txtEmployeeSetNewPasswordPane" maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="147.0">
+                                       <children>
+                                          <TextField fx:id="txtEmployeeSetNewPassword" maxWidth="234.4" minWidth="134.0" prefHeight="27.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                             <padding>
+                                                <Insets bottom="4.0" left="8.0" right="46.0" top="4.0" />
+                                             </padding>
+                                          </TextField>
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/hide-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showEmployeePwdSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                    <Pane fx:id="pwdEmployeeSetNewPasswordPane">
+                                       <children>
+                                          <PasswordField fx:id="pwdEmployeeSetNewPassword" maxWidth="234.4" minWidth="147.0" prefHeight="25.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                             <padding>
+                                                <Insets bottom="4.0" left="8.0" right="46.0" top="4.0" />
+                                             </padding>
+                                          </PasswordField>
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/show-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showEmployeeTxtSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </Pane>
+                              <Label layoutX="10.0" layoutY="10.0" text="Confirm Password : ">
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" top="8.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Pane layoutX="10.0" layoutY="32.0">
+                                 <children>
+                                    <Pane fx:id="txtEmployeeConfirmNewPasswordPane" maxHeight="27.0" minHeight="27.0" prefHeight="27.0" prefWidth="147.0">
+                                       <children>
+                                          <TextField fx:id="txtEmployeeConfirmNewPassword" maxWidth="234.4" minWidth="134.0" prefHeight="27.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                                             <padding>
+                                                <Insets bottom="4.0" left="8.0" right="46.0" top="4.0" />
+                                             </padding>
+                                          </TextField>
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/hide-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showEmployeePwdConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                    <Pane fx:id="pwdEmployeeConfirmNewPasswordPane">
+                                       <children>
+                                          <PasswordField fx:id="pwdEmployeeConfirmNewPassword" maxWidth="234.4" minWidth="147.0" prefHeight="25.0" prefWidth="147.0" styleClass="inputFields" stylesheets="@../styles/style.css" />
+                                          <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="115.0" layoutY="2.0" opacity="0.6" preserveRatio="true">
+                                             <image>
+                                                <Image url="@../img/show-password.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Pane layoutX="115.0" layoutY="2.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showEmployeeTxtConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                                       </children>
+                                    </Pane>
+                                 </children>
+                              </Pane>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox alignment="TOP_CENTER" prefHeight="98.0" prefWidth="294.0">
+                     <children>
+                        <JFXButton onAction="#btnSaveEmployeeOnAction" prefHeight="43.0" prefWidth="150.0" styleClass="btn" stylesheets="@../styles/style.css" text="SAVE EMPLOYEE" textFill="#feffda">
+                           <padding>
+                              <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXButton>
+                        <JFXButton layoutX="98.0" layoutY="10.0" onAction="#btnClearEmployeeOnAction" prefHeight="43.0" prefWidth="150.0" styleClass="btnClearAdmin" stylesheets="@../styles/style.css" text="CLEAR" textFill="#feffda">
+                           <padding>
+                              <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </JFXButton>
+                     </children>
+                     <padding>
+                        <Insets top="5.0" />
+                     </padding>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets left="40.0" right="40.0" />
+               </padding>
+            </VBox>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="anchorPaneEdit" disable="true" layoutX="244.0" layoutY="-1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="694.0" prefWidth="404.0" visible="false">
+         <children>
+            <Pane prefHeight="177.0" prefWidth="404.0" />
+            <VBox layoutY="177.0" prefHeight="518.0" prefWidth="404.0">
+               <children>
+                  <Label text="ADMIN" textFill="#69665b">
+                     <font>
+                        <Font name="Berlin Sans FB Demi Bold" size="26.0" />
+                     </font>
+                     <padding>
+                        <Insets left="54.0" top="5.0" />
+                     </padding>
+                  </Label>
+                  <TableView fx:id="tblAdmin" prefHeight="185.0" prefWidth="200.0">
+                    <columns>
+                      <TableColumn fx:id="columnAdminAdminId" prefWidth="55.0" text="ID" />
+                      <TableColumn fx:id="columnAdminAdminName" prefWidth="147.0" text="Name" />
+                        <TableColumn fx:id="columnAdminActions" maxWidth="144.0" minWidth="90.39996337890625" prefWidth="117.5999755859375" />
+                    </columns>
+                     <VBox.margin>
+                        <Insets bottom="20.0" left="40.0" right="40.0" top="12.0" />
+                     </VBox.margin>
+                  </TableView>
+                  <Label layoutX="10.0" layoutY="10.0" text="EMPLOYEE" textFill="#69665b">
+                     <font>
+                        <Font name="Berlin Sans FB Demi Bold" size="26.0" />
+                     </font>
+                     <padding>
+                        <Insets left="54.0" top="5.0" />
+                     </padding>
+                  </Label>
+                  <TableView fx:id="tblEmployee" layoutX="50.0" layoutY="57.0" prefHeight="185.0" prefWidth="200.0">
+                     <columns>
+                        <TableColumn fx:id="columnEmployeeEmployeeId" prefWidth="55.0" text="ID" />
+                        <TableColumn fx:id="columnEmployeeEmployeeName" prefWidth="147.0" text="Name" />
+                        <TableColumn fx:id="columnEmployeeActions" prefWidth="117.5999755859375" />
+                     </columns>
+                     <VBox.margin>
+                        <Insets left="40.0" right="40.0" top="12.0" />
+                     </VBox.margin>
+                  </TableView>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="anchorPaneDetails" disable="true" layoutX="244.0" layoutY="-1.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="694.0" prefWidth="404.0" visible="false">
+         <children>
+            <HBox layoutY="160.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="221.0" prefWidth="404.0" styleClass="employeeDetailsPane" stylesheets="@../styles/style.css">
+               <children>
+                  <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="210.0" prefWidth="45.0" />
+                  <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="210.0" prefWidth="310.0">
+                     <children>
+                        <HBox prefHeight="27.0" prefWidth="627.0" />
+                        <Label opacity="0.69" prefHeight="32.0" prefWidth="194.0" text="ADMIN  DETAILS" textFill="#2d2a20">
+                           <font>
+                              <Font name="System Bold" size="22.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </Label>
+                        <Pane prefHeight="24.0" prefWidth="627.0" />
+                        <HBox prefHeight="122.0" prefWidth="333.0">
+                           <children>
+                              <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="122.0" prefWidth="99.0">
+                                 <children>
+                                    <Label text="ID : ">
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label layoutX="10.0" layoutY="10.0" text="User Name : ">
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label text="Name :">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Email Address : ">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                    <Label text="Phone Number : ">
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                       <font>
+                                          <Font size="13.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                              <VBox layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="122.0" prefWidth="190.0">
+                                 <children>
+                                    <Label fx:id="lblAdminId" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblAdminUserName" layoutX="10.0" layoutY="130.0" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblAdminName" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblAdminEmail" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="lblAdminPhoneNumber" opacity="0.7">
+                                       <font>
+                                          <Font name="System Bold" size="13.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets top="5.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </children>
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                           <padding>
+                              <Insets left="20.0" />
+                           </padding>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox layoutY="595.0" opacity="0.89" prefHeight="98.0" prefWidth="404.0" styleClass="contactPane" stylesheets="@../styles/style.css">
+               <children>
+                  <VBox prefHeight="98.0" prefWidth="410.0">
+                     <children>
+                        <HBox prefHeight="17.0" prefWidth="674.0" />
+                        <HBox alignment="TOP_CENTER" prefHeight="38.0" prefWidth="408.0">
+                           <children>
+                              <Line startX="-100.0" stroke="#b1a57b" />
+                              <ImageView fitHeight="29.0" fitWidth="29.0" onMouseClicked="#openGithubOnAction" opacity="0.62" pickOnBounds="true" preserveRatio="true" styleClass="socialMediaIcons">
+                                 <image>
+                                    <Image url="@../img/github.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets left="20.0" right="10.0" top="-15.0" />
+                                 </HBox.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <ImageView fitHeight="25.0" fitWidth="25.0" onMouseClicked="#openLinkedinOnAction" opacity="0.62" pickOnBounds="true" preserveRatio="true" styleClass="socialMediaIcons">
+                                 <image>
+                                    <Image url="@../img/linkedin.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets left="10.0" right="10.0" top="-13.0" />
+                                 </HBox.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <ImageView fitHeight="24.0" fitWidth="24.0" onMouseClicked="#openInstagramOnAction" opacity="0.62" pickOnBounds="true" preserveRatio="true" styleClass="socialMediaIcons">
+                                 <image>
+                                    <Image url="@../img/instagram.png" />
+                                 </image>
+                                 <HBox.margin>
+                                    <Insets left="10.0" right="20.0" top="-13.0" />
+                                 </HBox.margin>
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </ImageView>
+                              <Line layoutX="161.0" layoutY="26.0" startX="-100.0" stroke="#b1a57b" />
+                           </children>
+                           <padding>
+                              <Insets top="15.0" />
+                           </padding>
+                        </HBox>
+                        <HBox alignment="CENTER" prefHeight="30.0" prefWidth="674.0">
+                           <children>
+                              <Label opacity="0.45" text="Created by : Tharusha Gunarathne" textFill="#ffefbd" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Button fx:id="btnResetPassword" layoutX="105.0" layoutY="400.0" mnemonicParsing="false" onAction="#btnResetPasswordOnAction" prefHeight="38.0" prefWidth="190.0" styleClass="btnResetPassword" stylesheets="@../styles/style.css" text="Reset Password" textFill="#fcefc7">
+               <font>
+                  <Font name="Dubai Medium" size="15.0" />
+               </font>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Button>
+            <Pane fx:id="resetPasswordPane" disable="true" layoutX="105.0" layoutY="380.0" prefHeight="186.0" prefWidth="190.0" visible="false">
+               <children>
+                  <Pane prefHeight="23.0" prefWidth="194.0" />
+                  <Label layoutY="23.20000457763672" text="New Password :" />
+                  <Pane fx:id="txtResetPasswordSetNewPasswordPane" layoutY="41.0">
+                     <children>
+                        <TextField fx:id="txtResetPasswordSetNewPassword" maxWidth="190.0" minWidth="190.0" prefHeight="25.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                           <padding>
+                              <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                           </padding>
+                        </TextField>
+                        <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/hide-password.png" />
+                           </image>
+                        </ImageView>
+                        <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showResetPasswordPwdSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" stylesheets="@../styles/style.css" />
+                     </children>
+                  </Pane>
+                  <Pane fx:id="pwdResetPasswordSetNewPasswordPane" layoutY="41.0" prefHeight="26.0" prefWidth="189.0">
+                     <children>
+                        <PasswordField fx:id="pwdResetPasswordSetNewPassword" maxWidth="234.4" minWidth="190.0" prefHeight="25.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                           <padding>
+                              <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                           </padding>
+                        </PasswordField>
+                        <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/show-password.png" />
+                           </image>
+                        </ImageView>
+                        <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showResetPasswordTxtSetNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" />
+                     </children>
+                  </Pane>
+                  <Pane layoutY="68.00000762939453" prefHeight="14.0" prefWidth="242.0" />
+                  <Label layoutY="82.4000015258789" text="Confirm New Password :" />
+                  <Pane fx:id="txtResetPasswordConfirmNewPasswordPane" layoutY="101.0">
+                     <children>
+                        <TextField fx:id="txtResetPasswordConfirmNewPassword" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                           <padding>
+                              <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                           </padding>
+                        </TextField>
+                        <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/hide-password.png" />
+                           </image>
+                        </ImageView>
+                        <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showResetPasswordPwdConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" />
+                     </children>
+                  </Pane>
+                  <Pane fx:id="pwdResetPasswordConfirmNewPasswordPane" layoutY="101.0">
+                     <children>
+                        <PasswordField fx:id="pwdResetPasswordConfirmNewPassword" maxWidth="190.0" minWidth="190.0" prefWidth="190.0" style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+                           <padding>
+                              <Insets bottom="4.0" left="8.0" right="50.0" top="4.0" />
+                           </padding>
+                        </PasswordField>
+                        <ImageView fitHeight="26.0" fitWidth="24.0" layoutX="160.0" layoutY="1.0" opacity="0.6" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/show-password.png" />
+                           </image>
+                        </ImageView>
+                        <Pane layoutX="160.0" maxHeight="26.0" maxWidth="24.0" minHeight="26.0" minWidth="24.0" onMouseClicked="#showResetPasswordTxtConfirmNewPasswordOnAction" prefHeight="26.0" prefWidth="24.0" styleClass="elementPointer" />
+                     </children>
+                  </Pane>
+                  <Pane layoutY="126.4000015258789" prefHeight="22.0" prefWidth="242.0" />
+                  <Button layoutY="148.0" mnemonicParsing="false" onAction="#btnConfirmResetPasswordOnAction" prefHeight="38.0" prefWidth="83.0" styleClass="btnConfirmResetPassword" stylesheets="@../styles/style.css" text="Confirm" textFill="#fcefc7">
+                     <font>
+                        <Font name="Dubai Medium" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+                  <Button layoutX="107.0" layoutY="148.0" mnemonicParsing="false" onAction="#btnCancelResetPasswordOnAction" prefHeight="38.0" prefWidth="83.0" styleClass="btnCancelResetPassword" stylesheets="@../styles/style.css" text="Cancel" textFill="#f2e9d0">
+                     <font>
+                        <Font name="Dubai Medium" size="15.0" />
+                     </font>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
+               </children>
+            </Pane>
+         </children>
+      </AnchorPane>
+      <VBox alignment="CENTER" layoutX="15.0" layoutY="9.0" prefHeight="107.0" prefWidth="200.0">
+         <children>
+            <ImageView fitHeight="46.0" fitWidth="93.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../img/StoreIcon.png" />
+               </image>
+            </ImageView>
+            <Label text="CLOTHIFY" textFill="#333127">
+               <font>
+                  <Font name="Berlin Sans FB" size="20.0" />
+               </font>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </Label>
+         </children>
+      </VBox>
+      <HBox alignment="BOTTOM_LEFT" layoutX="338.0" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="142.4" prefWidth="310.4" style="-fx-background-color: f5f0df;">
+         <children>
+            <VBox alignment="TOP_CENTER" maxHeight="651.0" minHeight="142.0" prefHeight="142.0" prefWidth="310.0" stylesheets="@../styles/style.css">
+               <children>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="40.0" prefWidth="310.0">
+                     <children>
+                        <ImageView fitHeight="24.0" fitWidth="35.0" onMouseClicked="#btnCloseOnAction" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/closeBtnAdmin.png" />
+                           </image>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                           <viewport>
+                              <Rectangle2D />
+                           </viewport>
+                        </ImageView>
+                     </children>
+                  </HBox>
+                  <Pane prefHeight="4.0" prefWidth="264.0" style="-fx-background-color: #b6b6b6;" />
+                  <Pane prefHeight="20.0" prefWidth="310.0" />
+                  <HBox alignment="CENTER_LEFT" prefHeight="55.0" prefWidth="310.0">
+                     <children>
+                        <ImageView fitHeight="44.0" fitWidth="47.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/DateIcon.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="30.0" right="15.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <VBox maxWidth="-Infinity" minWidth="75.0" prefHeight="64.0" prefWidth="170.0">
+                           <children>
+                              <HBox prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Label text="Date : ">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="lblDate">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="100.0" prefWidth="200.0">
+                                 <children>
+                                    <Label text="Time : ">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="lblTime">
+                                       <font>
+                                          <Font name="System Bold" size="16.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <HBox.margin>
+                              <Insets left="12.0" />
+                           </HBox.margin>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <Pane prefHeight="20.0" prefWidth="310.0" />
+                  <Pane prefHeight="4.0" prefWidth="264.0" style="-fx-background-color: #b6b6b6;" />
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <VBox alignment="TOP_CENTER" layoutY="117.0" prefHeight="575.0" prefWidth="244.0" styleClass="sidePaneDashboard" stylesheets="@../styles/style.css">
+         <children>
+            <Pane prefHeight="45.0" prefWidth="218.0" />
+            <Button fx:id="btnReports" ellipsisString="" layoutX="11.0" layoutY="275.0" maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#btnReportsOnAction" prefWidth="200.0" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+               <graphic>
+                  <HBox alignment="CENTER" prefHeight="47.0" prefWidth="186.0" style="-fx-background-color: transparent;" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+                     <children>
+                        <ImageView fitHeight="45.0" fitWidth="44.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/ReportsIcon.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="-10.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label text="Reports" textFill="#efece3">
+                           <padding>
+                              <Insets left="20.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="19.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </HBox>
+               </graphic>
+               <VBox.margin>
+                  <Insets left="-5.0" />
+               </VBox.margin>
+            </Button>
+            <Pane layoutX="10.0" layoutY="10.0" prefHeight="32.0" prefWidth="218.0" />
+            <Button fx:id="btnAddAdmin" ellipsisString="" layoutX="11.0" layoutY="80.0" maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#btnAddAdminOnAction" prefWidth="200.0" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+               <graphic>
+                  <HBox alignment="CENTER" prefHeight="47.0" prefWidth="186.0" style="-fx-background-color: transparent;" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+                     <children>
+                        <ImageView fitHeight="55.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/adminIcon.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="-20.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label text="Admin" textFill="#efece3">
+                           <font>
+                              <Font name="System Bold" size="19.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets left="20.0" />
+                           </HBox.margin>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </HBox>
+               </graphic>
+               <VBox.margin>
+                  <Insets left="-5.0" />
+               </VBox.margin>
+            </Button>
+            <Pane layoutX="10.0" layoutY="152.0" prefHeight="32.0" prefWidth="226.0" />
+            <Button fx:id="btnAddEmployee" ellipsisString="" layoutX="11.0" layoutY="179.0" maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#btnAddEmployeeOnAction" prefWidth="200.0" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+               <graphic>
+                  <HBox alignment="CENTER" prefHeight="47.0" prefWidth="186.0" style="-fx-background-color: transparent;" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+                     <children>
+                        <ImageView fitHeight="51.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/employeeIcon.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="5.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label text="Employee" textFill="#efece3">
+                           <padding>
+                              <Insets left="20.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="19.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </HBox>
+               </graphic>
+               <VBox.margin>
+                  <Insets left="-5.0" />
+               </VBox.margin>
+            </Button>
+            <Pane layoutX="10.0" layoutY="260.0" prefHeight="32.0" prefWidth="226.0" />
+            <Button fx:id="btnEdit" ellipsisString="" layoutX="17.0" layoutY="292.0" maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#btnEditOnAction" prefWidth="200.0" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+               <graphic>
+                  <HBox alignment="CENTER" prefHeight="47.0" prefWidth="186.0" style="-fx-background-color: transparent;" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+                     <children>
+                        <ImageView fitHeight="51.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/editIcon.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="-45.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label text="Edit" textFill="#efece3">
+                           <padding>
+                              <Insets left="20.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="19.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </HBox>
+               </graphic>
+            </Button>
+            <Pane layoutX="10.0" layoutY="362.0" prefHeight="32.0" prefWidth="226.0" />
+            <Button fx:id="btnAdminDetails" ellipsisString="" layoutX="20.0" layoutY="394.0" maxWidth="200.0" minWidth="200.0" mnemonicParsing="false" onAction="#btnAdminDetailsOnAction" prefWidth="200.0" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+               <graphic>
+                  <HBox alignment="CENTER" prefHeight="47.0" prefWidth="186.0" style="-fx-background-color: transparent;" styleClass="sidePanelDashboardBtn" stylesheets="@../styles/style.css">
+                     <children>
+                        <ImageView fitHeight="51.0" fitWidth="55.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/detailsIcon.png" />
+                           </image>
+                           <HBox.margin>
+                              <Insets left="-20.0" />
+                           </HBox.margin>
+                        </ImageView>
+                        <Label text="Details" textFill="#efece3">
+                           <padding>
+                              <Insets left="20.0" />
+                           </padding>
+                           <font>
+                              <Font name="System Bold" size="19.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <padding>
+                        <Insets bottom="8.0" top="8.0" />
+                     </padding>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </HBox>
+               </graphic>
+            </Button>
+         </children>
+      </VBox>
+      <VBox fx:id="screen" disable="true" layoutX="10.0" layoutY="10.0" opacity="0.75" prefHeight="692.0" prefWidth="648.0" style="-fx-background-color: black;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+   </children>
 </AnchorPane>

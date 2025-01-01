@@ -7,6 +7,7 @@ import controller.admin.AdminLoginFormController;
 import controller.employee.EmployeeLoginFormController;
 import exceptions.NoAdminFoundException;
 import exceptions.NoEmployeeFoundException;
+import exceptions.RepositoryException;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -26,6 +27,7 @@ import lombok.Setter;
 import service.ServiceFactory;
 import service.custom.AdminService;
 import service.custom.EmployeeService;
+import util.AlertType;
 import util.Type;
 import util.UserType;
 
@@ -122,20 +124,18 @@ public class ForgotPasswordController implements Initializable {
         btnSendOtp.setDisable(true);
         pwdInitialize();
         String email = txtInputEmail.getText().trim();
-        if(userType==UserType.ADMIN){
-            try {
+        try{
+            if(userType==UserType.ADMIN){
                 adminService.findByEmail(email);
                 sendOTP(email);
-            } catch (NoAdminFoundException e) {
-                noAccountFound();
-            }
-        }else{
-            try {
+            }else{
                 employeeService.findByEmail(email);
                 sendOTP(email);
-            } catch (NoEmployeeFoundException e) {
-                noAccountFound();
             }
+        } catch (NoAdminFoundException | NoEmployeeFoundException e) {
+            noAccountFound();
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -187,32 +187,26 @@ public class ForgotPasswordController implements Initializable {
 
     @FXML
     void btnConfirmChangePasswordOnAction(ActionEvent event) {
-        if(pwdSetNewPassword.getText().equals(pwdConfirmNewPassword.getText())){
-            if(!pwdSetNewPassword.getText().trim().isEmpty() && !pwdConfirmNewPassword.getText().trim().isEmpty()){
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Password Update");
-                alert.setHeaderText("Success!");
-                alert.setContentText("Your password has been successfully changed.");
-                alert.showAndWait();
-                if(userType.equals(UserType.EMPLOYEE)){
-                    employeeService.updateEmployeePassword(txtInputEmail.getText().trim(), pwdSetNewPassword.getText().trim());
+        try{
+            if(pwdSetNewPassword.getText().equals(pwdConfirmNewPassword.getText())){
+                if(!pwdSetNewPassword.getText().trim().isEmpty() && !pwdConfirmNewPassword.getText().trim().isEmpty()){
+
+                    showAlert(Alert.AlertType.INFORMATION, "Password Update", "Success!", "Your password has been successfully changed.", AlertType.SHOWANDWAIT);
+
+                    if(userType.equals(UserType.EMPLOYEE)){
+                        employeeService.updateEmployeePassword(txtInputEmail.getText().trim(), pwdSetNewPassword.getText().trim());
+                    }else{
+                        adminService.updateAdminPassword(txtInputEmail.getText().trim(), pwdSetNewPassword.getText().trim());
+                    }
+                    closeForgotPassword(event);
                 }else{
-                    adminService.updateAdminPassword(txtInputEmail.getText().trim(), pwdSetNewPassword.getText().trim());
+                    showAlert(Alert.AlertType.ERROR, "Error", "Password Field is Empty", "Please enter your password before proceeding.", AlertType.SHOWANDWAIT);
                 }
-                closeForgotPassword(event);
             }else{
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Password Field is Empty");
-                alert.setContentText("Please enter your password before proceeding.");
-                alert.showAndWait();
+                showAlert(Alert.AlertType.ERROR, "Error", "Passwords Do Not Match", "The passwords entered do not match. Please try again.", AlertType.SHOWANDWAIT);
             }
-        }else{
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Passwords Do Not Match");
-            alert.setContentText("The passwords entered do not match. Please try again.");
-            alert.showAndWait();
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -239,11 +233,9 @@ public class ForgotPasswordController implements Initializable {
 
     private void noAccountFound(){
         String accountType = userType.equals(UserType.EMPLOYEE) ? "employee":"admin";
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(String.format("No %s Found",accountType));
-        alert.setHeaderText(null);
-        alert.setContentText(String.format("No %s account found under the provided email", accountType));
-        alert.show();
+
+        showAlert(Alert.AlertType.ERROR, String.format("No %s Found",accountType), "Error", String.format("No %s account found under the provided email", accountType), AlertType.SHOW);
+
         txtInputEmail.setText("");
         resetOTPLabels();
         enableResetPasswordPane(false);
@@ -253,6 +245,7 @@ public class ForgotPasswordController implements Initializable {
 
     private void sendOTP(String email) {
         resetOTPLabels();
+
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("OTP Sent");
         alert.setHeaderText(null);
@@ -414,6 +407,18 @@ public class ForgotPasswordController implements Initializable {
             AdminLoginFormController.getInstance().disableScreen();
         }else{
             EmployeeLoginFormController.getInstance().disableScreen();
+        }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
         }
     }
 }

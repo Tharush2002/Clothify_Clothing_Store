@@ -1,32 +1,33 @@
 package repository.custom.impl;
 
-import entity.AdminEntity;
 import entity.EmployeeEntity;
+import exceptions.RepositoryException;
 import jakarta.persistence.OptimisticLockException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 import repository.custom.EmployeeRepository;
+
+import java.util.List;
 
 public class EmployeeRepositoryImpl implements EmployeeRepository {
     @Override
-    public EmployeeEntity findByEmail(String email) {
+    public EmployeeEntity findByEmail(String email) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         EmployeeEntity employeeEntity = null;
 
         try {
             transaction = session.beginTransaction();
-            String hql = "FROM EmployeeEntity WHERE email = :email";
-            Query<EmployeeEntity> query = session.createQuery(hql, EmployeeEntity.class);
-            query.setParameter("email", email);
-            employeeEntity = query.uniqueResult();
+            employeeEntity = session
+                    .createQuery("FROM EmployeeEntity WHERE email = :email", EmployeeEntity.class)
+                    .setParameter("email", email)
+                    .uniqueResult();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to find the specific employee entity record.");
         } finally {
             session.close();
         }
@@ -34,23 +35,23 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     }
 
     @Override
-    public EmployeeEntity findByUserName(String userName) {
+    public EmployeeEntity findByUserName(String userName) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         EmployeeEntity employeeEntity = null;
 
         try {
             transaction = session.beginTransaction();
-            String hql = "FROM EmployeeEntity WHERE userName = :userName";
-            Query<EmployeeEntity> query = session.createQuery(hql, EmployeeEntity.class);
-            query.setParameter("userName", userName);
-            employeeEntity = query.uniqueResult();
+            employeeEntity = session
+                    .createQuery("FROM EmployeeEntity WHERE userName = :userName", EmployeeEntity.class)
+                    .setParameter("userName", userName)
+                    .uniqueResult();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw new RepositoryException("Failed to find the specific employee entity record.");
         } finally {
             session.close();
         }
@@ -91,22 +92,90 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     }
 
     @Override
-    public boolean update(EmployeeEntity employeeEntity) {
+    public void update(EmployeeEntity employeeEntity) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
             session.update(employeeEntity);
             transaction.commit();
-            return true;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
-            return false;
+            throw new RepositoryException("Failed to update the specific employee entity record.");
         } finally {
             session.close();
         }
+    }
+
+    @Override
+    public List<EmployeeEntity> findAll() throws RepositoryException {
+        Transaction transaction = null;
+        List<EmployeeEntity> employeeEntityList = null;
+        Session session = sessionFactory.openSession();
+        try{
+            transaction = session.beginTransaction();
+            employeeEntityList = session.createQuery("from EmployeeEntity", EmployeeEntity.class).list();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw new RepositoryException("Failed to fetch employee entity records.");
+        }finally{
+            session.close();
+        }
+        return employeeEntityList;
+    }
+
+    @Override
+    public void deleteById(String employeeId) throws RepositoryException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session
+                    .createQuery("DELETE FROM EmployeeEntity WHERE employeeId = :employeeId")
+                    .setParameter("employeeId", employeeId)
+                    .executeUpdate();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RepositoryException("Failed to delete the specific employee entity record.");
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public void save(EmployeeEntity employeeEntity) throws RepositoryException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session.save(employeeEntity);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RepositoryException("Failed to save the specific employee entity record.");
+        } finally {
+            session.close();
+        }
+    }
+
+    @Override
+    public EmployeeEntity findByEmail(String email, Session session) {
+        return session
+                .createQuery("FROM EmployeeEntity WHERE email = :email", EmployeeEntity.class)
+                .setParameter("email", email)
+                .uniqueResult();
+    }
+
+    @Override
+    public void update(Session session, EmployeeEntity employeeEntity) {
+        session.update(employeeEntity);
     }
 }

@@ -16,6 +16,7 @@ import lombok.Setter;
 import model.Category;
 import model.Product;
 import model.Supplier;
+import util.AlertType;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -38,26 +39,20 @@ public class AddProductsBySupplierFormController implements Initializable {
 
     @FXML
     void btnAddProductOnAction(ActionEvent event) {
-        try{
+        try {
             String name = txtSetProductName.getText();
             String categoryId = txtSetProductCategory.getText();
             Integer quantity = spinnerSetProductQuantity.getValue();
             Double unitPrice = Double.parseDouble(txtSetProductUnitPrice.getText());
-            if(!name.isEmpty() && !categoryId.isEmpty()){
+            if (!name.isEmpty() && !categoryId.isEmpty()) {
                 EmployeeDashboardFormController.getInstance().getSuppliedProducts().add(new Product(null, name, new Category(null, categoryId), quantity, unitPrice, new Supplier()));
                 employeeDashboardFormController.loadSuppliersAddProductsTable();
                 btnCancelAddProductsOnAction(event);
-            }else{
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle(null);
-                alert.setContentText("Please Enter Data For All Fields");
-                alert.show();
+            } else {
+                showAlert(Alert.AlertType.ERROR,"Error","Empty Fields Found !","Please Enter Data For All Fields",AlertType.SHOW);
             }
         } catch (Exception e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle(null);
-            alert.setContentText("Please Enter Correct Data");
-            alert.show();
+            showAlert(Alert.AlertType.ERROR,"Error","Invalid Data !","Please Enter Correct Data",AlertType.SHOW);
         }
     }
 
@@ -78,5 +73,17 @@ public class AddProductsBySupplierFormController implements Initializable {
 
     private void setSpinnerInitialValues() {
         spinnerSetProductQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,750,1));
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

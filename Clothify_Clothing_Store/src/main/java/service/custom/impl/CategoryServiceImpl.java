@@ -1,6 +1,7 @@
 package service.custom.impl;
 
 import entity.CategoryEntity;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Category;
@@ -15,7 +16,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository= RepositoryFactory.getInstance().getRepositoryType(Type.CATEGORY);
 
     @Override
-    public ObservableList<Category> getAllCategories() {
+    public ObservableList<Category> getAllCategories() throws RepositoryException {
         List<CategoryEntity> categoryEntityList = categoryRepository.findAll();
         ObservableList<Category> categoryObservableList= FXCollections.observableArrayList();
         if (categoryEntityList!=null){
@@ -25,7 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category findCategoryByName(String name) {
+    public Category findCategoryByName(String name) throws RepositoryException {
         CategoryEntity categoryEntity = categoryRepository.findByName(name);
         if(categoryEntity !=null){
             return new Category(categoryEntity.getCategoryId(), categoryEntity.getName());

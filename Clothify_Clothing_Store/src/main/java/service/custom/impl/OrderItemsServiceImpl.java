@@ -4,12 +4,12 @@ import entity.CustomerEntity;
 import entity.OrderEntity;
 import entity.OrderItemEntity;
 import entity.ProductEntity;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Customer;
 import model.Order;
 import model.OrderItem;
-import model.Product;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import repository.RepositoryFactory;
@@ -27,7 +27,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     private final ProductRepository productRepository= RepositoryFactory.getInstance().getRepositoryType(Type.PRODUCT);
 
     @Override
-    public ObservableList<OrderItem> findOrderItemsByOrderID(String orderId) {
+    public ObservableList<OrderItem> findOrderItemsByOrderID(String orderId) throws RepositoryException {
         ObservableList<OrderItem> orderItemObservableList = FXCollections.observableArrayList();
         List<OrderItemEntity> orderItemEntityList = orderItemsRepository.findByOrderID(orderId);
 
@@ -50,6 +50,49 @@ public class OrderItemsServiceImpl implements OrderItemsService {
         return orderItemObservableList;
     }
 
+    @Override
+    public void saveOrder(OrderItem orderItem, Integer quantity) throws RepositoryException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+
+        try {
+            transaction = session.beginTransaction();
+
+            OrderItemEntity orderItemEntity = getOrderItemEntity(orderItem);
+
+            for(int i=0 ; i<quantity ; i++){
+                orderItemsRepository.save(orderItemEntity);
+            }
+
+            ProductEntity productEntity = productRepository.findByID(orderItemEntity.getProductId(), session);
+
+            productEntity.setQuantity(productEntity.getQuantity() - quantity);
+            productRepository.save(productEntity, session);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw new RepositoryException("Failed to save the specific order entity record.");
+        } finally {
+            session.close();
+        }
+    }
+
+    private OrderItemEntity getOrderItemEntity(OrderItem orderItem) {
+        OrderItemEntity orderItemEntity = new OrderItemEntity();
+
+        orderItemEntity.setOrderEntity(new OrderEntity(null,null, orderItem.getOrder().getDate(), orderItem.getOrder().getTime(), orderItem.getOrder().getTotal(), orderItem.getOrder().getPaymentType(), orderItem.getOrder().getOrderItemCount(), new CustomerEntity(null,null, orderItem.getOrder().getCustomer().getName(), orderItem.getOrder().getCustomer().getEmail(), orderItem.getOrder().getCustomer().getPhoneNumber())));
+        orderItemEntity.setProductName(orderItem.getProductName());
+        orderItemEntity.setProductId(orderItem.getProductId());
+        orderItemEntity.setCategoryId(orderItem.getCategoryId());
+        orderItemEntity.setCategoryName(orderItem.getCategoryName());
+        orderItemEntity.setSupplierId(orderItem.getSupplierId());
+        orderItemEntity.setSupplierName(orderItem.getSupplierName());
+        orderItemEntity.setSize(orderItem.getSize());
+        orderItemEntity.setUnitPrice(orderItem.getUnitPrice());
+        return orderItemEntity;
+    }
+
     private Order getOrder(OrderItemEntity orderItemEntity) {
         OrderEntity orderEntity = orderItemEntity.getOrderEntity();
         CustomerEntity customerEntity = orderEntity.getCustomerEntity();
@@ -63,49 +106,5 @@ public class OrderItemsServiceImpl implements OrderItemsService {
                 orderEntity.getPaymentType(),
                 customer,
                 orderEntity.getOrderItemCount());
-    }
-
-    @Override
-    public boolean saveOrder(OrderItem orderItem, Integer quantity) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-
-        try {
-            transaction = session.beginTransaction();
-
-            // Step 1: Save Orders
-            OrderItemEntity orderItemEntity = new OrderItemEntity();
-
-            orderItemEntity.setOrderEntity(new OrderEntity(null,null, orderItem.getOrder().getDate(), orderItem.getOrder().getTime(), orderItem.getOrder().getTotal(), orderItem.getOrder().getPaymentType(), orderItem.getOrder().getOrderItemCount(), new CustomerEntity(null,null,orderItem.getOrder().getCustomer().getName(),orderItem.getOrder().getCustomer().getEmail(),orderItem.getOrder().getCustomer().getPhoneNumber())));
-            orderItemEntity.setProductName(orderItem.getProductName());
-            orderItemEntity.setProductId(orderItem.getProductId());
-            orderItemEntity.setCategoryId(orderItem.getCategoryId());
-            orderItemEntity.setCategoryName(orderItem.getCategoryName());
-            orderItemEntity.setSupplierId(orderItem.getSupplierId());
-            orderItemEntity.setSupplierName(orderItem.getSupplierName());
-            orderItemEntity.setSize(orderItem.getSize());
-            orderItemEntity.setUnitPrice(orderItem.getUnitPrice());
-
-            for(int i=0 ; i<quantity ; i++){
-                orderItemsRepository.save(orderItemEntity);
-            }
-
-            // Step 2: Update Products
-            ProductEntity productEntity = productRepository.findByID(orderItemEntity.getProductId(), session);
-
-            // Update the product quantity
-            productEntity.setQuantity(productEntity.getQuantity() - quantity);
-            session.saveOrUpdate(productEntity);
-
-            // Commit the transaction
-            transaction.commit();
-            return true;
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback(); // Rollback on failure
-            e.printStackTrace();
-            return false;
-        } finally {
-            session.close();
-        }
     }
 }

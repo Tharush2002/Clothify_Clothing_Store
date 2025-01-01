@@ -1,17 +1,18 @@
 package repository.custom;
 
 import entity.OrderItemEntity;
+import exceptions.RepositoryException;
 import org.hibernate.Session;
 import repository.SuperRepository;
 
 import java.util.List;
 
 public interface OrderItemsRepository extends SuperRepository {
-    List<OrderItemEntity> findAll();
+    List<OrderItemEntity> findAll() throws RepositoryException;
 
-    List<OrderItemEntity> findByOrderID(String orderId);
+    List<OrderItemEntity> findByOrderID(String orderId) throws RepositoryException;
 
-    void save(OrderItemEntity orderItemEntity);
+    void save(OrderItemEntity orderItemEntity) throws RepositoryException;
 
-    void deleteBySizeAndId(String orderId, String productId, String size, Session session);
+    void deleteBySizeId(String orderId, String productId, String size, Session session);
 }

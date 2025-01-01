@@ -1,18 +1,29 @@
 package service.custom;
 
 import exceptions.NoAdminFoundException;
-import exceptions.NoEmployeeFoundException;
+import exceptions.RepositoryException;
+import javafx.collections.ObservableList;
 import model.Admin;
 import service.SuperService;
 
 public interface AdminService extends SuperService {
     boolean isValidEmail(String email);
 
-    Admin findByEmail(String email) throws NoAdminFoundException;
+    boolean isValidContactNumber(String contactNumber);
 
-    boolean updateAdminPassword(String email, String password);
+    Admin findByEmail(String email) throws NoAdminFoundException, RepositoryException;
 
-    Admin findByUserName(String trim) throws NoAdminFoundException;
+    void updateAdminPassword(String email, String password) throws RepositoryException;
+
+    Admin findByUserName(String trim) throws NoAdminFoundException, RepositoryException;
 
     boolean saveOrUpdate(Admin admin, int i);
+
+    ObservableList<Admin> getAll() throws RepositoryException;
+
+    void deleteById(String adminId) throws RepositoryException;
+
+    void save(Admin admin) throws RepositoryException;
+
+    void update(Admin admin) throws RepositoryException;
 }

@@ -1,20 +1,26 @@
 package repository.custom;
 
 import entity.SupplierEntity;
+import exceptions.RepositoryException;
+import org.hibernate.Session;
 import repository.SuperRepository;
 
 import java.util.List;
 
 public interface SupplierRepository extends SuperRepository {
-    List<SupplierEntity> findAll();
+    List<SupplierEntity> findAll() throws RepositoryException;
 
-    SupplierEntity findBySupplierID(String supplierId);
+    SupplierEntity findByName(String name) throws RepositoryException;
 
-    SupplierEntity findByName(String name);
+    void update(SupplierEntity supplierEntity) throws RepositoryException;
+    void update(Session session, SupplierEntity supplierEntity);
 
-    void deleteByID(String supplierId);
+    void save(SupplierEntity supplierEntity) throws RepositoryException;
+    void save(Session session, SupplierEntity newSupplier);
 
-    void update(SupplierEntity supplierEntity);
+    SupplierEntity findByName(Session session, String name);
 
-    void save(SupplierEntity supplierEntity);
+    SupplierEntity findBySupplierID(Session session, String supplierId);
+
+    void deleteByID(Session session, String supplierId);
 }

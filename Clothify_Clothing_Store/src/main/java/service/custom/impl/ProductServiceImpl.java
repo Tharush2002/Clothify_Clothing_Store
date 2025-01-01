@@ -3,11 +3,17 @@ package service.custom.impl;
 import entity.CategoryEntity;
 import entity.ProductEntity;
 import entity.SupplierEntity;
+import exceptions.NoCategoryMatchFoundException;
+import exceptions.NoProductMatchFoundException;
+import exceptions.NoSupplierMatchFoundException;
+import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Category;
 import model.Product;
 import model.Supplier;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import repository.RepositoryFactory;
 import repository.custom.CategoryRepository;
 import repository.custom.ProductRepository;
@@ -17,13 +23,15 @@ import util.Type;
 
 import java.util.List;
 
+import static repository.SuperRepository.sessionFactory;
+
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository = RepositoryFactory.getInstance().getRepositoryType(Type.PRODUCT);
     private final CategoryRepository categoryRepository = RepositoryFactory.getInstance().getRepositoryType(Type.CATEGORY);
     private final SupplierRepository supplierRepository = RepositoryFactory.getInstance().getRepositoryType(Type.SUPPLIER);
 
     @Override
-    public boolean addProduct(Product product) {
+    public void addProduct(Product product) throws RepositoryException {
         ProductEntity entity = new ProductEntity(null,null,product.getName(),new CategoryEntity(), product.getQuantity(), product.getUnitPrice(), new SupplierEntity());
 
         CategoryEntity categoryEntity = new CategoryEntity();
@@ -41,11 +49,11 @@ public class ProductServiceImpl implements ProductService {
 
             entity.setSupplierEntity(supplierEntity);
         }
-        return productRepository.save(entity);
+        productRepository.save(entity);
     }
 
     @Override
-    public ObservableList<Product> getAllProducts() {
+    public ObservableList<Product> getAllProducts() throws RepositoryException {
         List<ProductEntity> productEntityList = productRepository.findAll();
         ObservableList<Product> productObservableList= FXCollections.observableArrayList();
         if (productEntityList!=null){
@@ -60,28 +68,54 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updateProduct(Product product) {
-        ProductEntity productEntity = productRepository.findByID(product.getProductId());
-        productEntity.setName(product.getName());
-        productEntity.setQuantity(product.getQuantity());
-        productEntity.setUnitPrice(product.getUnitPrice());
+    public void update(Product product) throws RepositoryException {
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            transaction = session.beginTransaction();
 
-        productEntity.setCategoryEntity(categoryRepository.findByCategoryID(product.getCategory().getCategoryId()));
-        if (product.getSupplier()!=null){
-            productEntity.setSupplierEntity(supplierRepository.findBySupplierID(product.getSupplier().getSupplierId()));
-        }else{
-            productEntity.setSupplierEntity(null);
+            ProductEntity productEntity = productRepository.findByID(product.getProductId(), session);
+            if (productEntity == null) {
+                throw new NoProductMatchFoundException("Product with ID " + product.getProductId() + " not found.");
+            }
+
+            productEntity.setName(product.getName());
+            productEntity.setQuantity(product.getQuantity());
+            productEntity.setUnitPrice(product.getUnitPrice());
+
+            CategoryEntity categoryEntity = categoryRepository.findByCategoryID(session, product.getCategory().getCategoryId());
+            if (categoryEntity == null) {
+                throw new NoCategoryMatchFoundException("Category with ID " + product.getCategory().getCategoryId() + " not found.");
+            }
+            productEntity.setCategoryEntity(categoryEntity);
+
+            if (product.getSupplier() != null) {
+                SupplierEntity supplierEntity = supplierRepository.findBySupplierID(session, product.getSupplier().getSupplierId());
+                if (supplierEntity == null) {
+                    throw new NoSupplierMatchFoundException("Supplier with ID " + product.getSupplier().getSupplierId() + " not found.");
+                }
+                productEntity.setSupplierEntity(supplierEntity);
+            } else {
+                productEntity.setSupplierEntity(null);
+            }
+
+            productRepository.update(session, productEntity);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw new RepositoryException("Failed to update the specific product entity record.");
+        } finally {
+            session.close();
         }
-        productRepository.update(productEntity);
     }
 
     @Override
-    public void deleteProduct(String productId) {
+    public void deleteProduct(String productId) throws RepositoryException {
         productRepository.deleteByID(productId);
     }
 
     @Override
-    public ObservableList<Product> findProductsBySupplierID(String supplierId) {
+    public ObservableList<Product> findProductsBySupplierID(String supplierId) throws RepositoryException {
         List<ProductEntity> suppliedProducts = productRepository.findBySupplierID(supplierId);
         ObservableList<Product> productObservableList= FXCollections.observableArrayList();
         if (suppliedProducts!=null){
@@ -96,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findProductByProductID(String productId) {
+    public Product findProductByProductID(String productId) throws RepositoryException {
         ProductEntity productEntity = productRepository.findByID(productId);
         return new Product(
                 productEntity.getProductId(),

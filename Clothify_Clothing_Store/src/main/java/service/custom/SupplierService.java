@@ -1,20 +1,21 @@
 package service.custom;
 
+import exceptions.RepositoryException;
 import javafx.collections.ObservableList;
 import model.Product;
 import model.Supplier;
 import service.SuperService;
 
 public interface SupplierService extends SuperService {
-    ObservableList<Supplier> getAllSuppliers();
+    ObservableList<Supplier> getAllSuppliers() throws RepositoryException;
 
-    Supplier findSupplierByName(String value);
+    Supplier findSupplierByName(String value) throws RepositoryException;
 
-    void deleteSupplier(String supplierId);
+    void deleteSupplier(String supplierId) throws RepositoryException;
 
-    void updateSupplier(Supplier supplier);
+    void updateSupplier(Supplier supplier) throws RepositoryException;
 
-    void addSupplier(Supplier supplier);
+    void addSupplier(Supplier supplier) throws RepositoryException;
 
     boolean isValidEmail(String email);
 }

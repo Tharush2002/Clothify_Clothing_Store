@@ -1,5 +1,5 @@
 package util;
 
-public enum DashboardViewType {
+public enum EmployeeDashboardViewType {
     CATALOG,ORDERS,SUPPLIERS,REPORTS
 }

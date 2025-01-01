@@ -1,14 +1,28 @@
 package repository.custom;
 
 import entity.EmployeeEntity;
+import exceptions.RepositoryException;
+import org.hibernate.Session;
 import repository.SuperRepository;
 
-public interface EmployeeRepository extends SuperRepository {
-    EmployeeEntity findByEmail(String email);
+import java.util.List;
 
-    EmployeeEntity findByUserName(String userName);
+public interface EmployeeRepository extends SuperRepository {
+    EmployeeEntity findByEmail(String email) throws RepositoryException;
+
+    EmployeeEntity findByUserName(String userName) throws RepositoryException;
 
     boolean saveOrUpdate(EmployeeEntity employeeEntity);
 
-    boolean update(EmployeeEntity employeeEntity);
+    void update(EmployeeEntity employeeEntity) throws RepositoryException;
+
+    List<EmployeeEntity> findAll() throws RepositoryException;
+
+    void deleteById(String employeeId) throws RepositoryException;
+
+    void save(EmployeeEntity employeeEntity) throws RepositoryException;
+
+    EmployeeEntity findByEmail(String email, Session session);
+
+    void update(Session session, EmployeeEntity employeeEntity);
 }

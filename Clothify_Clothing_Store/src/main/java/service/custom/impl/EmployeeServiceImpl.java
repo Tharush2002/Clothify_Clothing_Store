@@ -2,11 +2,20 @@ package service.custom.impl;
 
 import entity.EmployeeEntity;
 import exceptions.NoEmployeeFoundException;
+import exceptions.RepositoryException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import model.Employee;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import repository.RepositoryFactory;
 import repository.custom.EmployeeRepository;
 import service.custom.EmployeeService;
 import util.Type;
+
+import java.util.List;
+
+import static repository.SuperRepository.sessionFactory;
 
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository= RepositoryFactory.getInstance().getRepositoryType(Type.EMPLOYEE);
@@ -18,7 +27,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee findByEmail(String email) throws NoEmployeeFoundException {
+    public boolean isValidContactNumber(String contactNumber){
+        String contactNumberPattern = "^(\\+\\d{1,3})?\\d{10}$";
+        return contactNumber.matches(contactNumberPattern);
+    }
+
+    @Override
+    public boolean isValidNIC(String nic){
+        String nicPattern = "^\\d{13}$|^\\d{9}[vV]$\n";
+        return nic.matches(nicPattern);
+    }
+
+
+    @Override
+    public Employee findByEmail(String email) throws NoEmployeeFoundException, RepositoryException {
         EmployeeEntity employeeEntity = employeeRepository.findByEmail(email);
         if (employeeEntity != null) {
             return new Employee(employeeEntity.getEmployeeId(),
@@ -36,7 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee findByUserName(String userName) throws  NoEmployeeFoundException {
+    public Employee findByUserName(String userName) throws NoEmployeeFoundException, RepositoryException {
         EmployeeEntity employeeEntity = employeeRepository.findByUserName(userName);
         if (employeeEntity != null) {
             return new Employee(employeeEntity.getEmployeeId(),
@@ -54,10 +76,28 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public boolean updateEmployeePassword(String email, String password){
-        EmployeeEntity employeeEntity = employeeRepository.findByEmail(email);
-        employeeEntity.setPassword(password);
-        return employeeRepository.update(employeeEntity);
+    public void updateEmployeePassword(String email, String password) throws RepositoryException {
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+            transaction = session.beginTransaction();
+
+            EmployeeEntity employeeEntity = employeeRepository.findByEmail(email, session);
+            if (employeeEntity == null) {
+                throw new NoEmployeeFoundException("Employee with email " + email + " not found.");
+            }
+
+            employeeEntity.setPassword(password);
+
+            employeeRepository.update(session, employeeEntity);
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) transaction.rollback();
+            throw new RepositoryException("Failed to update EmployeeEntity password.");
+        } finally {
+            session.close();
+        }
     }
 
     @Override
@@ -77,5 +117,66 @@ public class EmployeeServiceImpl implements EmployeeService {
                 )
         );
         return true;
+    }
+
+    @Override
+    public ObservableList<Employee> getAll() throws RepositoryException {
+        List<EmployeeEntity> employeeEntityList = employeeRepository.findAll();
+        ObservableList<Employee> employeeObservableList= FXCollections.observableArrayList();
+        if (employeeEntityList!=null){
+            employeeEntityList.forEach(entity->employeeObservableList.add(new Employee(
+                    entity.getEmployeeId(),
+                    entity.getFirstName(),
+                    entity.getLastName(),
+                    entity.getEmail(),
+                    entity.getPhoneNumber(),
+                    entity.getUserName(),
+                    entity.getNic(),
+                    entity.getAddress(),
+                    null
+            )));
+        }
+        return employeeObservableList;
+    }
+
+    @Override
+    public void deleteById(String employeeId) throws RepositoryException {
+        employeeRepository.deleteById(employeeId);
+    }
+
+    @Override
+    public void save(Employee employee) throws RepositoryException {
+        employeeRepository.save(
+            new EmployeeEntity(
+                    null,
+                    null,
+                    employee.getFirstName(),
+                    employee.getLastName(),
+                    employee.getEmail(),
+                    employee.getPhoneNumber(),
+                    employee.getUserName(),
+                    employee.getNic(),
+                    employee.getAddress(),
+                    employee.getPassword()
+            )
+        );
+    }
+
+    @Override
+    public void update(Employee employee) throws RepositoryException {
+        employeeRepository.update(
+            new EmployeeEntity(
+                    null,
+                    employee.getEmployeeId(),
+                    employee.getFirstName(),
+                    employee.getLastName(),
+                    employee.getEmail(),
+                    employee.getPhoneNumber(),
+                    employee.getUserName(),
+                    employee.getNic(),
+                    employee.getAddress(),
+                    null
+            )
+        );
     }
 }

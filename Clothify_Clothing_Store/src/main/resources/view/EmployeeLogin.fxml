@@ -40,7 +40,7 @@
                </children></Pane>
             <ImageView fitHeight="149.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../img/admin.png" />
+                  <Image url="@../img/employee.png" />
                </image>
             </ImageView>
             <Label text="Employee Login" textFill="#53461c">
