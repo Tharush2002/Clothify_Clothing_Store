@@ -65,7 +65,7 @@ public class ReturnOrderServiceImpl implements ReturnOrderService {
             );
 
             returnOrderRepository.save(returnOrderEntity, session);
-            ProductEntity productEntity = productRepository.findByID(returnOrder.getProductId(), session);
+            ProductEntity productEntity = productRepository.findByProductID(returnOrder.getProductId(), session);
 
             productEntity.setQuantity(productEntity.getQuantity() + 1);
             productRepository.update(session, productEntity);

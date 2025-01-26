@@ -26,11 +26,29 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category findCategoryByName(String name) throws RepositoryException {
-        CategoryEntity categoryEntity = categoryRepository.findByName(name);
-        if(categoryEntity !=null){
-            return new Category(categoryEntity.getCategoryId(), categoryEntity.getName());
-        }
-        return new Category();
+    public Category findByCategoryId(String categoryId) throws RepositoryException {
+        CategoryEntity categoryEntity = categoryRepository.findByCategoryID(categoryId);
+        return new Category(categoryEntity.getCategoryId(),categoryEntity.getName());
     }
+
+    @Override
+    public void updateCategory(Category selectedCategoryToEdit) throws RepositoryException {
+        categoryRepository.update(new CategoryEntity(null, selectedCategoryToEdit.getCategoryId(), selectedCategoryToEdit.getName()));
+    }
+
+    @Override
+    public void deleteCategory(String categoryId) throws RepositoryException {
+        categoryRepository.deleteByCategoryId(categoryId);
+    }
+
+    @Override
+    public boolean isCategoryNameAvailable(String name) throws RepositoryException {
+        return categoryRepository.findByName(name) != null;
+    }
+
+    @Override
+    public void addCategory(Category category) throws RepositoryException {
+        categoryRepository.add(new CategoryEntity(null, null, category.getName()));
+    }
+
 }

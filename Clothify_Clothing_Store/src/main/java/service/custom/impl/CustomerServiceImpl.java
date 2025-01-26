@@ -30,6 +30,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Customer findByCustomerId(String customerId) throws RepositoryException{
+        CustomerEntity customerEntity = customerRepository.findByCustomerId(customerId);
+        return new Customer(
+                customerEntity.getCustomerId(),
+                customerEntity.getName(),
+                customerEntity.getEmail(),
+                customerEntity.getPhoneNumber()
+        );
+    }
+
+    @Override
     public boolean isValidPhoneNumber(String phoneNumber) {
         String phoneNumberPattern = "^(\\+\\d{1,3}[- ]?)?\\(?\\d{3}\\)?[- ]?\\d{3}[- ]?\\d{4}$";
         return phoneNumber.matches(phoneNumberPattern);

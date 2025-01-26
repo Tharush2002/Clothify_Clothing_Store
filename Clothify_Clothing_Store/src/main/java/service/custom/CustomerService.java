@@ -8,6 +8,8 @@ import service.SuperService;
 public interface CustomerService extends SuperService {
     ObservableList<Customer> getAllCustomers() throws RepositoryException;
 
+    Customer findByCustomerId(String customerId) throws RepositoryException;
+
     boolean isValidPhoneNumber(String phoneNumber);
 
     boolean isValidEmail(String email);

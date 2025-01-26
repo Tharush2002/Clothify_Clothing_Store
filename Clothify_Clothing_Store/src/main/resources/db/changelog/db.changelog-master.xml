@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <include file="db/changelog/scripts/schema/liquibase-create-database-clothify.sql" />  <!-- Database creation script -->
+
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-admin-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-category-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-supplier-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-customer-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-employee-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-order-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-order-item-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-product-table.sql" />
+    <include file="db/changelog/scripts/schema/tables/liquibase-create-return-order-table.sql" />
+
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-admin-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-employee-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-category-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-supplier-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-product-table.sql" />
+
+    <includeAll path="db/changelog/scripts/schema/triggers" />  <!-- Table data insertion trigger scripts here -->
+</databaseChangeLog>

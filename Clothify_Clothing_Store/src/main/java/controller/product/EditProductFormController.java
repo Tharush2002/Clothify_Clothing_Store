@@ -1,24 +1,19 @@
 package controller.product;
 
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXTextField;
 import controller.employee.EmployeeDashboardFormController;
 import exceptions.RepositoryException;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Setter;
+import model.Category;
 import model.Product;
+import model.Supplier;
 import service.ServiceFactory;
 import service.custom.CategoryService;
 import service.custom.ProductService;
@@ -39,10 +34,10 @@ public class EditProductFormController implements Initializable {
     private final Product selectedProductToEdit = EmployeeDashboardFormController.getInstance().getSelectedProductToEdit();
 
     @FXML
-    public JFXComboBox<String> cmbEditProductCategory;
+    private ComboBox<Category> cmbEditProductCategory;
 
     @FXML
-    private JFXComboBox<String> cmbEditProductSupplier;
+    private ComboBox<Supplier> cmbEditProductSupplier;
 
     @FXML
     private Label lblEditProductID;
@@ -51,22 +46,17 @@ public class EditProductFormController implements Initializable {
     private Spinner<Integer> spinnerEditProductQuantity;
 
     @FXML
-    private JFXTextField txtEditProductName;
+    private TextField txtEditProductName;
 
     @FXML
-    private JFXTextField txtEditProductUnitPrice;
-
-    @FXML
-    void btnRemoveSupplierOnAction(ActionEvent event) {
-        cmbEditProductSupplier.setValue("");
-    }
+    private TextField txtEditProductUnitPrice;
 
     @FXML
     void btnCancelEditProductsOnAction(ActionEvent event) {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         Scene scene = EmployeeDashboardFormController.getInstance().getEmployeeDashboardStage().getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
-        VBox vbox = (VBox) root.getChildren().get(7);
+        VBox vbox = (VBox) root.getChildren().get(8);
         vbox.setVisible(false);
         vbox.setDisable(true);
     }
@@ -75,19 +65,24 @@ public class EditProductFormController implements Initializable {
     void btnSaveChangesOnAction(ActionEvent event) {
         try {
             String name = txtEditProductName.getText().trim();
-            String unitPrice = txtEditProductUnitPrice.getText().trim();
-            String categoryName = cmbEditProductCategory.getValue().trim();
-            String supplierName = cmbEditProductSupplier.getValue().trim();
-            if (!name.isEmpty() && !categoryName.isEmpty() && !unitPrice.isEmpty()) {
+            Double unitPrice = Double.parseDouble(txtEditProductUnitPrice.getText().trim());
+            Category category = cmbEditProductCategory.getValue();
+            Supplier supplier = cmbEditProductSupplier.getValue();
+            if (!name.isEmpty()) {
                 selectedProductToEdit.setName(name);
                 selectedProductToEdit.setQuantity(spinnerEditProductQuantity.getValue());
-                selectedProductToEdit.setUnitPrice(Double.parseDouble(unitPrice));
-                selectedProductToEdit.setCategory(categoryService.findCategoryByName(categoryName));
+                selectedProductToEdit.setUnitPrice(unitPrice);
 
-                if (!supplierName.isEmpty()) {
-                    selectedProductToEdit.setSupplier(supplierService.findSupplierByName(cmbEditProductSupplier.getValue()));
+                if (category != null) {
+                    selectedProductToEdit.setCategory(categoryService.findByCategoryId(category.getCategoryId()));
                 } else {
-                    selectedProductToEdit.setSupplier(null);
+                    selectedProductToEdit.setCategory(new Category());
+                }
+
+                if (supplier != null) {
+                    selectedProductToEdit.setSupplier(supplierService.findBySupplierId(supplier.getSupplierId()));
+                } else {
+                    selectedProductToEdit.setSupplier(new Supplier());
                 }
             } else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -110,28 +105,46 @@ public class EditProductFormController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        initializeCategoryComboBox();
+        initializeSupplierComboBox();
+        initializeUnitPrice();
         setInitialProductData();
     }
 
+    private void initializeUnitPrice() {
+        TextFormatter<String> formatter = new TextFormatter<>(change -> {
+            String newText = change.getControlNewText();
+            if (newText.matches("\\d*(\\.\\d*)?")) {
+                return change;
+            }
+            return null;
+        });
+
+        txtEditProductUnitPrice.setTextFormatter(formatter);
+    }
+
     private void setInitialProductData(){
-        try{
-            lblEditProductID.setText(selectedProductToEdit.getProductId());
-            txtEditProductName.setText(selectedProductToEdit.getName());
-            spinnerEditProductQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,750,selectedProductToEdit.getQuantity()));
-            txtEditProductUnitPrice.setText(selectedProductToEdit.getUnitPrice().toString());
+        lblEditProductID.setText(selectedProductToEdit.getProductId());
+        txtEditProductName.setText(selectedProductToEdit.getName());
+        spinnerEditProductQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,750,selectedProductToEdit.getQuantity()));
+        txtEditProductUnitPrice.setText(selectedProductToEdit.getUnitPrice().toString());
 
-            ObservableList<String> categoryList= FXCollections.observableArrayList();
-            categoryService.getAllCategories().forEach(category -> categoryList.add(category.getName()));
-            cmbEditProductCategory.setItems(categoryList);
-            if(selectedProductToEdit.getCategory()!=null) cmbEditProductCategory.setValue(selectedProductToEdit.getCategory().getName());
-
-            ObservableList<String> supplierList= FXCollections.observableArrayList();
-            supplierService.getAllSuppliers().forEach(supplier -> supplierList.add(supplier.getName()));
-            cmbEditProductSupplier.setItems(supplierList);
-            if(selectedProductToEdit.getSupplier()!=null) cmbEditProductSupplier.setValue(selectedProductToEdit.getSupplier().getName());
-        } catch (RepositoryException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        int categoryIndex = 0;
+        for (Category cmbEditProductCategoryItem : cmbEditProductCategory.getItems()) {
+            if (cmbEditProductCategoryItem.getCategoryId().equals(selectedProductToEdit.getCategory().getCategoryId()))
+                break;
+            categoryIndex++;
         }
+        cmbEditProductCategory.getSelectionModel().select(categoryIndex);
+
+        int supplierIndex = 0;
+        for (Supplier supplier : cmbEditProductSupplier.getItems()) {
+            if (supplier.getSupplierId().equals(selectedProductToEdit.getSupplier().getSupplierId())) {
+                break;
+            }
+            supplierIndex++;
+        }
+        cmbEditProductSupplier.getSelectionModel().select(supplierIndex);
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
@@ -143,6 +156,54 @@ public class EditProductFormController implements Initializable {
             alert.show();
         }else{
             alert.showAndWait();
+        }
+    }
+
+    private void initializeSupplierComboBox() {
+        try{
+            cmbEditProductSupplier.setItems(supplierService.getAll());
+
+            cmbEditProductSupplier.setCellFactory(listView -> new javafx.scene.control.ListCell<Supplier>() {
+                @Override
+                protected void updateItem(Supplier supplier, boolean empty) {
+                    super.updateItem(supplier, empty);
+                    setText((supplier == null || empty) ? null : supplier.getName());
+                }
+            });
+
+            cmbEditProductSupplier.setButtonCell(new javafx.scene.control.ListCell<Supplier>() {
+                @Override
+                protected void updateItem(Supplier supplier, boolean empty) {
+                    super.updateItem(supplier, empty);
+                    setText((supplier == null || empty) ? null : supplier.getName());
+                }
+            });
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
+    }
+
+    private void initializeCategoryComboBox() {
+        try{
+            cmbEditProductCategory.setItems(categoryService.getAllCategories());
+
+            cmbEditProductCategory.setCellFactory(listView -> new javafx.scene.control.ListCell<Category>() {
+                @Override
+                protected void updateItem(Category category, boolean empty) {
+                    super.updateItem(category, empty);
+                    setText((category == null || empty) ? null : category.getName());
+                }
+            });
+
+            cmbEditProductCategory.setButtonCell(new javafx.scene.control.ListCell<Category>() {
+                @Override
+                protected void updateItem(Category category, boolean empty) {
+                    super.updateItem(category, empty);
+                    setText((category == null || empty) ? null : category.getName());
+                }
+            });
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 }

@@ -26,10 +26,4 @@ public class AdminEntity {
     private String phoneNumber;
     private String password;
 
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.adminId = "A" + String.format("%04d",id);
-        }
-    }
 }

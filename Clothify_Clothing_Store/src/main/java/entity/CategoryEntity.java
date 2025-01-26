@@ -19,10 +19,4 @@ public class CategoryEntity {
     private String categoryId;
     private String name;
 
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.categoryId = "C" + String.format("%04d",id);
-        }
-    }
 }

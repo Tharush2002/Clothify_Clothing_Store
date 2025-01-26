@@ -5,10 +5,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.Getter;
+import util.AlertType;
 
 import java.io.IOException;
 
@@ -45,7 +47,7 @@ public class HomeFormController{
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         hideHomeStage(event);
     }
@@ -59,8 +61,20 @@ public class HomeFormController{
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         hideHomeStage(event);
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(message);
+        if(showType==AlertType.SHOW){
+            alert.show();
+        }else{
+            alert.showAndWait();
+        }
     }
 }

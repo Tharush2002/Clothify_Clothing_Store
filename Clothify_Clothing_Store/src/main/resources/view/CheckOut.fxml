@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXComboBox?>
-<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -16,9 +17,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="543.0" prefWidth="631.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CheckOutFormController">
+<AnchorPane prefHeight="698.0" prefWidth="631.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CheckOutFormController">
    <children>
-      <HBox alignment="CENTER" prefHeight="68.0" prefWidth="631.0" styleClass="updateProductsTitleBar" stylesheets="@../styles/style.css" AnchorPane.bottomAnchor="475.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox alignment="CENTER" prefHeight="61.0" prefWidth="631.0" styleClass="updateProductsTitleBar" stylesheets="@../styles/style.css" AnchorPane.bottomAnchor="637.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Label style="-fx-text-fill: #c9c5ba;" text="CHECK OUT">
                <font>
@@ -27,48 +28,97 @@
             </Label>
          </children>
       </HBox>
-      <VBox alignment="CENTER" layoutY="76.8" prefHeight="468.0" prefWidth="631.0" AnchorPane.bottomAnchor="-2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="77.0">
+      <VBox alignment="TOP_CENTER" layoutY="56.0" prefHeight="592.0" prefWidth="631.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="56.0">
          <children>
+            <Pane prefHeight="22.0" prefWidth="631.0" />
             <Label alignment="CENTER" prefHeight="19.0" prefWidth="631.0" text="Customer Details">
                <font>
                   <Font name="System Bold" size="15.0" />
                </font>
             </Label>
-            <Pane layoutX="10.0" layoutY="10.0" maxHeight="56.0" maxWidth="631.0" minHeight="15.0" minWidth="631.0" prefHeight="21.0" prefWidth="631.0" />
-            <HBox prefHeight="88.0" prefWidth="631.0">
+            <VBox alignment="TOP_CENTER" prefHeight="177.0" prefWidth="631.0">
+               <children>
+                  <Pane prefHeight="18.0" prefWidth="631.0" />
+                  <HBox alignment="CENTER" prefHeight="29.0" prefWidth="631.0">
+                     <children>
+                        <Label text="Select Customer / Add a new Customer : " />
+                        <ComboBox fx:id="cmbSelectCustomer" onAction="#cmbSelectCustomerOnAction" prefHeight="26.0" prefWidth="145.0" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="53.0" prefHeight="29.0" prefWidth="631.0">
+                     <children>
+                        <Label text="Payment Type : ">
+                           <HBox.margin>
+                              <Insets left="135.0" />
+                           </HBox.margin>
+                        </Label>
+                        <ComboBox fx:id="cmbSetPaymentType" prefHeight="26.0" prefWidth="101.0" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER" layoutX="10.0" layoutY="44.0" prefHeight="48.0" prefWidth="631.0">
+                     <children>
+                        <Button fx:id="btnAddNewCustomerPane" mnemonicParsing="false" onAction="#btnAddNewCustomerPaneOnAction" prefHeight="38.0" prefWidth="230.0" styleClass="btnConfirmResetPassword" stylesheets="@../styles/style.css" text="ADD A NEW CUSTOMER" textFill="#fcefc7">
+                           <font>
+                              <Font name="Dubai Medium" size="15.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button fx:id="btnCancelAddNewCustomerPane" mnemonicParsing="false" onAction="#btnCancelAddNewCustomerPaneOnAction" prefHeight="38.0" prefWidth="230.0" styleClass="btnCancelResetPassword" stylesheets="@../styles/style.css" text="CANCEL ADD NEW CUSTOMER" textFill="#f2e9d0">
+                           <font>
+                              <Font name="Dubai Medium" size="15.0" />
+                           </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets top="8.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <HBox fx:id="customerDetailsPane" prefHeight="88.0" prefWidth="631.0">
                <children>
                   <VBox maxWidth="315.0" minWidth="315.0" prefHeight="151.0" prefWidth="315.0">
                      <children>
                         <HBox maxWidth="315.0" minWidth="315.0" prefHeight="6.0" prefWidth="315.0">
                            <children>
-                              <Label text="Name :  ">
+                              <Label text="ID :  ">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <JFXTextField fx:id="txtSetCustomerName" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="162.0">
-                                 <padding>
-                                    <Insets left="8.0" />
-                                 </padding>
-                              </JFXTextField>
+                              <Label fx:id="lblCustomerID" layoutX="55.0" layoutY="10.0">
+                                 <font>
+                                    <Font size="13.0" />
+                                 </font>
+                              </Label>
                            </children>
                            <padding>
                               <Insets left="45.0" />
                            </padding>
                         </HBox>
                         <Pane maxHeight="15.0" minHeight="18.0" prefHeight="15.0" prefWidth="250.0" />
-                        <HBox prefHeight="6.0" prefWidth="250.0">
+                        <HBox layoutX="10.0" layoutY="10.0" maxWidth="315.0" minWidth="315.0" prefHeight="6.0" prefWidth="315.0">
                            <children>
-                              <Label text="Email : ">
+                              <Label text="Name :  ">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <JFXTextField fx:id="txtSetCustomerEmail" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="166.0">
-                                 <padding>
-                                    <Insets left="8.0" />
-                                 </padding>
-                              </JFXTextField>
+                              <TextField fx:id="txtSetCustomerName" maxHeight="24.0" maxWidth="162.0" minHeight="24.0" minWidth="162.0" prefHeight="24.0" prefWidth="162.0" styleClass="inputFields" stylesheets="@../styles/style.css" />
                            </children>
                            <padding>
                               <Insets left="45.0" />
@@ -86,11 +136,7 @@
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <JFXTextField fx:id="txtSetCustomerPhoneNumber" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="149.0">
-                                 <padding>
-                                    <Insets left="8.0" />
-                                 </padding>
-                              </JFXTextField>
+                              <TextField fx:id="txtSetCustomerPhoneNumber" maxHeight="24.0" maxWidth="162.0" minHeight="24.0" minWidth="162.0" prefHeight="24.0" prefWidth="162.0" styleClass="inputFields" stylesheets="@../styles/style.css" />
                            </children>
                            <padding>
                               <Insets left="10.0" />
@@ -99,12 +145,12 @@
                         <Pane maxHeight="15.0" minHeight="18.0" prefHeight="15.0" prefWidth="250.0" />
                         <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="6.0" prefWidth="250.0">
                            <children>
-                              <Label prefHeight="20.0" prefWidth="98.0" text="Payment Type : ">
+                              <Label prefHeight="20.0" prefWidth="44.0" text="Email : ">
                                  <font>
                                     <Font size="13.0" />
                                  </font>
                               </Label>
-                              <JFXComboBox fx:id="cmbSetPaymentType" maxHeight="23.0" minHeight="23.0" prefHeight="23.0" prefWidth="104.0" />
+                              <TextField fx:id="txtSetCustomerEmail" maxHeight="24.0" maxWidth="178.0" minHeight="24.0" minWidth="162.0" prefHeight="24.0" prefWidth="178.0" styleClass="inputFields" stylesheets="@../styles/style.css" />
                            </children>
                            <padding>
                               <Insets left="10.0" />
@@ -115,7 +161,7 @@
                   </VBox>
                </children>
             </HBox>
-            <Label alignment="CENTER" prefHeight="19.0" prefWidth="631.0" text="Order Details">
+            <Label alignment="BOTTOM_CENTER" prefHeight="29.0" prefWidth="631.0" text="Order Details">
                <font>
                   <Font name="System Bold" size="15.0" />
                </font>
@@ -123,7 +169,7 @@
             <Pane layoutX="10.0" layoutY="55.0" maxHeight="56.0" maxWidth="631.0" minHeight="15.0" minWidth="631.0" prefHeight="19.0" prefWidth="631.0" />
             <TableView fx:id="tblOrderItems" maxWidth="550.0" minWidth="550.0" prefHeight="200.0" prefWidth="550.0">
                <columns>
-                  <TableColumn fx:id="columnOrdersProductID" prefWidth="51.99997025728226" text="Id" />
+                  <TableColumn fx:id="columnOrdersProductID" prefWidth="51.99997025728226" text="ID" />
                   <TableColumn fx:id="columnOrdersProductName" prefWidth="109.59997177124023" text="Name" />
                   <TableColumn fx:id="columnOrdersUnitPrice" prefWidth="65.60003662109375" text="Price" />
                   <TableColumn fx:id="columnOrdersProductSize" prefWidth="29.5999755859375" text="Size" />

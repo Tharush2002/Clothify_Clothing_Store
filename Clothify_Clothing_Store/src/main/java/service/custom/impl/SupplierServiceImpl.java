@@ -24,7 +24,7 @@ public class SupplierServiceImpl implements SupplierService {
     private final ProductRepository productRepository = RepositoryFactory.getInstance().getRepositoryType(Type.PRODUCT);
 
     @Override
-    public ObservableList<Supplier> getAllSuppliers() throws RepositoryException {
+    public ObservableList<Supplier> getAll() throws RepositoryException {
         List<SupplierEntity> supplierEntityList = supplierRepository.findAll();
         ObservableList<Supplier> supplierObservableList= FXCollections.observableArrayList();
         if (supplierEntityList!=null){
@@ -45,6 +45,22 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
+    public Supplier findBySupplierId(String supplierId) throws RepositoryException {
+        SupplierEntity supplierEntity = supplierRepository.findBySupplierID(supplierId);
+        return new Supplier(
+                supplierEntity.getSupplierId(),
+                supplierEntity.getName(),
+                supplierEntity.getCompany(),
+                supplierEntity.getEmail()
+        );
+    }
+
+    @Override
+    public boolean isSupplierNameAlreadyAvailable(String name) throws RepositoryException {
+        return supplierRepository.findByName(name) != null;
+    }
+
+    @Override
     public void deleteSupplier(String supplierId) throws RepositoryException {
         Transaction transaction = null;
         Session session = sessionFactory.openSession();
@@ -55,7 +71,8 @@ public class SupplierServiceImpl implements SupplierService {
 
             productsListBySupplierID.forEach(productEntity -> {
                 productEntity.setSupplierEntity(null);
-                productRepository.update(session, productEntity);
+                session.update(productEntity);
+                session.flush();
             });
 
             supplierRepository.deleteByID(session, supplierId);
@@ -131,4 +148,5 @@ public class SupplierServiceImpl implements SupplierService {
         String emailPattern = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
         return email.matches(emailPattern);
     }
+
 }

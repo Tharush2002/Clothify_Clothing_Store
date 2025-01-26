@@ -30,10 +30,4 @@ public class OrderEntity {
     @JoinColumn(name = "customer_id", referencedColumnName = "customerID")
     private CustomerEntity customerEntity;
 
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.orderId = "O" + String.format("%04d",id);
-        }
-    }
 }

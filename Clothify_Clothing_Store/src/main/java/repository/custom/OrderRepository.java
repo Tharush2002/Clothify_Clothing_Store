@@ -1,6 +1,5 @@
 package repository.custom;
 
-import entity.CustomerEntity;
 import entity.OrderEntity;
 import exceptions.RepositoryException;
 import org.hibernate.Session;
@@ -13,7 +12,7 @@ import java.util.List;
 public interface OrderRepository extends SuperRepository {
     List<OrderEntity> findAll() throws RepositoryException;
 
-    OrderEntity findByCustomerDateTime(Session session, CustomerEntity customerEntity, LocalDate date, LocalTime time);
+    OrderEntity findByDateTime(Session session, LocalDate date, LocalTime time);
 
     OrderEntity findByOrderId(Session session, String orderId);
 }

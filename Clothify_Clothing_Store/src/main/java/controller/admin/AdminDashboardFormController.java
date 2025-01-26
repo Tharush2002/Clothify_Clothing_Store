@@ -347,17 +347,17 @@ public class AdminDashboardFormController implements Initializable {
 
     @FXML
     void btnLoadCustomerReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/customer.jrxml");
+        openReports("src/main/resources/reports/Customer.jrxml");
     }
 
     @FXML
     void btnLoadEmployeeReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/employee.jrxml");
+        openReports("src/main/resources/reports/Employee.jrxml");
     }
 
     @FXML
     void btnLoadInventoryReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/products.jrxml");
+        openReports("src/main/resources/reports/Inventory.jrxml");
     }
 
     @FXML
@@ -474,7 +474,7 @@ public class AdminDashboardFormController implements Initializable {
                 Desktop.getDesktop().browse(uri);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -491,7 +491,7 @@ public class AdminDashboardFormController implements Initializable {
                 Desktop.getDesktop().browse(uri);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -945,7 +945,7 @@ public class AdminDashboardFormController implements Initializable {
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         enableScreen();
     }

@@ -52,7 +52,7 @@ public class ReturnOrderFormController implements Initializable {
     private Button btnReturnItem;
 
     @FXML
-    private JFXComboBox<String> cmbSetOrderToReturn;
+    private ComboBox<String> cmbSetOrderToReturn;
 
     @FXML
     private TableColumn<OrderItem, String> columnOrdersProductName;
@@ -103,7 +103,7 @@ public class ReturnOrderFormController implements Initializable {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         Scene scene = EmployeeDashboardFormController.getInstance().getEmployeeDashboardStage().getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
-        VBox vbox = (VBox) root.getChildren().get(7);
+        VBox vbox = (VBox) root.getChildren().get(8);
         vbox.setVisible(false);
         vbox.setDisable(true);
     }

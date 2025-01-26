@@ -2,6 +2,7 @@ package repository.custom;
 
 import entity.SupplierEntity;
 import exceptions.RepositoryException;
+import model.Supplier;
 import org.hibernate.Session;
 import repository.SuperRepository;
 
@@ -23,4 +24,6 @@ public interface SupplierRepository extends SuperRepository {
     SupplierEntity findBySupplierID(Session session, String supplierId);
 
     void deleteByID(Session session, String supplierId);
+
+    SupplierEntity findBySupplierID(String supplierId) throws RepositoryException;
 }

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="326.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.supplier.EditSupplierFormController">
+<AnchorPane prefHeight="349.0" prefWidth="374.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.supplier.EditSupplierFormController">
    <children>
-      <HBox alignment="CENTER" prefHeight="74.0" prefWidth="374.0" styleClass="updateProductsTitleBar" stylesheets="@../styles/style.css" AnchorPane.bottomAnchor="252.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox alignment="CENTER" prefHeight="64.0" prefWidth="374.0" styleClass="updateProductsTitleBar" stylesheets="@../styles/style.css" AnchorPane.bottomAnchor="285.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <Label style="-fx-text-fill: #c9c5ba;" text="Edit Supplier">
                <font>
@@ -21,21 +21,42 @@
             </Label>
          </children>
       </HBox>
-      <VBox layoutY="80.0" prefHeight="228.0" prefWidth="374.0" AnchorPane.bottomAnchor="18.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+      <VBox layoutY="62.0" prefHeight="263.0" prefWidth="374.0" AnchorPane.bottomAnchor="1.1999999999999886" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="62.0">
          <children>
-            <Pane layoutX="10.0" layoutY="159.0" maxHeight="34.0" minHeight="15.0" prefHeight="34.0" prefWidth="374.0" />
+            <Pane layoutX="10.0" layoutY="159.0" maxHeight="49.0" minHeight="15.0" prefHeight="26.0" prefWidth="374.0" />
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="31.0" prefHeight="6.0" prefWidth="250.0">
+               <children>
+                  <Label text="Supplier ID : ">
+                     <font>
+                        <Font name="System Bold" size="13.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="lblSupplierId" prefHeight="20.0" prefWidth="107.0">
+                     <padding>
+                        <Insets top="2.0" />
+                     </padding>
+                     <HBox.margin>
+                        <Insets left="8.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="60.0" />
+               </padding>
+            </HBox>
+            <Pane layoutX="10.0" layoutY="58.0" maxHeight="15.0" minHeight="18.0" prefHeight="15.0" prefWidth="250.0" />
             <HBox layoutX="10.0" layoutY="10.0" prefHeight="6.0" prefWidth="250.0">
                <children>
                   <Label text="Supplier Name : ">
                      <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font size="13.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="txtSetSupplierName" maxHeight="20.0" minHeight="20.0" prefHeight="20.0">
-                     <padding>
+                  <TextField fx:id="txtSetSupplierName" prefHeight="26.0" prefWidth="138.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <HBox.margin>
                         <Insets left="8.0" />
-                     </padding>
-                  </JFXTextField>
+                     </HBox.margin>
+                  </TextField>
                </children>
                <padding>
                   <Insets left="60.0" />
@@ -46,14 +67,14 @@
                <children>
                   <Label text="Company : ">
                      <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font size="13.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="txtSetSetSupplierCompany" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="180.0">
-                     <padding>
+                  <TextField fx:id="txtSetSetSupplierCompany" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <HBox.margin>
                         <Insets left="8.0" />
-                     </padding>
-                  </JFXTextField>
+                     </HBox.margin>
+                  </TextField>
                </children>
                <padding>
                   <Insets left="60.0" />
@@ -64,20 +85,20 @@
                <children>
                   <Label text="Email : ">
                      <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font size="13.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="txtSetSupplierEmail" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="205.0">
-                     <padding>
+                  <TextField fx:id="txtSetSupplierEmail" prefHeight="26.0" prefWidth="198.0" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <HBox.margin>
                         <Insets left="8.0" />
-                     </padding>
-                  </JFXTextField>
+                     </HBox.margin>
+                  </TextField>
                </children>
                <padding>
                   <Insets left="60.0" />
                </padding>
             </HBox>
-            <Pane layoutX="10.0" layoutY="28.0" maxHeight="56.0" minHeight="15.0" prefHeight="37.0" prefWidth="374.0" />
+            <Pane layoutX="10.0" layoutY="28.0" maxHeight="56.0" minHeight="10.0" prefHeight="10.0" prefWidth="374.0" />
             <HBox alignment="CENTER" prefHeight="78.0" prefWidth="374.0">
                <children>
                   <JFXButton onAction="#btnSaveSupplierOnAction" styleClass="btn" stylesheets="@../styles/style.css" text="SAVE CHANGES" textFill="#feffda">

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
-<?import com.jfoenix.controls.JFXTextField?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -24,19 +25,19 @@
       </HBox>
       <VBox layoutY="80.0" prefHeight="345.0" prefWidth="374.0" AnchorPane.bottomAnchor="-2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
          <children>
-            <Pane layoutX="10.0" layoutY="159.0" maxHeight="34.0" minHeight="15.0" prefHeight="34.0" prefWidth="374.0" />
-            <HBox layoutX="10.0" layoutY="10.0" prefHeight="6.0" prefWidth="250.0">
+            <Pane layoutX="10.0" layoutY="159.0" maxHeight="34.0" minHeight="15.0" prefHeight="27.0" prefWidth="374.0" />
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="10.0" prefHeight="6.0" prefWidth="250.0">
                <children>
                   <Label text="Product Name : ">
                      <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font size="13.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="txtSetProductName" maxHeight="20.0" minHeight="20.0" prefHeight="20.0">
-                     <padding>
+                  <TextField fx:id="txtSetProductName" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <HBox.margin>
                         <Insets left="8.0" />
-                     </padding>
-                  </JFXTextField>
+                     </HBox.margin>
+                  </TextField>
                </children>
                <padding>
                   <Insets left="60.0" />
@@ -47,7 +48,7 @@
                <children>
                   <Label text="Quantity : ">
                      <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font size="13.0" />
                      </font>
                   </Label>
                   <Spinner fx:id="spinnerSetProductQuantity" maxHeight="24.0" minHeight="24.0" prefHeight="24.0" prefWidth="72.0" stylesheets="@../styles/style.css">
@@ -61,42 +62,42 @@
                </padding>
             </HBox>
             <Pane layoutX="10.0" layoutY="60.0" maxHeight="15.0" minHeight="18.0" prefHeight="15.0" prefWidth="250.0" />
-            <HBox layoutX="10.0" layoutY="76.0" prefHeight="6.0" prefWidth="250.0">
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="76.0" prefHeight="6.0" prefWidth="250.0">
                <children>
                   <Label text="Unit Price : ">
                      <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font size="13.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="txtSetProductUnitPrice" maxHeight="20.0" minHeight="20.0" prefHeight="20.0">
-                     <padding>
+                  <TextField fx:id="txtSetProductUnitPrice" styleClass="inputFields" stylesheets="@../styles/style.css">
+                     <HBox.margin>
                         <Insets left="8.0" />
-                     </padding>
-                  </JFXTextField>
+                     </HBox.margin>
+                  </TextField>
                </children>
                <padding>
                   <Insets left="60.0" />
                </padding>
             </HBox>
             <Pane layoutX="10.0" layoutY="93.0" maxHeight="15.0" minHeight="18.0" prefHeight="15.0" prefWidth="250.0" />
-            <HBox layoutX="10.0" layoutY="108.0" prefHeight="6.0" prefWidth="250.0">
+            <HBox alignment="CENTER_LEFT" layoutX="10.0" layoutY="108.0" prefHeight="6.0" prefWidth="250.0">
                <children>
                   <Label text="Category : ">
                      <font>
-                        <Font name="System Bold" size="14.0" />
+                        <Font size="13.0" />
                      </font>
                   </Label>
-                  <JFXTextField fx:id="txtSetProductCategory" maxHeight="20.0" minHeight="20.0" prefHeight="20.0">
-                     <padding>
+                  <ComboBox fx:id="cmbSetProductCategory" prefWidth="150.0">
+                     <HBox.margin>
                         <Insets left="8.0" />
-                     </padding>
-                  </JFXTextField>
+                     </HBox.margin>
+                  </ComboBox>
                </children>
                <padding>
                   <Insets left="60.0" />
                </padding>
             </HBox>
-            <Pane layoutX="10.0" layoutY="28.0" maxHeight="56.0" minHeight="15.0" prefHeight="31.0" prefWidth="374.0" />
+            <Pane layoutX="10.0" layoutY="28.0" maxHeight="56.0" minHeight="15.0" prefHeight="18.0" prefWidth="374.0" />
             <HBox alignment="CENTER" prefHeight="78.0" prefWidth="374.0">
                <children>
                   <JFXButton onAction="#btnAddProductOnAction" prefHeight="43.0" prefWidth="131.0" styleClass="btn" stylesheets="@../styles/style.css" text="ADD PRODUCT" textFill="#feffda">

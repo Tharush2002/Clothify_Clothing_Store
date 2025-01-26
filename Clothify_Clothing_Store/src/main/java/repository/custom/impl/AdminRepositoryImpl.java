@@ -3,12 +3,14 @@ package repository.custom.impl;
 import entity.AdminEntity;
 import exceptions.RepositoryException;
 import jakarta.persistence.OptimisticLockException;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import repository.custom.AdminRepository;
 
 import java.util.List;
 
+@Slf4j
 public class AdminRepositoryImpl implements AdminRepository {
     @Override
     public AdminEntity findByEmail(String email) throws RepositoryException {
@@ -38,7 +40,7 @@ public class AdminRepositoryImpl implements AdminRepository {
     public AdminEntity findByUserName(String userName) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;
-        AdminEntity adminEntity = null;
+        AdminEntity adminEntity;
 
         try {
             transaction = session.beginTransaction();
@@ -102,7 +104,7 @@ public class AdminRepositoryImpl implements AdminRepository {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            log.error(e.getMessage());
             return false;
         } finally {
             session.close();

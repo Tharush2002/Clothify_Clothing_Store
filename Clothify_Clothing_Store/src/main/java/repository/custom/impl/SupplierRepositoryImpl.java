@@ -122,6 +122,29 @@ public class SupplierRepositoryImpl implements SupplierRepository {
     }
 
     @Override
+    public SupplierEntity findBySupplierID(String supplierId) throws RepositoryException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        SupplierEntity supplierEntity = null;
+        try {
+            transaction = session.beginTransaction();
+            supplierEntity = session
+                    .createQuery("FROM SupplierEntity WHERE supplierId = :supplierId", SupplierEntity.class)
+                    .setParameter("supplierId", supplierId)
+                    .uniqueResult();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            throw new RepositoryException("Failed to find the specific supplier entity record.");
+        } finally {
+            session.close();
+        }
+        return supplierEntity;
+    }
+
+    @Override
     public void update(Session session, SupplierEntity supplierEntity) {
         session
                 .createQuery("UPDATE SupplierEntity s SET s.name = :name, s.company = :company, s.email = :email WHERE s.supplierId = :supplierId")

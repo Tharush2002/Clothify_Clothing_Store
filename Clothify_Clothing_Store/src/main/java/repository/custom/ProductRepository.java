@@ -16,10 +16,13 @@ public interface ProductRepository extends SuperRepository {
 
     List<ProductEntity> findAll() throws RepositoryException;
 
-    ProductEntity findByID(String productId) throws RepositoryException;
-    ProductEntity findByID(String productId, Session session);
+    ProductEntity findByProductID(String productId, Session session);
 
     void deleteByID(String productId) throws RepositoryException;
 
     List<ProductEntity> findBySupplierID(String supplierId) throws RepositoryException;
+
+//    List<ProductEntity> findByCategoryId(Session session, String categoryId);
+
+    List<ProductEntity> findByCategoryId(String categoryId) throws RepositoryException;
 }

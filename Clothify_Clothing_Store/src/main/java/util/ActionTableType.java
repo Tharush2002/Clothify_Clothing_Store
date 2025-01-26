@@ -1,5 +1,5 @@
 package util;
 
 public enum ActionTableType {
-    PRODUCTS,SUPPLIERS
+    PRODUCTS,SUPPLIERS,CATEGORY
 }

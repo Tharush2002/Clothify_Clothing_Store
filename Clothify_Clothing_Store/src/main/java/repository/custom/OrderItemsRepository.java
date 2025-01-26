@@ -12,7 +12,9 @@ public interface OrderItemsRepository extends SuperRepository {
 
     List<OrderItemEntity> findByOrderID(String orderId) throws RepositoryException;
 
-    void save(OrderItemEntity orderItemEntity) throws RepositoryException;
+//    void save(OrderItemEntity orderItemEntity) throws RepositoryException;
 
     void deleteBySizeId(String orderId, String productId, String size, Session session);
+
+    void save(OrderItemEntity orderItemEntity, Session session);
 }

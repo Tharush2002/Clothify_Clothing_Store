@@ -1,19 +1,13 @@
 package controller.product;
 
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXTextField;
 import controller.employee.EmployeeDashboardFormController;
 import exceptions.RepositoryException;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Setter;
@@ -38,41 +32,33 @@ public class AddProductFormController implements Initializable {
     private final CategoryService categoryService = ServiceFactory.getInstance().getServiceType(Type.CATEGORY);
 
     @FXML
-    private JFXComboBox<String> cmbSetProductSupplier;
+    private ComboBox<Category> cmbSetProductCategory;
+
+    @FXML
+    private ComboBox<Supplier> cmbSetProductSupplier;
 
     @FXML
     private Spinner<Integer> spinnerSetProductQuantity;
 
     @FXML
-    private JFXTextField txtSetProductCategory;
+    private TextField txtSetProductName;
 
     @FXML
-    private JFXTextField txtSetProductName;
-
-    @FXML
-    private JFXTextField txtSetProductUnitPrice;
+    private TextField txtSetProductUnitPrice;
 
     @FXML
     void btnAddProductOnAction(ActionEvent event) {
         try {
             String name = txtSetProductName.getText().trim();
-            String category = txtSetProductCategory.getText().trim();
+            Category category = cmbSetProductCategory.getValue();
             Double unitPrice = Double.parseDouble(txtSetProductUnitPrice.getText().trim());
-            String supplier = cmbSetProductSupplier.getValue().trim();
+            Supplier supplier = cmbSetProductSupplier.getValue();
             Integer quantity = spinnerSetProductQuantity.getValue();
-            if (!name.isEmpty() && !category.isEmpty()) {
-                Supplier supplierObject = new Supplier();
-                if (!supplier.isEmpty()) {
-                    supplierObject = supplierService.findSupplierByName(supplier);
-                }
+            if (!name.isEmpty()) {
+                if (supplier==null) supplier=new Supplier();
+                if (category==null) category=new Category();
 
-                Category newCategory = categoryService.findCategoryByName(category);
-                if (newCategory.getCategoryId() == null) {
-                    newCategory = new Category();
-                    newCategory.setName(category);
-                }
-
-                productService.addProduct(new Product(null, name, newCategory, quantity, unitPrice, supplierObject));
+                productService.addProduct(new Product(null, name, category, quantity, unitPrice, supplier));
                 employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
                 employeeDashboardFormController.setCatalogPaneLabels();
                 btnCancelAddProductsOnAction(event);
@@ -91,26 +77,62 @@ public class AddProductFormController implements Initializable {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         Scene scene = EmployeeDashboardFormController.getInstance().getEmployeeDashboardStage().getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
-        VBox vbox = (VBox) root.getChildren().get(7);
+        VBox vbox = (VBox) root.getChildren().get(8);
         vbox.setVisible(false);
         vbox.setDisable(true);
     }
 
-    @FXML
-    void btnRemoveSupplierOnAction(ActionEvent event) {
-        cmbSetProductSupplier.setValue("");
-    }
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try{
-            ObservableList<Supplier> supplierObservableList=supplierService.getAllSuppliers();
-            ObservableList<String> supplierList= FXCollections.observableArrayList();
-            supplierObservableList.forEach(supplier -> supplierList.add(supplier.getName()));
-            cmbSetProductSupplier.setItems(supplierList);
+        spinnerSetProductQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,750,1));
 
-            spinnerSetProductQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1,750,1));
-            cmbSetProductSupplier.setValue("");
+        initializeCategoryComboBox();
+        initializeSupplierComboBox();
+    }
+
+    private void initializeSupplierComboBox() {
+        try{
+            cmbSetProductSupplier.setItems(supplierService.getAll());
+
+            cmbSetProductSupplier.setCellFactory(listView -> new javafx.scene.control.ListCell<Supplier>() {
+                @Override
+                protected void updateItem(Supplier supplier, boolean empty) {
+                    super.updateItem(supplier, empty);
+                    setText((supplier == null || empty) ? null : supplier.getName());
+                }
+            });
+
+            cmbSetProductSupplier.setButtonCell(new javafx.scene.control.ListCell<Supplier>() {
+                @Override
+                protected void updateItem(Supplier supplier, boolean empty) {
+                    super.updateItem(supplier, empty);
+                    setText((supplier == null || empty) ? null : supplier.getName());
+                }
+            });
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
+    }
+
+    private void initializeCategoryComboBox() {
+        try{
+            cmbSetProductCategory.setItems(categoryService.getAllCategories());
+
+            cmbSetProductCategory.setCellFactory(listView -> new javafx.scene.control.ListCell<Category>() {
+                @Override
+                protected void updateItem(Category category, boolean empty) {
+                    super.updateItem(category, empty);
+                    setText((category == null || empty) ? null : category.getName());
+                }
+            });
+
+            cmbSetProductCategory.setButtonCell(new javafx.scene.control.ListCell<Category>() {
+                @Override
+                protected void updateItem(Category category, boolean empty) {
+                    super.updateItem(category, empty);
+                    setText((category == null || empty) ? null : category.getName());
+                }
+            });
         } catch (RepositoryException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }

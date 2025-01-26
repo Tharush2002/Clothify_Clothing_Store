@@ -24,25 +24,30 @@ public class ProductRepositoryImpl implements ProductRepository {
         Session session = sessionFactory.openSession();
         try {
             transaction = session.beginTransaction();
-            if (entity.getCategoryEntity() != null) {
-                CategoryEntity existingCategory = categoryRepository.findByName(session, entity.getCategoryEntity().getName());
+
+            if (entity.getCategoryEntity().getCategoryId() != null) {
+                CategoryEntity existingCategory = categoryRepository.findByCategoryID(session, entity.getCategoryEntity().getCategoryId());
 
                 if (existingCategory != null) {
                     entity.setCategoryEntity(existingCategory);
                 } else {
-                    session.save(entity.getCategoryEntity());
-                    session.flush();
+                    throw new RepositoryException("No matching category entity found.");
                 }
+            }else{
+                session.save(entity.getCategoryEntity());
+                session.refresh(entity.getCategoryEntity());
             }
-            if (entity.getSupplierEntity() != null) {
-                SupplierEntity existingSupplier = supplierRepository.findByName(session, entity.getSupplierEntity().getName());
+            if (entity.getSupplierEntity().getSupplierId() != null) {
+                SupplierEntity existingSupplier = supplierRepository.findBySupplierID(session, entity.getSupplierEntity().getSupplierId());
 
                 if (existingSupplier != null) {
                     entity.setSupplierEntity(existingSupplier);
                 } else {
-                    session.save(entity.getSupplierEntity());
-                    session.flush();
+                    throw new RepositoryException("No matching category entity found.");
                 }
+            }else{
+                session.save(entity.getSupplierEntity());
+                session.refresh(entity.getSupplierEntity());
             }
 
             session.save(entity);
@@ -125,30 +130,7 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public ProductEntity findByID(String productId) throws RepositoryException {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        ProductEntity productEntity = null;
-        try {
-            transaction = session.beginTransaction();
-            productEntity = session
-                    .createQuery("FROM ProductEntity WHERE productId = :productId", ProductEntity.class)
-                    .setParameter("productId", productId)
-                    .uniqueResult();
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            throw new RepositoryException("Failed to find the specific product entity record.");
-        } finally {
-            session.close();
-        }
-        return productEntity;
-    }
-
-    @Override
-    public ProductEntity findByID(String productId, Session session) {
+    public ProductEntity findByProductID(String productId, Session session) {
         ProductEntity entity = session.createQuery(
                 "FROM ProductEntity WHERE productId = :productId",
                 ProductEntity.class
@@ -231,37 +213,31 @@ public class ProductRepositoryImpl implements ProductRepository {
     }
 
     @Override
-    public void update(Session session, ProductEntity entity) {
-        ProductEntity existingProduct = session
-                .createQuery("FROM ProductEntity WHERE productId = :productId", ProductEntity.class)
-                .setParameter("productId", entity.getProductId())
-                .uniqueResult();
-
-        if (existingProduct != null) {
-            existingProduct.setName(entity.getName());
-            existingProduct.setQuantity(entity.getQuantity());
-            existingProduct.setUnitPrice(entity.getUnitPrice());
-
-            if (entity.getCategoryEntity()!=null){
-                CategoryEntity existingCategory = categoryRepository.findByName(session, entity.getCategoryEntity().getName());
-
-                if (existingCategory != null) {
-                    existingProduct.setCategoryEntity(existingCategory);
-                }
+    public List<ProductEntity> findByCategoryId(String categoryId) throws RepositoryException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
+        List<ProductEntity> productEntityList = null;
+        try {
+            transaction = session.beginTransaction();
+            productEntityList = session
+                    .createQuery("FROM ProductEntity p WHERE p.categoryEntity.categoryId = :categoryId", ProductEntity.class)
+                    .setParameter("categoryId", categoryId)
+                    .getResultList();
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
             }
-
-            if(entity.getSupplierEntity()!=null){
-                SupplierEntity existingSupplier = supplierRepository.findBySupplierID(session, entity.getSupplierEntity().getSupplierId());
-
-                if (existingSupplier != null) {
-                    existingProduct.setSupplierEntity(existingSupplier);
-                }
-            }else{
-                existingProduct.setSupplierEntity(null);
-            }
-
-            session.update(existingProduct);
+            throw new RepositoryException("Failed to find the specific product entity record.");
+        } finally {
+            session.close();
         }
+        return productEntityList;
+    }
+
+    @Override
+    public void update(Session session, ProductEntity entity) {
+        session.update(entity);
     }
 
 }

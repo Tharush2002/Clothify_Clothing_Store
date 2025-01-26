@@ -8,19 +8,30 @@ public class DBConnection {
     private static DBConnection dbConnection;
     private Connection connection;
 
+    // Private constructor for singleton pattern
     private DBConnection(){
         try {
-            this.connection= DriverManager.getConnection("jdbc:mysql://localhost:3306/Clothify","root","12345");
+            // Make sure the connection is established only once
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/clothify", "root", "12345");
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error establishing DB connection", e);
         }
     }
 
-    public Connection getConnection() {
-        return connection;
+    // Public method to get the singleton instance
+    public static DBConnection getInstance() {
+        if (dbConnection == null) {
+            dbConnection = new DBConnection();
+        }
+        return dbConnection;
     }
 
-    public static DBConnection getInstance(){
-        return dbConnection==null ? dbConnection=new DBConnection() : dbConnection;
+    // Method to get a connection, checking if the connection is closed
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            // Reconnect if the connection is closed or null
+            this.connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/clothify", "root", "12345");
+        }
+        return connection;
     }
 }

@@ -1,8 +1,6 @@
 package controller;
 
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXTextField;
 import controller.employee.EmployeeDashboardFormController;
 import exceptions.RepositoryException;
 import javafx.collections.FXCollections;
@@ -19,10 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Callback;
 import lombok.Setter;
-import model.Order;
-import model.OrderItem;
-import model.Product;
-import model.OrderItemWithQuantity;
+import model.*;
 import service.ServiceFactory;
 import service.custom.CustomerService;
 import service.custom.OrderItemsService;
@@ -47,11 +42,22 @@ public class CheckOutFormController implements Initializable {
     private Button checkOutButton;
     private EmployeeDashboardFormController employeeDashboardFormController;
 
+    private Customer selectedCustomer = null;
+
+    @FXML
+    private Button btnAddNewCustomerPane;
+
+    @FXML
+    private Button btnCancelAddNewCustomerPane;
+
     @FXML
     private JFXButton btnConfirmOrder;
 
     @FXML
-    private JFXComboBox<String> cmbSetPaymentType;
+    private ComboBox<String> cmbSetPaymentType;
+
+    @FXML
+    private ComboBox<Customer> cmbSelectCustomer;
 
     @FXML
     private TableColumn<OrderItem, Void> columnOrdersAction;
@@ -75,19 +81,43 @@ public class CheckOutFormController implements Initializable {
     private TableColumn<OrderItem, Double> columnOrdersUnitPrice;
 
     @FXML
-    private TableView<OrderItem> tblOrderItems;
+    private HBox customerDetailsPane;
 
     @FXML
     private Label lblTotalCost;
 
     @FXML
-    private JFXTextField txtSetCustomerEmail;
+    private TableView<OrderItem> tblOrderItems;
 
     @FXML
-    private JFXTextField txtSetCustomerName;
+    private TextField txtSetCustomerEmail;
 
     @FXML
-    private JFXTextField txtSetCustomerPhoneNumber;
+    private Label lblCustomerID;
+
+    @FXML
+    private TextField txtSetCustomerName;
+
+    @FXML
+    private TextField txtSetCustomerPhoneNumber;
+
+    @FXML
+    void btnAddNewCustomerPaneOnAction(ActionEvent event) {
+        cmbSelectCustomer.setValue(null);
+        selectedCustomer = null;
+        btnAddNewCustomerPane.setDisable(true);
+        btnCancelAddNewCustomerPane.setDisable(false);
+        setCustomerDetailsEditable(true);
+    }
+
+    @FXML
+    void btnCancelAddNewCustomerPaneOnAction(ActionEvent event) {
+        cmbSelectCustomer.setValue(null);
+        btnAddNewCustomerPane.setDisable(false);
+        btnCancelAddNewCustomerPane.setDisable(true);
+        setCustomerDetailsEditable(false);
+        cmbSelectCustomer.requestFocus();
+    }
 
     @FXML
     void btnClearOrderOnAction(ActionEvent event) {
@@ -104,47 +134,55 @@ public class CheckOutFormController implements Initializable {
     @FXML
     void btnConfirmOrderOnAction(ActionEvent event) {
         try{
+            String customerId = selectedCustomer != null ? selectedCustomer.getCustomerId():null;
             String name = txtSetCustomerName.getText().trim();
             String email = txtSetCustomerEmail.getText().trim();
             String phoneNumber = txtSetCustomerPhoneNumber.getText().trim();
 
             List<OrderItemWithQuantity> orderItemWithQuantityList = EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList();
 
-            if(!name.isEmpty() && customerService.isValidEmail(email) && customerService.isValidPhoneNumber(phoneNumber) && !orderItemWithQuantityList.isEmpty() && !cmbSetPaymentType.getValue().isEmpty()){
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Order Confirmation");
-                alert.setHeaderText("Confirm Order");
-                alert.setContentText("Do you want to confirm the order?");
-                Optional<ButtonType> result = alert.showAndWait();
 
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    LocalDate date = LocalDate.now();
-                    LocalTime time = LocalTime.now().withNano(0);
+            if(name.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || !customerService.isValidEmail(email) || !customerService.isValidPhoneNumber(phoneNumber) || orderItemWithQuantityList.isEmpty() || cmbSetPaymentType.getValue().isEmpty()) {
+                showAlert(Alert.AlertType.ERROR,"Error","Check All The Fields Correctly","Please Enter All the Fields with Correct Data",AlertType.SHOW);
+                return;
+            }
 
-                    for(OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList){
-                        Order tempOrder = orderItemWithQuantity.getOrderItem().getOrder();
-                        tempOrder.setDate(date);
-                        tempOrder.setTime(time);
-                        tempOrder.setPaymentType(cmbSetPaymentType.getValue());
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Order Confirmation");
+            alert.setHeaderText("Confirm Order");
+            alert.setContentText("Do you want to confirm the order?");
+            Optional<ButtonType> result = alert.showAndWait();
+
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                LocalDate date = LocalDate.now();
+                LocalTime time = LocalTime.now().withNano(0);
+
+                for(OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList){
+                    Order tempOrder = orderItemWithQuantity.getOrderItem().getOrder();
+                    tempOrder.setDate(date);
+                    tempOrder.setTime(time);
+                    tempOrder.setPaymentType(cmbSetPaymentType.getValue());
+
+                    if (customerId == null) {
                         tempOrder.getCustomer().setName(name);
                         tempOrder.getCustomer().setEmail(email);
                         tempOrder.getCustomer().setPhoneNumber(phoneNumber);
-                        tempOrder.setOrderItemCount(tblOrderItems.getItems().size());
-                        orderItemsService.saveOrder(orderItemWithQuantity.getOrderItem() , orderItemWithQuantity.getQuantity());
+                    } else {
+                        tempOrder.setCustomer(customerService.findByCustomerId(customerId));
                     }
 
-                    employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
-                    employeeDashboardFormController.loadOrdersTable(orderService.getAllOrders());
-                    employeeDashboardFormController.setCatalogPaneLabels();
-                    employeeDashboardFormController.setOrdersPaneLabels();
-
-                    showAlert(Alert.AlertType.INFORMATION,"Confirmation Successful","Success","Order Has Been Processed",AlertType.SHOWANDWAIT);
-
-                    btnClearOrderOnAction(event);
+                    tempOrder.setOrderItemCount(tblOrderItems.getItems().size());
+                    orderItemsService.saveOrder(orderItemWithQuantity.getOrderItem() , orderItemWithQuantity.getQuantity());
                 }
-                return;
+
+                employeeDashboardFormController.loadCatalogProductsTable(productService.getAllProducts());
+                employeeDashboardFormController.loadOrdersTable(orderService.getAllOrders());
+                employeeDashboardFormController.setCatalogPaneLabels();
+                employeeDashboardFormController.setOrdersPaneLabels();
+
+                showAlert(Alert.AlertType.INFORMATION,"Confirmation Successful","Success","Order Has Been Processed",AlertType.SHOWANDWAIT);
+                btnClearOrderOnAction(event);
             }
-            showAlert(Alert.AlertType.ERROR,"Error","Check All The Fields Correctly","Please Enter All the Fields with Correct Data",AlertType.SHOW);
         } catch (RepositoryException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
@@ -158,20 +196,58 @@ public class CheckOutFormController implements Initializable {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         Scene scene = EmployeeDashboardFormController.getInstance().getEmployeeDashboardStage().getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
-        VBox vbox = (VBox) root.getChildren().get(7);
+        VBox vbox = (VBox) root.getChildren().get(8);
         vbox.setVisible(false);
         vbox.setDisable(true);
+    }
+
+    @FXML
+    void cmbSelectCustomerOnAction(ActionEvent event) {
+        selectedCustomer = cmbSelectCustomer.getValue();
+        if(selectedCustomer!=null){
+            lblCustomerID.setText(selectedCustomer.getCustomerId() != null ? selectedCustomer.getCustomerId():"");
+            txtSetCustomerName.setText(selectedCustomer.getName() != null ? selectedCustomer.getName():"");
+            txtSetCustomerEmail.setText(selectedCustomer.getEmail() != null ? selectedCustomer.getEmail():"");
+            txtSetCustomerPhoneNumber.setText(selectedCustomer.getPhoneNumber() != null ? selectedCustomer.getPhoneNumber():"");
+        }
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnConfirmOrder.setDisable(false);
-        setPaymentTypes();
+        btnAddNewCustomerPane.setDisable(true);
+        btnCancelAddNewCustomerPane.setDisable(false);
+        initializeCustomerComboBox();
+        initializePaymentTypeComboBox();
         loadOrderItemsTable(EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList());
         calculateTotal();
     }
 
-    private void setPaymentTypes() {
+    private void initializeCustomerComboBox() {
+        try{
+            cmbSelectCustomer.setItems(customerService.getAllCustomers());
+
+            cmbSelectCustomer.setCellFactory(listView -> new javafx.scene.control.ListCell<Customer>() {
+                @Override
+                protected void updateItem(Customer customer, boolean empty) {
+                    super.updateItem(customer, empty);
+                    setText((customer == null || empty) ? null : customer.getName());
+                }
+            });
+
+            cmbSelectCustomer.setButtonCell(new javafx.scene.control.ListCell<Customer>() {
+                @Override
+                protected void updateItem(Customer customer, boolean empty) {
+                    super.updateItem(customer, empty);
+                    setText((customer == null || empty) ? null : customer.getName());
+                }
+            });
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
+    }
+
+    private void initializePaymentTypeComboBox() {
         ObservableList<String> paymentTypeList = FXCollections.observableArrayList();
         paymentTypeList.add("Cash");
         paymentTypeList.add("Card");
@@ -286,6 +362,17 @@ public class CheckOutFormController implements Initializable {
             }
         };
         columnOrdersAction.setCellFactory(orderItemsCellFactory);
+    }
+
+    private void setCustomerDetailsEditable(boolean state) {
+        customerDetailsPane.setDisable(!state);
+        txtSetCustomerName.setEditable(state);
+        txtSetCustomerPhoneNumber.setEditable(state);
+        txtSetCustomerEmail.setEditable(state);
+        txtSetCustomerEmail.setText("");
+        txtSetCustomerPhoneNumber.setText("");
+        txtSetCustomerName.setText("");
+        lblCustomerID.setText("");
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String headerText, String message, AlertType showType) {

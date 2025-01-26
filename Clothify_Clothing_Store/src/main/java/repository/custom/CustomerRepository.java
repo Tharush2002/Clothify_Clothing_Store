@@ -10,5 +10,7 @@ import java.util.List;
 public interface CustomerRepository extends SuperRepository {
     List<CustomerEntity> findAll() throws RepositoryException;
 
-    CustomerEntity findByNameEmailPhoneNumber(Session session, String name, String email, String phoneNumber);
+    CustomerEntity findByCustomerId(Session session, String customerId);
+
+    CustomerEntity findByCustomerId(String customerId) throws RepositoryException;
 }

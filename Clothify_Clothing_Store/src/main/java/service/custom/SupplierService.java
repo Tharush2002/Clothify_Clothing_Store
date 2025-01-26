@@ -2,12 +2,11 @@ package service.custom;
 
 import exceptions.RepositoryException;
 import javafx.collections.ObservableList;
-import model.Product;
 import model.Supplier;
 import service.SuperService;
 
 public interface SupplierService extends SuperService {
-    ObservableList<Supplier> getAllSuppliers() throws RepositoryException;
+    ObservableList<Supplier> getAll() throws RepositoryException;
 
     Supplier findSupplierByName(String value) throws RepositoryException;
 
@@ -18,4 +17,8 @@ public interface SupplierService extends SuperService {
     void addSupplier(Supplier supplier) throws RepositoryException;
 
     boolean isValidEmail(String email);
+
+    Supplier findBySupplierId(String supplierId) throws RepositoryException;
+
+    boolean isSupplierNameAlreadyAvailable(String name) throws RepositoryException;
 }

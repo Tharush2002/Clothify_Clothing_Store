@@ -1,10 +1,12 @@
 package controller.employee;
 
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextField;
+import com.jfoenix.controls.JFXComboBox;
 import controller.CheckOutFormController;
 import controller.HomeFormController;
+import controller.category.EditCategoryFormController;
 import controller.product.AddProductFormController;
+import controller.product.AddProductsByCategoryFormController;
 import controller.product.AddProductsBySupplierFormController;
 import controller.product.EditProductFormController;
 import controller.returnOrders.ReturnOrderFormController;
@@ -42,6 +44,7 @@ import javafx.util.Callback;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import model.*;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -73,6 +76,7 @@ import static util.ActionTableType.SUPPLIERS;
 
 @Getter
 @Setter
+@Slf4j
 public class EmployeeDashboardFormController implements Initializable {
     private Employee loggedEmployee;
     private Stage employeeDashboardStage;
@@ -103,12 +107,16 @@ public class EmployeeDashboardFormController implements Initializable {
 
     private Product selectedProductToEdit = new Product();
     private Supplier selectedSupplierToEdit = new Supplier();
+    private Category selectedCategoryToEdit = new Category();
+
     private ObservableList<Product> suppliedProducts = FXCollections.observableArrayList();
+    private ObservableList<Product> categorizedAddProducts = FXCollections.observableArrayList();
 
     private ObservableList<Product> allProducts = FXCollections.observableArrayList();
     private ObservableList<Supplier> allSuppliers = FXCollections.observableArrayList();
     private ObservableList<Order> allOrders = FXCollections.observableArrayList();
     private ObservableList<ReturnOrder> allReturnOrderItems = FXCollections.observableArrayList();
+    private ObservableList<Category> allCategories = FXCollections.observableArrayList();
     private final List<OrderItemWithQuantity> orderItemWithQuantityList = new ArrayList<>();
 
     //SERVICE-FACTORIES
@@ -119,10 +127,14 @@ public class EmployeeDashboardFormController implements Initializable {
     private final CustomerService customerService = ServiceFactory.getInstance().getServiceType(Type.CUSTOMER);
     private final EmployeeService employeeService = ServiceFactory.getInstance().getServiceType(Type.EMPLOYEE);
     private final ReturnOrderService returnOrderService = ServiceFactory.getInstance().getServiceType(Type.RETURNORDER);
+    private final CategoryService categoryService = ServiceFactory.getInstance().getServiceType(Type.CATEGORY);
     //=================
 
     @FXML
     private AnchorPane anchorPaneCatalog;
+
+    @FXML
+    private AnchorPane anchorPaneCategories;
 
     @FXML
     private AnchorPane anchorPaneOrders;
@@ -134,13 +146,19 @@ public class EmployeeDashboardFormController implements Initializable {
     private AnchorPane anchorPaneSuppliers;
 
     @FXML
-    public Button btnAddToCart;
+    private Button btnAddToCart;
 
     @FXML
     private Button btnCatalog;
 
     @FXML
-    public Button btnCheckOut;
+    private Button btnCategories;
+
+    @FXML
+    private Button btnCheckOut;
+
+    @FXML
+    private JFXButton btnCloseSearch;
 
     @FXML
     private Button btnOrders;
@@ -155,106 +173,7 @@ public class EmployeeDashboardFormController implements Initializable {
     private Button btnSuppliers;
 
     @FXML
-    private ComboBox<String> cmbCatalogSize;
-
-    @FXML
-    public JFXButton btnCloseSearch;
-
-    @FXML
-    private JFXTextField txtAddSupplierCompany;
-
-    @FXML
-    private JFXTextField txtAddSupplierEmail;
-
-    @FXML
-    private JFXTextField txtAddSupplierName;
-
-    @FXML
-    private Label lblCatalogProductID;
-
-    @FXML
-    private Label lblCatalogProductName;
-
-    @FXML
-    private Label lblCatalogUnitPrice;
-
-    @FXML
-    private Label lblDate;
-
-    @FXML
-    private Label lblEmployeeAddress;
-
-    @FXML
-    private Label lblEmployeeContact;
-
-    @FXML
-    private Label lblEmployeeEmail;
-
-    @FXML
-    private Label lblEmployeeID;
-
-    @FXML
-    private Label lblEmployeeNIC;
-
-    @FXML
-    private Label lblEmployeeName;
-
-    @FXML
-    private Label lblEmployeeUserName;
-
-    @FXML
-    private Label lblTime;
-
-    @FXML
-    private Label lblTotalCompanies;
-
-    @FXML
-    private Label lblTotalCustomerCount;
-
-    @FXML
-    private Label lblTotalOrdersCatalog;
-
-    @FXML
-    private Label lblTotalOrdersOrders;
-
-    @FXML
-    private Label lblTotalProducts;
-
-    @FXML
-    private Label lblTotalReturnOrderCount;
-
-    @FXML
-    private Label lblTotalStock;
-
-    @FXML
-    private Label lblTotalSuppliers;
-
-    @FXML
-    private Label lblWelcomeEmployee;
-
-    @FXML
-    private Pane pwdConfirmNewPasswordPane;
-
-    @FXML
-    private Pane pwdSetNewPasswordPane;
-
-    @FXML
-    private Pane txtConfirmNewPasswordPane;
-
-    @FXML
-    private Pane txtSetNewPasswordPane;
-
-    @FXML
-    private Pane resetPasswordPane;
-
-    @FXML
-    private PasswordField pwdConfirmNewPassword;
-
-    @FXML
-    private PasswordField pwdSetNewPassword;
-
-    @FXML
-    public Spinner<Integer> spinnerCatalogQuantity;
+    private JFXComboBox<String> cmbCatalogSize;
 
     @FXML
     private TableColumn<Product, Void> columnCatalogProductsAction;
@@ -276,6 +195,27 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     private TableColumn<Product, Double> columnCatalogProductsUnitPrice;
+
+    @FXML
+    private TableColumn<Category, Void> columnCategoriesAction;
+
+    @FXML
+    private TableColumn<Product, String> columnCategoriesAddProductsProduct;
+
+    @FXML
+    private TableColumn<Product, String> columnCategoriesAddProductsSupplier;
+
+    @FXML
+    private TableColumn<Category, String> columnCategoriesId;
+
+    @FXML
+    private TableColumn<Category, String> columnCategoriesName;
+
+    @FXML
+    private TableColumn<Product, String> columnCategorizedProductsProductName;
+
+    @FXML
+    private TableColumn<Product, String> columnCategorizedProductsCategoryId;
 
     @FXML
     private TableColumn<ReturnOrder, String> columnReturnsOrderID;
@@ -356,7 +296,118 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableColumn<Order, Double> columnOrdersTotal;
 
     @FXML
+    private Label lblCatalogProductID;
+
+    @FXML
+    private Label lblCatalogProductName;
+
+    @FXML
+    private Label lblCatalogUnitPrice;
+
+    @FXML
+    private Label lblDate;
+
+    @FXML
+    private Label lblEmployeeAddress;
+
+    @FXML
+    private Label lblEmployeeContact;
+
+    @FXML
+    private Label lblEmployeeEmail;
+
+    @FXML
+    private Label lblEmployeeID;
+
+    @FXML
+    private Label lblEmployeeNIC;
+
+    @FXML
+    private Label lblEmployeeName;
+
+    @FXML
+    private Label lblEmployeeUserName;
+
+    @FXML
+    private Label lblReturnedItemsAvailableForTheOrder;
+
+    @FXML
+    private Label lblTime;
+
+    @FXML
+    private Label lblTotalCompanies;
+
+    @FXML
+    private Label lblTotalCustomerCount;
+
+    @FXML
+    private Label lblTotalOrdersCatalog;
+
+    @FXML
+    private Label lblTotalOrdersOrders;
+
+    @FXML
+    private Label lblTotalProductsCatalog;
+
+    @FXML
+    private Label lblTotalProductsCategories;
+
+    @FXML
+    private Label lblTotalReturnOrderCount;
+
+    @FXML
+    private Label lblTotalStock;
+
+    @FXML
+    private Label lblTotalSuppliers;
+
+    @FXML
+    private Label lblTotalCategories;
+
+    @FXML
+    private Label lblWelcomeEmployee;
+
+    @FXML
+    private HBox notInStock;
+
+    @FXML
+    private HBox inStock;
+
+    @FXML
+    private PasswordField pwdConfirmNewPassword;
+
+    @FXML
+    private Pane pwdConfirmNewPasswordPane;
+
+    @FXML
+    private PasswordField pwdSetNewPassword;
+
+    @FXML
+    private Pane pwdSetNewPasswordPane;
+
+    @FXML
+    private Pane resetPasswordPane;
+
+    @FXML
+    private VBox screen;
+
+    @FXML
+    private TextField searchInput;
+
+    @FXML
+    private Spinner<Integer> spinnerCatalogQuantity;
+
+    @FXML
     public TableView<Product> tblCatalogProducts;
+
+    @FXML
+    private TableView<Category> tblCategories;
+
+    @FXML
+    private TableView<Product> tblCategoriesAddProducts;
+
+    @FXML
+    private TableView<Product> tblCategoriesCategorizedProducts;
 
     @FXML
     private TableView<Supplier> tblSuppliers;
@@ -377,16 +428,28 @@ public class EmployeeDashboardFormController implements Initializable {
     private TableView<ReturnOrder> tblReturnOrders;
 
     @FXML
-    public TextField searchInput;
+    private TextField txtAddCategoryName;
+
+    @FXML
+    private TextField txtAddSupplierCompany;
+
+    @FXML
+    private TextField txtAddSupplierEmail;
+
+    @FXML
+    private TextField txtAddSupplierName;
 
     @FXML
     private TextField txtConfirmNewPassword;
 
     @FXML
+    private Pane txtConfirmNewPasswordPane;
+
+    @FXML
     private TextField txtSetNewPassword;
 
     @FXML
-    public VBox screen;
+    private Pane txtSetNewPasswordPane;
 
     @FXML
     void btnCloseOnAction(MouseEvent event) {
@@ -415,35 +478,130 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     @FXML
+    void btnCategoriesOnAction(ActionEvent event) {
+        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.CATEGORY);
+    }
+
+    @FXML
+    void btnAddCategoryOnAction(ActionEvent event) {
+        String name = txtAddCategoryName.getText().trim();
+        try{
+            if (!name.isEmpty() && !categoryService.isCategoryNameAvailable(name)) {
+                Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmationAlert.setTitle("Confirm Category Addition");
+                confirmationAlert.setHeaderText("Add New Category");
+                confirmationAlert.setContentText("Are you sure you want to add the new category: " + name + "?");
+
+                Optional<ButtonType> resultConfirmationAlert = confirmationAlert.showAndWait();
+
+                if (resultConfirmationAlert.isPresent() && resultConfirmationAlert.get() == ButtonType.OK) {
+                    if (!categorizedAddProducts.isEmpty()) {
+                        for(Product product : categorizedAddProducts){
+                            product.setCategory(new Category(null, name));
+                            productService.addProduct(product);
+                        }
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Confirm No Items");
+                        alert.setHeaderText("No Items for Category");
+                        alert.setContentText("Are you sure you don't want to add items for this category: " + name + "?");
+
+                        Optional<ButtonType> resultAlert = alert.showAndWait();
+
+                        if (resultAlert.isPresent() && resultAlert.get() == ButtonType.OK) {
+                            categoryService.addCategory(new Category(null, name));
+                        } else {
+                            return;
+                        }
+                    }
+                    loadCategoriesTable(categoryService.getAllCategories());
+                    loadCatalogProductsTable(productService.getAllProducts());
+                    setCategoriesPaneLabels();
+                    resetCategoriesTables();
+                }
+                showAlert(Alert.AlertType.INFORMATION, "Supplier Added", "Success", "Supplier added successfully!", AlertType.SHOW);
+
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", "Please Enter All the Fields with Correct Data",AlertType.SHOW);
+
+                txtAddSupplierName.setText("");
+                txtAddSupplierCompany.setText("");
+                txtAddSupplierEmail.setText("");
+            }
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
+    }
+
+    @FXML
+    void btnAddProductForTheCategoryOnAction(ActionEvent event) {
+        try {
+            setEmployeeDashboardStage(event);
+            Stage stage = new Stage();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/AddProductsByCategory.fxml"));
+            Parent root = loader.load();
+            AddProductsByCategoryFormController controller = loader.getController();
+            controller.setEmployeeDashboardFormController(this);
+            stage.setScene(new Scene(root));
+            stage.initStyle(StageStyle.UNDECORATED);
+            stage.show();
+            stage.setResizable(false);
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
+        enableScreen();
+    }
+
+    @FXML
     void btnAddSupplierOnAction(ActionEvent event) {
         String name = txtAddSupplierName.getText().trim();
         String email = txtAddSupplierEmail.getText().trim();
         String company = txtAddSupplierCompany.getText().trim();
-        if (!name.isEmpty() && supplierService.isValidEmail(email) && !company.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "Supplier Added", "Success", "Supplier added successfully!", AlertType.SHOW);
+        try{
+            if (!name.isEmpty() && supplierService.isValidEmail(email) && !company.isEmpty() && !supplierService.isSupplierNameAlreadyAvailable(name)) {
+                Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmationAlert.setTitle("Confirm Supplier Addition");
+                confirmationAlert.setHeaderText("Add New Supplier");
+                confirmationAlert.setContentText("Are you sure you want to add the new supplier: " + name + "?");
 
-            try{
-                if (!suppliedProducts.isEmpty()) {
-                    for(Product product : suppliedProducts){
-                        product.setSupplier(new Supplier(null, name, company, email));
-                        productService.addProduct(product);
+                Optional<ButtonType> resultConfirmationAlert = confirmationAlert.showAndWait();
+
+                if (resultConfirmationAlert.isPresent() && resultConfirmationAlert.get() == ButtonType.OK) {
+                    if (!suppliedProducts.isEmpty()) {
+                        for(Product product : suppliedProducts){
+                            product.setSupplier(new Supplier(null, name, company, email));
+                            productService.addProduct(product);
+                        }
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Confirm No Items");
+                        alert.setHeaderText("No Items for Supplier");
+                        alert.setContentText("Are you sure you don't want to add items for the supplier: " + name + "?");
+
+                        Optional<ButtonType> resultAlert = alert.showAndWait();
+
+                        if (resultAlert.isPresent() && resultAlert.get() == ButtonType.OK) {
+                            supplierService.addSupplier(new Supplier(null, name, company, email));
+                        } else {
+                            return;
+                        }
                     }
-                } else {
-                    supplierService.addSupplier(new Supplier(null, name, company, email));
+                    loadSuppliersTable(supplierService.getAll());
+                    loadCatalogProductsTable(productService.getAllProducts());
+                    setSuppliersPaneLabels();
+                    resetSuppliersTables();
                 }
-                loadSuppliersTable(supplierService.getAllSuppliers());
-                loadCatalogProductsTable(productService.getAllProducts());
-                setSuppliersPaneLabels();
-            } catch (RepositoryException e) {
-                showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+                showAlert(Alert.AlertType.INFORMATION, "Supplier Added", "Success", "Supplier added successfully!", AlertType.SHOW);
+
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", "Please Enter All the Fields with Correct Data",AlertType.SHOW);
+
+                txtAddSupplierName.setText("");
+                txtAddSupplierCompany.setText("");
+                txtAddSupplierEmail.setText("");
             }
-
-        } else {
-            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", "Please Enter All the Fields with Correct Data",AlertType.SHOW);
-
-            txtAddSupplierName.setText("");
-            txtAddSupplierCompany.setText("");
-            txtAddSupplierEmail.setText("");
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -508,7 +666,7 @@ public class EmployeeDashboardFormController implements Initializable {
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         enableScreen();
     }
@@ -527,7 +685,7 @@ public class EmployeeDashboardFormController implements Initializable {
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         enableScreen();
     }
@@ -546,7 +704,7 @@ public class EmployeeDashboardFormController implements Initializable {
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         enableScreen();
     }
@@ -561,18 +719,25 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     @FXML
+    void btnClearAddCategoryOnAction(ActionEvent event) {
+        categorizedAddProducts = FXCollections.observableArrayList();
+        tblCategoriesAddProducts.getItems().clear();
+        txtAddCategoryName.setText("");
+    }
+
+    @FXML
     void btnLoadCustomerReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/customer.jrxml");
+        openReports("src/main/resources/reports/Customer.jrxml");
     }
 
     @FXML
     void btnLoadEmployeeReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/employee.jrxml");
+        openReports("src/main/resources/reports/Employee.jrxml");
     }
 
     @FXML
     void btnLoadInventoryReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/products.jrxml");
+        openReports("src/main/resources/reports/Inventory.jrxml");
     }
 
     @FXML
@@ -618,6 +783,14 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     public void openInstagramOnAction(MouseEvent event) {
+        try {
+            URI uri = new URI("https://www.instagram.com/_tharush_00/");
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(uri);
+            }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
     }
 
     @FXML
@@ -628,9 +801,8 @@ public class EmployeeDashboardFormController implements Initializable {
                 Desktop.getDesktop().browse(uri);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
-
     }
 
     @FXML
@@ -641,7 +813,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 Desktop.getDesktop().browse(uri);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 
@@ -723,19 +895,21 @@ public class EmployeeDashboardFormController implements Initializable {
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         enableScreen();
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.CATALOG);
+
         loadDateAndTime();
         loadTables();
 
         setAllLabels();
         disableCloseSearch();
-        setTablesInitializationStates();
+        setTablesSelectableStates();
 
         bindResetPasswordFields();
         enableResetPasswordPane(false);
@@ -748,7 +922,8 @@ public class EmployeeDashboardFormController implements Initializable {
     private void loadTables() {
         try{
             loadCatalogProductsTable(productService.getAllProducts());
-            loadSuppliersTable(supplierService.getAllSuppliers());
+            loadSuppliersTable(supplierService.getAll());
+            loadCategoriesTable(categoryService.getAllCategories());
             loadOrdersTable(orderService.getAllOrders());
             loadReturnOrdersTable(returnOrderService.getAllReturnedItems());
         } catch (RepositoryException e) {
@@ -816,6 +991,18 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
+    private void loadCategorizedProducts(ObservableList<Product> categorizedProducts) {
+        if (categorizedProducts != null) {
+            columnCategorizedProductsProductName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            columnCategorizedProductsCategoryId.setCellValueFactory(new PropertyValueFactory<>("productId"));
+
+            columnCategorizedProductsProductName.setStyle("-fx-alignment:center;");
+            columnCategorizedProductsCategoryId.setStyle("-fx-alignment:center;");
+
+            tblCategoriesCategorizedProducts.setItems(categorizedProducts);
+        }
+    }
+
     public void loadSuppliersTable(ObservableList<Supplier> allSuppliers) {
         if (allSuppliers != null) {
             this.allSuppliers = allSuppliers;
@@ -843,9 +1030,11 @@ public class EmployeeDashboardFormController implements Initializable {
                 Category category = cellData.getValue().getCategory();
                 return new SimpleStringProperty(category != null ? category.getName() : "-");
             });
-            tblSuppliersAddProducts.setItems(suppliedProducts);
+
             columnSuppliersAddProductsProductName.setStyle("-fx-alignment:center;");
             columnSuppliersAddProductsCategoryName.setStyle("-fx-alignment:center;");
+
+            tblSuppliersAddProducts.setItems(suppliedProducts);
         }
     }
 
@@ -906,6 +1095,38 @@ public class EmployeeDashboardFormController implements Initializable {
         }
     }
 
+    public void loadCategoriesTable(ObservableList<Category> allCategories){
+        if(!allCategories.isEmpty()){
+            this.allCategories = allCategories;
+
+            columnCategoriesId.setCellValueFactory(new PropertyValueFactory<>("categoryId"));
+            columnCategoriesName.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+            columnCategoriesId.setStyle("-fx-alignment:center;");
+            columnCategoriesName.setStyle("-fx-alignment:center;");
+
+            setActionsToTables(ActionTableType.CATEGORY);
+            tblCategories.setItems(allCategories);
+        }
+    }
+
+    public void loadCategoriesAddProducts(){
+        if (!categorizedAddProducts.isEmpty()) {
+            columnCategoriesAddProductsProduct.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+            columnCategoriesAddProductsSupplier.setCellValueFactory(cellData -> {
+                Supplier supplier = cellData.getValue().getSupplier();
+                return new SimpleStringProperty(supplier != null ? supplier.getName() : "-");
+            });
+
+            columnCategoriesAddProductsProduct.setStyle("-fx-alignment:center;");
+            columnCategoriesAddProductsSupplier.setStyle("-fx-alignment:center;");
+
+            tblCategoriesAddProducts.setItems(categorizedAddProducts);
+        }
+    }
+
+
     //=============
 
 
@@ -918,17 +1139,42 @@ public class EmployeeDashboardFormController implements Initializable {
                 btnCatalog.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
                 btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnCategories.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
 //                ENABLE AND SHOW ANCHOR PANE CATALOG
                 anchorPaneCatalog.setDisable(false);
                 anchorPaneCatalog.setVisible(true);
 //                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneCategories.setDisable(true);
                 anchorPaneOrders.setDisable(true);
                 anchorPaneReports.setDisable(true);
                 anchorPaneSuppliers.setDisable(true);
+                anchorPaneCategories.setVisible(false);
                 anchorPaneOrders.setVisible(false);
                 anchorPaneReports.setVisible(false);
                 anchorPaneSuppliers.setVisible(false);
+                cancelResetPassword();
+                break;
+            case CATEGORY:
+//                HANDLE BUTTON STYLES WHEN CLICKED
+                btnCategories.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
+                btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+//                ENABLE AND SHOW ANCHOR PANE ORDERS
+                anchorPaneCategories.setDisable(false);
+                anchorPaneCategories.setVisible(true);
+//                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneOrders.setDisable(true);
+                anchorPaneCatalog.setDisable(true);
+                anchorPaneReports.setDisable(true);
+                anchorPaneSuppliers.setDisable(true);
+                anchorPaneOrders.setVisible(false);
+                anchorPaneCatalog.setVisible(false);
+                anchorPaneReports.setVisible(false);
+                anchorPaneSuppliers.setVisible(false);
+                resetSearch();
                 cancelResetPassword();
                 break;
             case ORDERS:
@@ -936,14 +1182,17 @@ public class EmployeeDashboardFormController implements Initializable {
                 btnOrders.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
                 btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnCategories.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
 //                ENABLE AND SHOW ANCHOR PANE ORDERS
                 anchorPaneOrders.setDisable(false);
                 anchorPaneOrders.setVisible(true);
 //                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneCategories.setDisable(true);
                 anchorPaneCatalog.setDisable(true);
                 anchorPaneReports.setDisable(true);
                 anchorPaneSuppliers.setDisable(true);
+                anchorPaneCategories.setVisible(false);
                 anchorPaneCatalog.setVisible(false);
                 anchorPaneReports.setVisible(false);
                 anchorPaneSuppliers.setVisible(false);
@@ -955,14 +1204,17 @@ public class EmployeeDashboardFormController implements Initializable {
                 btnSuppliers.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
                 btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnCategories.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnReports.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
 //                ENABLE AND SHOW ANCHOR PANE ORDERS
                 anchorPaneSuppliers.setDisable(false);
                 anchorPaneSuppliers.setVisible(true);
 //                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneCategories.setDisable(true);
                 anchorPaneOrders.setDisable(true);
                 anchorPaneReports.setDisable(true);
                 anchorPaneCatalog.setDisable(true);
+                anchorPaneCategories.setVisible(false);
                 anchorPaneOrders.setVisible(false);
                 anchorPaneReports.setVisible(false);
                 anchorPaneCatalog.setVisible(false);
@@ -974,14 +1226,17 @@ public class EmployeeDashboardFormController implements Initializable {
                 btnReports.setStyle("-fx-background-color: rgba(44, 37, 14, 0.4);");
                 btnOrders.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnSuppliers.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
+                btnCategories.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
                 btnCatalog.setStyle("-fx-background-color: rgba(0, 0, 0, 0);");
 //                ENABLE AND SHOW ANCHOR PANE ORDERS
                 anchorPaneReports.setDisable(false);
                 anchorPaneReports.setVisible(true);
 //                DISABLE AND HIDE REMAINING ANCHOR PANES
+                anchorPaneCategories.setDisable(true);
                 anchorPaneOrders.setDisable(true);
                 anchorPaneCatalog.setDisable(true);
                 anchorPaneSuppliers.setDisable(true);
+                anchorPaneCategories.setVisible(false);
                 anchorPaneOrders.setVisible(false);
                 anchorPaneCatalog.setVisible(false);
                 anchorPaneSuppliers.setVisible(false);
@@ -1025,9 +1280,7 @@ public class EmployeeDashboardFormController implements Initializable {
                             deleteIcon.setStyle("-fx-cursor: hand ;");
                             editIcon.setStyle("-fx-cursor: hand ;");
 
-                            deleteIcon.setOnMouseClicked(event -> {
-                                handleDeleteActions(type, tblCatalogProducts.getItems().get(getIndex()));
-                            });
+                            deleteIcon.setOnMouseClicked(event -> handleDeleteActions(type, tblCatalogProducts.getItems().get(getIndex())));
 
                             editIcon.setOnMouseClicked(event -> {
                                 selectedProductToEdit = tblCatalogProducts.getItems().get(getIndex());
@@ -1079,12 +1332,48 @@ public class EmployeeDashboardFormController implements Initializable {
             }
         };
 
+        Callback<TableColumn<Category, Void>, TableCell<Category, Void>> categoryCellFactory = new Callback<>() {
+            @Override
+            public TableCell<Category, Void> call(final TableColumn<Category, Void> param) {
+                return new TableCell<>() {
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            Button editIcon = new Button("Edit");
+                            Button deleteIcon = new Button("Delete");
+
+                            deleteIcon.setStyle("-fx-cursor: hand ;");
+                            editIcon.setStyle("-fx-cursor: hand ;");
+
+                            deleteIcon.setOnMouseClicked(event -> handleDeleteActions(type, tblCategories.getItems().get(getIndex())));
+
+                            editIcon.setOnMouseClicked(event -> {
+                                selectedCategoryToEdit = tblCategories.getItems().get(getIndex());
+                                handleEditActions(type, event);
+                            });
+
+                            HBox managebtn = new HBox(editIcon, deleteIcon);
+                            managebtn.setStyle("-fx-alignment:center");
+                            managebtn.setSpacing(8);
+                            setGraphic(managebtn);
+                        }
+                    }
+                };
+            }
+        };
+
         switch (type) {
             case PRODUCTS:
                 columnCatalogProductsAction.setCellFactory(productCellFactory);
                 break;
             case SUPPLIERS:
                 columnSuppliersAction.setCellFactory(supplierCellFactory);
+                break;
+            case CATEGORY:
+                columnCategoriesAction.setCellFactory(categoryCellFactory);
                 break;
         }
     }
@@ -1097,14 +1386,22 @@ public class EmployeeDashboardFormController implements Initializable {
             FXMLLoader loader = switch (type) {
                 case PRODUCTS -> new FXMLLoader(getClass().getResource("../../view/EditProducts.fxml"));
                 case SUPPLIERS -> new FXMLLoader(getClass().getResource("../../view/EditSupplier.fxml"));
+                case CATEGORY -> new FXMLLoader(getClass().getResource("../../view/EditCategory.fxml"));
             };
             Parent root = loader.load();
-            if (type == PRODUCTS) {
-                EditProductFormController editProductFormController = loader.getController();
-                editProductFormController.setEmployeeDashboardFormController(this);
-            } else {
-                EditSupplierFormController editSupplierFormController = loader.getController();
-                editSupplierFormController.setEmployeeDashboardFormController(this);
+            switch (type) {
+                case PRODUCTS -> {
+                    EditProductFormController editProductFormController = loader.getController();
+                    editProductFormController.setEmployeeDashboardFormController(this);
+                }
+                case SUPPLIERS -> {
+                    EditSupplierFormController editSupplierFormController = loader.getController();
+                    editSupplierFormController.setEmployeeDashboardFormController(this);
+                }
+                default -> {
+                    EditCategoryFormController editCategoryFormController = loader.getController();
+                    editCategoryFormController.setEmployeeDashboardFormController(this);
+                }
             }
 
             stage.setScene(new Scene(root));
@@ -1112,7 +1409,7 @@ public class EmployeeDashboardFormController implements Initializable {
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
         enableScreen();
     }
@@ -1126,15 +1423,27 @@ public class EmployeeDashboardFormController implements Initializable {
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try{
-                if (type == PRODUCTS) {
-                    Product product = (Product) object;
-                    productService.deleteProduct(product.getProductId());
-                    loadCatalogProductsTable(productService.getAllProducts());
-                } else if (type == SUPPLIERS) {
-                    Supplier supplier = (Supplier) object;
-                    supplierService.deleteSupplier(supplier.getSupplierId());
-                    loadSuppliersTable(supplierService.getAllSuppliers());
-                    loadCatalogProductsTable(productService.getAllProducts());
+                switch (type) {
+                    case PRODUCTS -> {
+                        Product product = (Product) object;
+                        productService.deleteProduct(product.getProductId());
+                        setCatalogPaneLabels();
+                        loadCatalogProductsTable(productService.getAllProducts());
+                    }
+                    case SUPPLIERS -> {
+                        Supplier supplier = (Supplier) object;
+                        supplierService.deleteSupplier(supplier.getSupplierId());
+                        setSuppliersPaneLabels();
+                        loadSuppliersTable(supplierService.getAll());
+                        loadCatalogProductsTable(productService.getAllProducts());
+                    }
+                    default -> {
+                        Category category = (Category) object;
+                        categoryService.deleteCategory(category.getCategoryId());
+                        setCategoriesPaneLabels();
+                        loadCategoriesTable(categoryService.getAllCategories());
+                        loadCatalogProductsTable(productService.getAllProducts());
+                    }
                 }
             } catch (RepositoryException e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
@@ -1164,9 +1473,13 @@ public class EmployeeDashboardFormController implements Initializable {
         cmbCatalogSize.setValue("M");
         cmbCatalogSize.setVisible(true);
 
-        spinnerCatalogQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, newVal.getQuantity(), 1));
-        spinnerCatalogQuantity.setVisible(true);
-
+        if(newVal.getQuantity() != 0) {
+            showNotInStock(false);
+            spinnerCatalogQuantity.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, newVal.getQuantity(), 1));
+            spinnerCatalogQuantity.setVisible(true);
+        }else{
+            showNotInStock(true);
+        }
         btnAddToCart.setDisable(newVal.getQuantity() == 0);
     }
 
@@ -1201,16 +1514,34 @@ public class EmployeeDashboardFormController implements Initializable {
         tblOrders.getSelectionModel().clearSelection();
     }
 
+    private void resetCategoriesTables(){
+        tblCategoriesAddProducts.getItems().clear();
+        tblCategories.getSelectionModel().clearSelection();
+    }
+
     private void setAllLabels() {
+        showNotInStock(false);
+        showOrderHasReturnedItems(false);
+
         setCatalogPaneLabels();
         setSuppliersPaneLabels();
         setOrdersPaneLabels();
+        setCategoriesPaneLabels();
+    }
+
+    public void setCategoriesPaneLabels(){
+        if (allCategories != null) {
+            lblTotalCategories.setText(String.valueOf(allCategories.size()));
+        } else {
+            lblTotalProductsCategories.setText(lblTotalProductsCatalog.getText());
+        }
+        lblTotalProductsCategories.setText(lblTotalProductsCatalog.getText());
     }
 
     public void setCatalogPaneLabels() {
         lblTotalOrdersCatalog.setText(allOrders != null ? String.valueOf(allOrders.size()) : "");
         if (allProducts != null) {
-            lblTotalProducts.setText(String.valueOf(allProducts.size()));
+            lblTotalProductsCatalog.setText(String.valueOf(allProducts.size()));
 
             Integer totalStock = 0;
             ObservableList<Product> items = tblCatalogProducts.getItems();
@@ -1219,7 +1550,7 @@ public class EmployeeDashboardFormController implements Initializable {
             }
             lblTotalStock.setText(String.valueOf(totalStock));
         } else {
-            lblTotalProducts.setText("");
+            lblTotalProductsCatalog.setText("");
             lblTotalStock.setText("");
         }
     }
@@ -1264,32 +1595,62 @@ public class EmployeeDashboardFormController implements Initializable {
         disableCloseSearch();
     }
 
-    private void setTablesInitializationStates(){
-        handleDashboardSidePanelBtnClicks(EmployeeDashboardViewType.CATALOG);
+    private void setTablesSelectableStates(){
+        setCatalogProductsSelectableState();
+        setSuppliersSelectableState();
+        setOrdersSelectableState();
+        setCategoriesSelectableState();
+    }
+
+    private void setCategoriesSelectableState() {
+        tblCategories.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                try {
+                    loadCategorizedProducts(productService.findByCategoryId(newVal.getCategoryId()));
+                } catch (RepositoryException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+                }
+            }
+        });
+    }
+
+    private void setOrdersSelectableState() {
+        tblOrders.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                try {
+                    ObservableList<OrderItem> temp = orderItemsService.findOrderItemsByOrderID(newVal.getOrderId());
+                    showOrderHasReturnedItems(temp.size()!= newVal.getOrderItemCount());
+                    loadOrderItemsTable(temp);
+                } catch (RepositoryException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+                }
+            }
+        });
+    }
+
+    private void setSuppliersSelectableState() {
+        tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                try {
+                    loadSuppliedProductsTable(productService.findBySupplierID(newVal.getSupplierId()));
+                } catch (RepositoryException e) {
+                    showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+                }
+            }
+        });
+    }
+
+    private void setCatalogProductsSelectableState() {
         tblCatalogProducts.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
             if (newVal != null) {
                 resetSearch();
                 addProductValuesToDisplay(newVal);
             }
         });
-        tblSuppliers.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
-            if (newVal != null) {
-                try {
-                    loadSuppliedProductsTable(productService.findProductsBySupplierID(newVal.getSupplierId()));
-                } catch (RepositoryException e) {
-                    showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
-                }
-            }
-        });
-        tblOrders.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
-            if (newVal != null) {
-                try {
-                    loadOrderItemsTable(orderItemsService.findOrderItemsByOrderID(newVal.getOrderId()));
-                } catch (RepositoryException e) {
-                    showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
-                }
-            }
-        });
+    }
+
+    private void showOrderHasReturnedItems(boolean state) {
+        lblReturnedItemsAvailableForTheOrder.setVisible(state);
     }
 
     public void loadEmployeeDetails(Employee employee) {
@@ -1320,6 +1681,7 @@ public class EmployeeDashboardFormController implements Initializable {
             viewer.setVisible(true);
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred while generating the report.", e.getMessage(),AlertType.SHOW);
+            log.error(e.getMessage());
         }
     }
 
@@ -1380,5 +1742,13 @@ public class EmployeeDashboardFormController implements Initializable {
         }else{
             alert.showAndWait();
         }
+    }
+
+    private void showNotInStock(boolean state){
+        notInStock.setDisable(!state);
+        notInStock.setVisible(state);
+
+        inStock.setDisable(state);
+        inStock.setVisible(!state);
     }
 }

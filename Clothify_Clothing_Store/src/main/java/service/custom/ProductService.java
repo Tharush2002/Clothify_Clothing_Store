@@ -11,7 +11,7 @@ public interface ProductService extends SuperService {
     void update(Product product) throws RepositoryException;
     void deleteProduct(String id) throws RepositoryException;
 
-    ObservableList<Product> findProductsBySupplierID(String supplierId) throws RepositoryException;
+    ObservableList<Product> findBySupplierID(String supplierId) throws RepositoryException;
 
-    Product findProductByProductID(String productId) throws RepositoryException;
+    ObservableList<Product> findByCategoryId(String categoryId) throws RepositoryException;
 }

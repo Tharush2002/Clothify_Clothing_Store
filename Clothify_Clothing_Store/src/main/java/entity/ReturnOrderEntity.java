@@ -36,10 +36,4 @@ public class ReturnOrderEntity {
 
     private LocalDate returnDate;
 
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.returnOrderId = "R" + String.format("%04d",id);
-        }
-    }
 }

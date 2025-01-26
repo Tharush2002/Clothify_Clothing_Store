@@ -2,21 +2,23 @@ package controller.product;
 
 import com.jfoenix.controls.JFXTextField;
 import controller.employee.EmployeeDashboardFormController;
+import exceptions.RepositoryException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Setter;
 import model.Category;
 import model.Product;
 import model.Supplier;
+import service.ServiceFactory;
+import service.custom.CategoryService;
 import util.AlertType;
+import util.Type;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,28 +26,31 @@ import java.util.ResourceBundle;
 @Setter
 public class AddProductsBySupplierFormController implements Initializable {
     private EmployeeDashboardFormController employeeDashboardFormController;
+    private final CategoryService categoryService = ServiceFactory.getInstance().getServiceType(Type.CATEGORY);
+
+    @FXML
+    private ComboBox<Category> cmbSetProductCategory;
 
     @FXML
     private Spinner<Integer> spinnerSetProductQuantity;
 
     @FXML
-    private JFXTextField txtSetProductCategory;
+    private TextField txtSetProductName;
 
     @FXML
-    private JFXTextField txtSetProductName;
+    private TextField txtSetProductUnitPrice;
 
-    @FXML
-    private JFXTextField txtSetProductUnitPrice;
 
     @FXML
     void btnAddProductOnAction(ActionEvent event) {
         try {
             String name = txtSetProductName.getText();
-            String categoryId = txtSetProductCategory.getText();
+            Category category = cmbSetProductCategory.getValue();
             Integer quantity = spinnerSetProductQuantity.getValue();
             Double unitPrice = Double.parseDouble(txtSetProductUnitPrice.getText());
-            if (!name.isEmpty() && !categoryId.isEmpty()) {
-                EmployeeDashboardFormController.getInstance().getSuppliedProducts().add(new Product(null, name, new Category(null, categoryId), quantity, unitPrice, new Supplier()));
+            if (!name.isEmpty()) {
+                if(category==null) category=new Category();
+                EmployeeDashboardFormController.getInstance().getSuppliedProducts().add(new Product(null, name, category, quantity, unitPrice, new Supplier()));
                 employeeDashboardFormController.loadSuppliersAddProductsTable();
                 btnCancelAddProductsOnAction(event);
             } else {
@@ -61,13 +66,14 @@ public class AddProductsBySupplierFormController implements Initializable {
         ((Node) (event.getSource())).getScene().getWindow().hide();
         Scene scene = EmployeeDashboardFormController.getInstance().getEmployeeDashboardStage().getScene();
         AnchorPane root = (AnchorPane) scene.getRoot();
-        VBox vbox = (VBox) root.getChildren().get(7);
+        VBox vbox = (VBox) root.getChildren().get(8);
         vbox.setVisible(false);
         vbox.setDisable(true);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        initializeCategoryComboBox();
         setSpinnerInitialValues();
     }
 
@@ -84,6 +90,30 @@ public class AddProductsBySupplierFormController implements Initializable {
             alert.show();
         }else{
             alert.showAndWait();
+        }
+    }
+
+    private void initializeCategoryComboBox() {
+        try{
+            cmbSetProductCategory.setItems(categoryService.getAllCategories());
+
+            cmbSetProductCategory.setCellFactory(listView -> new javafx.scene.control.ListCell<Category>() {
+                @Override
+                protected void updateItem(Category category, boolean empty) {
+                    super.updateItem(category, empty);
+                    setText((category == null || empty) ? null : category.getName());
+                }
+            });
+
+            cmbSetProductCategory.setButtonCell(new javafx.scene.control.ListCell<Category>() {
+                @Override
+                protected void updateItem(Category category, boolean empty) {
+                    super.updateItem(category, empty);
+                    setText((category == null || empty) ? null : category.getName());
+                }
+            });
+        } catch (RepositoryException e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         }
     }
 }

@@ -32,10 +32,9 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public OrderEntity findByCustomerDateTime(Session session, CustomerEntity customerEntity, LocalDate date, LocalTime time) {
+    public OrderEntity findByDateTime(Session session, LocalDate date, LocalTime time) {
         return session
-                .createQuery("FROM OrderEntity WHERE customerEntity = :customer AND date = :date AND time = :time", OrderEntity.class)
-                .setParameter("customer", customerEntity)
+                .createQuery("FROM OrderEntity WHERE date = :date AND time = :time", OrderEntity.class)
                 .setParameter("date", date)
                 .setParameter("time", time)
                 .uniqueResult();

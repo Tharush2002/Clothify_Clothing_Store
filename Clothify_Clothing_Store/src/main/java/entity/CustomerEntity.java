@@ -19,11 +19,4 @@ public class CustomerEntity {
     private String name;
     private String email;
     private String phoneNumber;
-
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.customerId = "U" + String.format("%04d",id);
-        }
-    }
 }

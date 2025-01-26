@@ -61,17 +61,22 @@ public class OrderItemsServiceImpl implements OrderItemsService {
             OrderItemEntity orderItemEntity = getOrderItemEntity(orderItem);
 
             for(int i=0 ; i<quantity ; i++){
-                orderItemsRepository.save(orderItemEntity);
+                System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                orderItemsRepository.save(orderItemEntity,session);
+                session.flush();
+                session.clear();
+                System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             }
 
-            ProductEntity productEntity = productRepository.findByID(orderItemEntity.getProductId(), session);
+            ProductEntity productEntity = productRepository.findByProductID(orderItemEntity.getProductId(), session);
+            if (productEntity==null) throw new RepositoryException("No Product Entity Found For the Order.");
 
             productEntity.setQuantity(productEntity.getQuantity() - quantity);
             productRepository.save(productEntity, session);
 
             transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
+        } catch (RepositoryException e) {
+            transaction.rollback();
             throw new RepositoryException("Failed to save the specific order entity record.");
         } finally {
             session.close();
@@ -81,7 +86,7 @@ public class OrderItemsServiceImpl implements OrderItemsService {
     private OrderItemEntity getOrderItemEntity(OrderItem orderItem) {
         OrderItemEntity orderItemEntity = new OrderItemEntity();
 
-        orderItemEntity.setOrderEntity(new OrderEntity(null,null, orderItem.getOrder().getDate(), orderItem.getOrder().getTime(), orderItem.getOrder().getTotal(), orderItem.getOrder().getPaymentType(), orderItem.getOrder().getOrderItemCount(), new CustomerEntity(null,null, orderItem.getOrder().getCustomer().getName(), orderItem.getOrder().getCustomer().getEmail(), orderItem.getOrder().getCustomer().getPhoneNumber())));
+        orderItemEntity.setOrderEntity(new OrderEntity(null,orderItem.getOrder().getOrderId(), orderItem.getOrder().getDate(), orderItem.getOrder().getTime(), orderItem.getOrder().getTotal(), orderItem.getOrder().getPaymentType(), orderItem.getOrder().getOrderItemCount(), new CustomerEntity(null,null, orderItem.getOrder().getCustomer().getName(), orderItem.getOrder().getCustomer().getEmail(), orderItem.getOrder().getCustomer().getPhoneNumber())));
         orderItemEntity.setProductName(orderItem.getProductName());
         orderItemEntity.setProductId(orderItem.getProductId());
         orderItemEntity.setCategoryId(orderItem.getCategoryId());

@@ -29,10 +29,4 @@ public class EmployeeEntity {
     private String address;
     private String password;
 
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.employeeId = "E" + String.format("%04d",id);
-        }
-    }
 }

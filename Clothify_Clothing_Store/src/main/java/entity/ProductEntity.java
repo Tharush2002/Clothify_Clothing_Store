@@ -30,10 +30,4 @@ public class ProductEntity {
     @JoinColumn(name = "supplier_id", referencedColumnName = "supplierId")
     private SupplierEntity supplierEntity;
 
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.productId = "P" + String.format("%04d",id);
-        }
-    }
 }

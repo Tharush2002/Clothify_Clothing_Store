@@ -32,23 +32,20 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void addProduct(Product product) throws RepositoryException {
-        ProductEntity entity = new ProductEntity(null,null,product.getName(),new CategoryEntity(), product.getQuantity(), product.getUnitPrice(), new SupplierEntity());
 
         CategoryEntity categoryEntity = new CategoryEntity();
+
         categoryEntity.setName(product.getCategory().getName());
         categoryEntity.setCategoryId(product.getCategory().getCategoryId());
-        entity.setCategoryEntity(categoryEntity);
 
-        Supplier supplier = product.getSupplier();
-        if(supplier!=null) {
-            SupplierEntity supplierEntity = new SupplierEntity();
-            supplierEntity.setName(supplier.getName());
-            supplierEntity.setEmail(supplier.getEmail());
-            supplierEntity.setCompany(supplier.getCompany());
-            supplierEntity.setSupplierId(supplier.getSupplierId());
+        SupplierEntity supplierEntity = new SupplierEntity();
 
-            entity.setSupplierEntity(supplierEntity);
-        }
+        supplierEntity.setName(product.getSupplier().getName());
+        supplierEntity.setEmail(product.getSupplier().getEmail());
+        supplierEntity.setCompany(product.getSupplier().getCompany());
+        supplierEntity.setSupplierId(product.getSupplier().getSupplierId());
+
+        ProductEntity entity = new ProductEntity(null,null,product.getName(),categoryEntity, product.getQuantity(), product.getUnitPrice(), supplierEntity);
         productRepository.save(entity);
     }
 
@@ -74,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             transaction = session.beginTransaction();
 
-            ProductEntity productEntity = productRepository.findByID(product.getProductId(), session);
+            ProductEntity productEntity = productRepository.findByProductID(product.getProductId(), session);
             if (productEntity == null) {
                 throw new NoProductMatchFoundException("Product with ID " + product.getProductId() + " not found.");
             }
@@ -83,20 +80,22 @@ public class ProductServiceImpl implements ProductService {
             productEntity.setQuantity(product.getQuantity());
             productEntity.setUnitPrice(product.getUnitPrice());
 
-            CategoryEntity categoryEntity = categoryRepository.findByCategoryID(session, product.getCategory().getCategoryId());
-            if (categoryEntity == null) {
-                throw new NoCategoryMatchFoundException("Category with ID " + product.getCategory().getCategoryId() + " not found.");
+            if(product.getCategory().getCategoryId()!=null){
+                CategoryEntity categoryEntity = categoryRepository.findByCategoryID(session, product.getCategory().getCategoryId());
+                if (categoryEntity == null) {
+                    throw new NoCategoryMatchFoundException("Category with ID " + product.getCategory().getCategoryId() + " not found.");
+                }
+                productEntity.setCategoryEntity(categoryEntity);
+                session.flush();
             }
-            productEntity.setCategoryEntity(categoryEntity);
 
-            if (product.getSupplier() != null) {
+            if (product.getSupplier().getSupplierId() != null) {
                 SupplierEntity supplierEntity = supplierRepository.findBySupplierID(session, product.getSupplier().getSupplierId());
                 if (supplierEntity == null) {
                     throw new NoSupplierMatchFoundException("Supplier with ID " + product.getSupplier().getSupplierId() + " not found.");
                 }
                 productEntity.setSupplierEntity(supplierEntity);
-            } else {
-                productEntity.setSupplierEntity(null);
+                session.flush();
             }
 
             productRepository.update(session, productEntity);
@@ -115,7 +114,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ObservableList<Product> findProductsBySupplierID(String supplierId) throws RepositoryException {
+    public ObservableList<Product> findBySupplierID(String supplierId) throws RepositoryException {
         List<ProductEntity> suppliedProducts = productRepository.findBySupplierID(supplierId);
         ObservableList<Product> productObservableList= FXCollections.observableArrayList();
         if (suppliedProducts!=null){
@@ -130,15 +129,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product findProductByProductID(String productId) throws RepositoryException {
-        ProductEntity productEntity = productRepository.findByID(productId);
-        return new Product(
-                productEntity.getProductId(),
-                productEntity.getName(),
-                new Category(productEntity.getCategoryEntity().getCategoryId(),productEntity.getCategoryEntity().getName()),
-                productEntity.getQuantity(),
-                productEntity.getUnitPrice(),
-                new Supplier(productEntity.getSupplierEntity().getSupplierId(),productEntity.getSupplierEntity().getName(),productEntity.getSupplierEntity().getCompany(),productEntity.getSupplierEntity().getEmail())
-        );
+    public ObservableList<Product> findByCategoryId(String categoryId) throws RepositoryException {
+        List<ProductEntity> categorizedProducts = productRepository.findByCategoryId(categoryId);
+        ObservableList<Product> productObservableList= FXCollections.observableArrayList();
+        if (categorizedProducts!=null){
+            categorizedProducts.forEach(entity->{
+                Product product = new Product(entity.getProductId(), entity.getName(), new Category(),entity.getQuantity(), entity.getUnitPrice(), new Supplier());
+                if (entity.getCategoryEntity()!=null) product.setCategory(new Category(entity.getCategoryEntity().getCategoryId(),entity.getCategoryEntity().getName()));
+                if (entity.getSupplierEntity()!=null) product.setSupplier(new Supplier(entity.getSupplierEntity().getSupplierId(),entity.getSupplierEntity().getName(),entity.getSupplierEntity().getCompany(),entity.getSupplierEntity().getEmail()));
+                productObservableList.add(product);
+            });
+        }
+        return productObservableList;
     }
+
 }

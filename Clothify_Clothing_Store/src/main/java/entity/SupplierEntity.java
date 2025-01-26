@@ -23,10 +23,4 @@ public class SupplierEntity {
     private String company;
     private String email;
 
-    @PostPersist
-    public void addPrefixToId() {
-        if (id != null) {
-            this.supplierId = "S" + String.format("%04d",id);
-        }
-    }
 }
