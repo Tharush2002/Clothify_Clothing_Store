@@ -234,10 +234,4 @@ public class ProductRepositoryImpl implements ProductRepository {
         }
         return productEntityList;
     }
-
-    @Override
-    public void update(Session session, ProductEntity entity) {
-        session.update(entity);
-    }
-
 }

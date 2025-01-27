@@ -59,39 +59,6 @@ public class EmployeeRepositoryImpl implements EmployeeRepository {
     }
 
     @Override
-    public boolean saveOrUpdate(EmployeeEntity employeeEntity) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            if (employeeEntity.getId() != null) {
-                EmployeeEntity existingEntity = session.get(EmployeeEntity.class, employeeEntity.getId());
-                if (existingEntity != null && employeeEntity.getEmployeeId() == null) {
-                    employeeEntity.setEmployeeId(existingEntity.getEmployeeId());
-                }
-                session.merge(employeeEntity);
-            } else {
-                session.persist(employeeEntity);
-            }
-            transaction.commit();
-            return true;
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            return false;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-            return false;
-        } finally {
-            session.close();
-        }
-    }
-
-    @Override
     public void update(EmployeeEntity employeeEntity) throws RepositoryException {
         Session session = sessionFactory.openSession();
         Transaction transaction = null;

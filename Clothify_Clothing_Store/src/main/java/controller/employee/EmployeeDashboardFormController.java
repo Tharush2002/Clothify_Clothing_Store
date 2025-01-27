@@ -1600,6 +1600,17 @@ public class EmployeeDashboardFormController implements Initializable {
         setSuppliersSelectableState();
         setOrdersSelectableState();
         setCategoriesSelectableState();
+        setReturnOrdersSelectableState();
+    }
+
+    private void setReturnOrdersSelectableState() {
+        tblReturnOrders.getSelectionModel().selectedItemProperty().addListener((observableValue, oldVal, newVal) -> {
+            if (newVal != null) {
+                tblOrders.getSelectionModel().clearSelection();
+                tblOrderItems.getItems().clear();
+                showOrderHasReturnedItems(false);
+            }
+        });
     }
 
     private void setCategoriesSelectableState() {

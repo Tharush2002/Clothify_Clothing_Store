@@ -79,39 +79,6 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     @Override
-    public boolean saveOrUpdate(AdminEntity adminEntity) {
-        Session session = sessionFactory.openSession();
-        Transaction transaction = null;
-        try {
-            transaction = session.beginTransaction();
-            if (adminEntity.getId() != null) {
-                AdminEntity existingEntity = session.get(AdminEntity.class, adminEntity.getId());
-                if (existingEntity != null && adminEntity.getAdminId() == null) {
-                    adminEntity.setAdminId(existingEntity.getAdminId());
-                }
-                session.merge(adminEntity);
-            } else {
-                session.persist(adminEntity);
-            }
-            transaction.commit();
-            return true;
-        } catch (OptimisticLockException e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            return false;
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            log.error(e.getMessage());
-            return false;
-        } finally {
-            session.close();
-        }
-    }
-
-    @Override
     public List<AdminEntity> findAll() throws RepositoryException {
         Transaction transaction = null;
         List<AdminEntity> adminEntityList = null;

@@ -12,8 +12,6 @@ public interface EmployeeRepository extends SuperRepository {
 
     EmployeeEntity findByUserName(String userName) throws RepositoryException;
 
-    boolean saveOrUpdate(EmployeeEntity employeeEntity);
-
     void update(EmployeeEntity employeeEntity) throws RepositoryException;
 
     List<EmployeeEntity> findAll() throws RepositoryException;

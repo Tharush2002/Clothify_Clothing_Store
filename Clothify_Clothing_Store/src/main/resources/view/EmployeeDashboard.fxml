@@ -22,7 +22,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="744.0" prefWidth="1201.0" style="-fx-background-color: #fff;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.employee.EmployeeDashboardFormController">
+<AnchorPane prefHeight="744.0" prefWidth="1201.0" style="-fx-background-color: #fff;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.employee.EmployeeDashboardFormController">
    <children>
       <AnchorPane fx:id="anchorPaneCatalog" disable="true" layoutX="217.0" maxHeight="744.0" maxWidth="985.0" minHeight="651.0" minWidth="985.0" prefHeight="744.0" prefWidth="985.0" visible="false">
          <children>
@@ -241,7 +241,7 @@
                   </Button>
                </children>
             </VBox>
-            <Button layoutX="42.0" layoutY="677.0" mnemonicParsing="false" onAction="#btnReturnOrdersOnAction" prefHeight="42.0" prefWidth="170.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Return Orders" textFill="#e1dbbf">
+            <Button layoutX="35.0" layoutY="677.0" mnemonicParsing="false" onAction="#btnReturnOrdersOnAction" prefHeight="42.0" prefWidth="170.0" styleClass="btnDashboardPanel" stylesheets="@../styles/style.css" text="Return Orders" textFill="#e1dbbf">
                <font>
                   <Font name="Dubai Medium" size="17.0" />
                </font>
@@ -262,31 +262,31 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <TableView fx:id="tblCatalogProducts" layoutX="43.0" layoutY="140.0" prefHeight="510.0" prefWidth="591.0">
+            <TableView fx:id="tblCatalogProducts" layoutX="36.0" layoutY="140.0" prefHeight="510.0" prefWidth="607.0">
                <columns>
-                  <TableColumn fx:id="columnCatalogProductsID" prefWidth="55.999996185302734" text="Id" />
-                  <TableColumn fx:id="columnCatalogProductsName" prefWidth="138.39999389648438" text="Name" />
-                  <TableColumn fx:id="columnCatalogProductsCategoryID" prefWidth="70.40003967285156" text="CategoryID" />
-                  <TableColumn fx:id="columnCatalogProductsQuantity" prefWidth="52.00006103515625" text="Qty" />
-                  <TableColumn fx:id="columnCatalogProductsUnitPrice" prefWidth="64.79998779296875" text="Price" />
-                  <TableColumn fx:id="columnCatalogProductsSupplierID" prefWidth="69.5999755859375" text="SupplierID" />
-                  <TableColumn fx:id="columnCatalogProductsAction" prefWidth="136.0" />
+                  <TableColumn fx:id="columnCatalogProductsID" prefWidth="51.4285888671875" text="ID" />
+                  <TableColumn fx:id="columnCatalogProductsName" prefWidth="130.28564453125" text="Name" />
+                  <TableColumn fx:id="columnCatalogProductsCategoryID" prefWidth="76.0" text="CategoryID" />
+                  <TableColumn fx:id="columnCatalogProductsQuantity" prefWidth="43.42852783203125" text="Qty" />
+                  <TableColumn fx:id="columnCatalogProductsUnitPrice" prefWidth="76.57147216796875" text="Price" />
+                  <TableColumn fx:id="columnCatalogProductsSupplierID" prefWidth="67.4285888671875" text="SupplierID" />
+                  <TableColumn fx:id="columnCatalogProductsAction" prefWidth="144.5714111328125" />
                </columns>
             </TableView>
-            <Group layoutX="43.0" layoutY="86.0">
+            <Group layoutX="35.0" layoutY="86.0">
                <children>
-                  <TextField fx:id="searchInput" onKeyTyped="#searchProduct" prefHeight="35.0" prefWidth="591.0" promptText="Search by product id" styleClass="searchBar">
+                  <TextField fx:id="searchInput" onKeyTyped="#searchProduct" prefHeight="35.0" prefWidth="610.0" promptText="Search by product id" styleClass="searchBar">
                      <padding>
                         <Insets left="25.0" />
                      </padding>
                   </TextField>
-                  <HBox layoutX="548.0" prefHeight="35.0" prefWidth="44.0" styleClass="searchBarContainer" stylesheets="@../styles/style.css" />
-                  <ImageView fitHeight="26.0" fitWidth="25.0" layoutX="557.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
+                  <HBox layoutX="568.0" prefHeight="35.0" prefWidth="44.0" styleClass="searchBarContainer" stylesheets="@../styles/style.css" />
+                  <ImageView fitHeight="26.0" fitWidth="25.0" layoutX="578.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                      <image>
                         <Image url="@../img/search.png" />
                      </image>
                   </ImageView>
-                  <JFXButton fx:id="btnCloseSearch" ellipsisString="" layoutX="519.0" layoutY="5.0" onAction="#btnCloseSearchOnAction" prefHeight="26.0" prefWidth="18.0">
+                  <JFXButton fx:id="btnCloseSearch" ellipsisString="" layoutX="540.0" layoutY="5.0" onAction="#btnCloseSearchOnAction" prefHeight="26.0" prefWidth="18.0">
                      <graphic>
                         <ImageView fitHeight="18.0" fitWidth="19.0" opacity="0.62" pickOnBounds="true" preserveRatio="true">
                            <image>
@@ -302,15 +302,15 @@
             </Group>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneSuppliers" layoutX="217.0" maxHeight="744.0" maxWidth="985.0" minHeight="651.0" minWidth="985.0" prefHeight="744.0" prefWidth="985.0" visible="false">
+      <AnchorPane fx:id="anchorPaneSuppliers" layoutX="217.0" maxHeight="744.0" maxWidth="985.0" minHeight="651.0" minWidth="985.0" prefHeight="744.0" prefWidth="985.0">
          <children>
             <TableView fx:id="tblSuppliers" layoutX="43.0" layoutY="362.0" prefHeight="352.0" prefWidth="591.0">
                <columns>
-                  <TableColumn fx:id="columnSuppliersID" prefWidth="47.999996185302734" text="Id" />
+                  <TableColumn fx:id="columnSuppliersID" prefWidth="47.999996185302734" text="ID" />
                   <TableColumn fx:id="columnSuppliersName" prefWidth="140.79998779296875" text="Name" />
                   <TableColumn fx:id="columnSuppliersCompany" prefWidth="117.59999084472656" text="Company" />
                   <TableColumn fx:id="columnSuppliersEmail" prefWidth="141.5999755859375" text="Email" />
-                  <TableColumn fx:id="columnSuppliersAction" prefWidth="138.39996337890625" />
+                  <TableColumn fx:id="columnSuppliersAction" prefWidth="127.99993896484375" />
                </columns>
             </TableView>
             <VBox alignment="TOP_CENTER" layoutX="676.0" maxHeight="744.0" minHeight="651.0" prefHeight="744.0" prefWidth="310.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
@@ -387,8 +387,8 @@
                   <TableView fx:id="tblSuppliersSuppliedProducts" maxWidth="260.0" prefHeight="372.0" prefWidth="260.0">
                     <columns>
                       <TableColumn fx:id="columnSuppliersSuppliedProductsSupplierID" prefWidth="67.99999505281448" text="SupplierID" />
-                      <TableColumn fx:id="columnSuppliersSuppliedProductsID" prefWidth="60.79993438720703" text="Id" />
-                        <TableColumn fx:id="columnSuppliersSuppliedProductsName" prefWidth="128.00001525878906" text="Name" />
+                      <TableColumn fx:id="columnSuppliersSuppliedProductsID" prefWidth="60.79993438720703" text="ID" />
+                        <TableColumn fx:id="columnSuppliersSuppliedProductsName" prefWidth="114.8570556640625" text="Name" />
                     </columns>
                   </TableView>
                </children>
@@ -487,8 +487,8 @@
                               <Pane prefHeight="29.0" prefWidth="295.0" />
                               <TableView fx:id="tblSuppliersAddProducts" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="166.0" prefWidth="262.0">
                                 <columns>
-                                  <TableColumn fx:id="columnSuppliersAddProductsCategoryName" prefWidth="129.59996682405472" text="Category" />
-                                  <TableColumn fx:id="columnSuppliersAddProductsProductName" prefWidth="131.2000274658203" text="Product" />
+                                  <TableColumn fx:id="columnSuppliersAddProductsCategoryName" prefWidth="117.71430039405823" text="Category" />
+                                  <TableColumn fx:id="columnSuppliersAddProductsProductName" prefWidth="129.14288330078125" text="Product" />
                                 </columns>
                               </TableView>
                            </children>
@@ -503,9 +503,9 @@
          <children>
             <TableView fx:id="tblCategories" layoutX="43.0" layoutY="342.0" prefHeight="372.0" prefWidth="591.0">
                <columns>
-                  <TableColumn fx:id="columnCategoriesId" prefWidth="116.0" text="Id" />
-                  <TableColumn fx:id="columnCategoriesName" prefWidth="263.9999694824219" text="Category" />
-                  <TableColumn fx:id="columnCategoriesAction" minWidth="7.200042724609375" prefWidth="209.60003662109375" />
+                  <TableColumn fx:id="columnCategoriesId" prefWidth="116.0" text="ID" />
+                  <TableColumn fx:id="columnCategoriesName" prefWidth="253.14285278320312" text="Category" />
+                  <TableColumn fx:id="columnCategoriesAction" minWidth="7.200042724609375" prefWidth="203.99993896484375" />
                </columns>
             </TableView>
             <VBox alignment="TOP_CENTER" layoutX="674.0" maxHeight="744.0" minHeight="651.0" prefHeight="744.0" prefWidth="310.0" styleClass="rightPanelDashboard" stylesheets="@../styles/style.css">
@@ -582,7 +582,7 @@
                   <TableView fx:id="tblCategoriesCategorizedProducts" maxWidth="260.0" prefHeight="372.0" prefWidth="260.0">
                      <columns>
                         <TableColumn fx:id="columnCategorizedProductsCategoryId" prefWidth="74.39996033906937" text="CategoryID" />
-                        <TableColumn fx:id="columnCategorizedProductsProductName" prefWidth="183.2000274658203" text="Name" />
+                        <TableColumn fx:id="columnCategorizedProductsProductName" prefWidth="167.99994659423828" text="Name" />
                      </columns>
                   </TableView>
                </children>
@@ -657,8 +657,8 @@
                            <children>
                               <TableView fx:id="tblCategoriesAddProducts" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="204.0" prefWidth="262.0">
                                  <columns>
-                                    <TableColumn fx:id="columnCategoriesAddProductsProduct" prefWidth="126.40001565217972" text="Product" />
-                                    <TableColumn fx:id="columnCategoriesAddProductsSupplier" prefWidth="135.19996643066406" text="Supplier" />
+                                    <TableColumn fx:id="columnCategoriesAddProductsProduct" prefWidth="113.71423935890198" text="Product" />
+                                    <TableColumn fx:id="columnCategoriesAddProductsSupplier" prefWidth="133.71417236328125" text="Supplier" />
                                  </columns>
                               </TableView>
                            </children>
@@ -669,7 +669,7 @@
             </VBox>
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="anchorPaneOrders" layoutX="217.0" maxHeight="744.0" maxWidth="985.0" minHeight="651.0" minWidth="985.0" prefHeight="744.0" prefWidth="985.0">
+      <AnchorPane fx:id="anchorPaneOrders" disable="true" layoutX="217.0" maxHeight="744.0" maxWidth="985.0" minHeight="651.0" minWidth="985.0" prefHeight="744.0" prefWidth="985.0" visible="false">
          <children>
             <Label layoutX="81.0" layoutY="24.0" text="ORDERS" textFill="#646258">
                <font>
@@ -769,9 +769,9 @@
                   <Pane prefHeight="13.0" prefWidth="310.0" />
                   <TableView fx:id="tblOrderItems" maxWidth="260.0" prefHeight="394.0" prefWidth="260.0">
                      <columns>
-                        <TableColumn fx:id="columnOrderItemsProductID" prefWidth="46.399962246418" text="Id" />
+                        <TableColumn fx:id="columnOrderItemsProductID" prefWidth="46.399962246418" text="ID" />
                         <TableColumn fx:id="columnOrderItemsProductName" prefWidth="122.40008926391602" text="Name" />
-                        <TableColumn fx:id="columnOrderItemsProductSize" prefWidth="88.80006408691406" text="Size" />
+                        <TableColumn fx:id="columnOrderItemsProductSize" prefWidth="75.428466796875" text="Size" />
                      </columns>
                   </TableView>
                </children>
@@ -782,9 +782,9 @@
                   <TableColumn fx:id="columnOrdersCustomerID" prefWidth="82.4000244140625" text="CustomerID" />
                   <TableColumn fx:id="columnOrdersTime" prefWidth="94.39997863769531" text="Time" />
                   <TableColumn fx:id="columnOrdersDate" prefWidth="95.20001220703125" text="Date" />
-                  <TableColumn fx:id="columnOrdersPaymentType" prefWidth="93.5999755859375" text="PaymentType" />
-                  <TableColumn fx:id="columnOrdersItemCount" prefWidth="69.60003662109375" text="ItemCount" />
-                  <TableColumn fx:id="columnOrdersTotal" prefWidth="101.60009765625" text="Total" />
+                  <TableColumn fx:id="columnOrdersPaymentType" prefWidth="81.14288330078125" text="PaymentType" />
+                  <TableColumn fx:id="columnOrdersItemCount" prefWidth="67.99993896484375" text="ItemCount" />
+                  <TableColumn fx:id="columnOrdersTotal" prefWidth="105.142822265625" text="Total" />
                </columns>
             </TableView>
             <Label layoutX="43.0" layoutY="436.0" prefHeight="14.0" prefWidth="364.0" text="Return Orders :">
@@ -802,7 +802,7 @@
                   <TableColumn fx:id="columnReturnsProductID" prefWidth="114.39997863769531" text="ProductID" />
                   <TableColumn fx:id="columnReturnsPrice" prefWidth="112.0" text="Amount" />
                   <TableColumn fx:id="columnReturnsSize" prefWidth="42.4000244140625" text="Size" />
-                  <TableColumn fx:id="columnReturnsReturnDate" prefWidth="121.60009765625" text="Return Date" />
+                  <TableColumn fx:id="columnReturnsReturnDate" prefWidth="106.857177734375" text="Return Date" />
                </columns>
             </TableView>
             <Label fx:id="lblReturnedItemsAvailableForTheOrder" layoutX="313.0" layoutY="436.0" text="THIS ORDER HAS ALREADY RETURNED SOME ITEMS" textFill="#e45151">

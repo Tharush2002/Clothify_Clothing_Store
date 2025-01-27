@@ -101,25 +101,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public boolean saveOrUpdate(Employee employee, int id) {
-        employeeRepository.saveOrUpdate(
-                new EmployeeEntity(
-                        id,
-                        employee.getEmployeeId(),
-                        employee.getFirstName(),
-                        employee.getLastName(),
-                        employee.getEmail(),
-                        employee.getPhoneNumber(),
-                        employee.getUserName(),
-                        employee.getNic(),
-                        employee.getAddress(),
-                        employee.getPassword()
-                )
-        );
-        return true;
-    }
-
-    @Override
     public ObservableList<Employee> getAll() throws RepositoryException {
         List<EmployeeEntity> employeeEntityList = employeeRepository.findAll();
         ObservableList<Employee> employeeObservableList= FXCollections.observableArrayList();

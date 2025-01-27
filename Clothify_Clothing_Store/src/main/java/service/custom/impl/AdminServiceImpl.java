@@ -90,23 +90,6 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean saveOrUpdate(Admin admin, int id) {
-        adminRepository.saveOrUpdate(
-                new AdminEntity(
-                        id,
-                        admin.getAdminId(),
-                        admin.getFirstName(),
-                        admin.getLastName(),
-                        admin.getEmail(),
-                        admin.getUserName(),
-                        admin.getPhoneNumber(),
-                        admin.getPassword()
-                )
-        );
-        return true;
-    }
-
-    @Override
     public ObservableList<Admin> getAll() throws RepositoryException {
         List<AdminEntity> adminEntityList = adminRepository.findAll();
         ObservableList<Admin> adminObservableList= FXCollections.observableArrayList();

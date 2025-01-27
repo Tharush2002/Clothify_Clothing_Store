@@ -12,7 +12,6 @@ public interface ProductRepository extends SuperRepository {
     void save(ProductEntity entity, Session session);
 
     void update(ProductEntity entity) throws RepositoryException;
-    void update(Session session, ProductEntity productEntity);
 
     List<ProductEntity> findAll() throws RepositoryException;
 
@@ -21,8 +20,6 @@ public interface ProductRepository extends SuperRepository {
     void deleteByID(String productId) throws RepositoryException;
 
     List<ProductEntity> findBySupplierID(String supplierId) throws RepositoryException;
-
-//    List<ProductEntity> findByCategoryId(Session session, String categoryId);
 
     List<ProductEntity> findByCategoryId(String categoryId) throws RepositoryException;
 }

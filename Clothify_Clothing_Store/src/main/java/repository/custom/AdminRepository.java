@@ -18,8 +18,6 @@ public interface AdminRepository extends SuperRepository {
 
     void update(AdminEntity adminEntity) throws RepositoryException;
 
-    boolean saveOrUpdate(AdminEntity adminEntity);
-
     void save(AdminEntity adminEntity) throws RepositoryException;
 
     AdminEntity findByEmail(Session session, String email);

@@ -2,6 +2,7 @@ import config.AppInitializer;
 import db.DBConnection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -42,11 +43,29 @@ public class Starter extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("./view/Home.fxml"))));
+        Parent root = FXMLLoader.load(getClass().getResource("./view/Home.fxml"));
+
+        Scene scene = new Scene(root);
+
+        final double[] xOffset = {0};
+        final double[] yOffset = {0};
+
+        root.setOnMousePressed(event -> {
+            xOffset[0] = event.getSceneX();
+            yOffset[0] = event.getSceneY();
+        });
+
+        root.setOnMouseDragged(event -> {
+            stage.setX(event.getScreenX() - xOffset[0]);
+            stage.setY(event.getScreenY() - yOffset[0]);
+        });
+
+        stage.setScene(scene);
         stage.initStyle(StageStyle.UNDECORATED);
         stage.show();
         stage.setResizable(false);
     }
+
 
     private static void runLiquibaseMigrations() {
         Properties properties = new Properties();

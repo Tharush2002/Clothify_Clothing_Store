@@ -1,8 +1,10 @@
 package repository;
 
+import lombok.extern.slf4j.Slf4j;
 import repository.custom.impl.*;
 import util.Type;
 
+@Slf4j
 public class RepositoryFactory {
     private static RepositoryFactory repositoryFactory;
     private RepositoryFactory(){}
@@ -22,6 +24,7 @@ public class RepositoryFactory {
             case RETURNORDER:return (T) new ReturnOrderRepositoryImpl();
             case ORDERITEMS:return (T) new OrderItemsRepositoryImpl();
         }
+//        log.error("No specific repository found");
         return null;
     }
 

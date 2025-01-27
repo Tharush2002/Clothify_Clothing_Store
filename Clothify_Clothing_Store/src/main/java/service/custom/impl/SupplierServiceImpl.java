@@ -36,15 +36,6 @@ public class SupplierServiceImpl implements SupplierService {
     }
 
     @Override
-    public Supplier findSupplierByName(String name) throws RepositoryException {
-        SupplierEntity supplierEntity = supplierRepository.findByName(name);
-        if(supplierEntity !=null){
-            return new Supplier(supplierEntity.getSupplierId(), supplierEntity.getName(), supplierEntity.getCompany(), supplierEntity.getEmail());
-        }
-        return new Supplier();
-    }
-
-    @Override
     public Supplier findBySupplierId(String supplierId) throws RepositoryException {
         SupplierEntity supplierEntity = supplierRepository.findBySupplierID(supplierId);
         return new Supplier(

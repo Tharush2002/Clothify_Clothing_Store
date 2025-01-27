@@ -19,8 +19,6 @@ public interface EmployeeService extends SuperService {
 
     void updateEmployeePassword(String email, String password) throws RepositoryException;
 
-    boolean saveOrUpdate(Employee employee, int i);
-
     ObservableList<Employee> getAll() throws RepositoryException;
 
     void deleteById(String employeeId) throws RepositoryException;

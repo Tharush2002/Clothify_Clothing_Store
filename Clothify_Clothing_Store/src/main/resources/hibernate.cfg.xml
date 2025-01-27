@@ -15,21 +15,8 @@
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
         <property name="show_sql">true</property>
 
-
-        <!-- Disable the automatic generation of the schema -->
         <property name="hibernate.hbm2ddl.auto">none</property>
-
-
-<!--        &lt;!&ndash; Drop and re-create the database schema on startup &ndash;&gt;-->
         <property name="hibernate.format_sql">true</property>
-
-<!--        &lt;!&ndash; Enable Hibernate's automatic session context management &ndash;&gt;-->
-<!--        <property name="hibernate.current_session_context_class">thread</property>-->
-
-<!--        &lt;!&ndash; Disable the second-level cache &ndash;&gt;-->
-<!--        <property name="hibernate.cache.provider_class">org.hibernate.cache.NoCacheProvider</property>-->
-        <!-- DB schema will be updated if needed -->
-<!--        <property name="hibernate.hbm2ddl.auto">update</property>-->
 
         <mapping class="entity.SupplierEntity"/>
         <mapping class="entity.CategoryEntity"/>

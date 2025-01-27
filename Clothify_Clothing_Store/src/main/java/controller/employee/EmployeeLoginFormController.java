@@ -77,36 +77,50 @@ public class EmployeeLoginFormController implements Initializable {
 
     @FXML
     public void btnLoginOnAction(ActionEvent event) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setHeaderText(null);
         try {
-            if(pwdPassword.getText().isEmpty() || txtUserName.getText().isEmpty()) throw new EmptyFieldsException("Please Enter user-name password to continue");
+            if (pwdPassword.getText().isEmpty() || txtUserName.getText().isEmpty()) {
+                throw new EmptyFieldsException("Please Enter user-name and password to continue");
+            }
+
             Employee employee = employeeService.findByUserName(txtUserName.getText().trim());
-            if(!employee.getPassword().equals(pwdPassword.getText().trim())) throw new NoPasswordMatchFoundException("No Matched Password Found");
+            if (!employee.getPassword().equals(pwdPassword.getText().trim())) {
+                throw new NoPasswordMatchFoundException("No Matched Password Found");
+            }
 
             ((Stage) ((Node) (event.getSource())).getScene().getWindow()).close();
-            Stage stage=new Stage();
+
+            Stage stage = new Stage();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../../view/EmployeeDashboard.fxml"));
             Parent root = loader.load();
             EmployeeDashboardFormController controller = loader.getController();
             controller.loadEmployeeDetails(employee);
-            stage.setScene(new Scene(root));
+
+            Scene scene = new Scene(root);
+
+            final double[] xOffset = {0};
+            final double[] yOffset = {0};
+
+            root.setOnMousePressed(mouseEvent -> {
+                xOffset[0] = mouseEvent.getSceneX();
+                yOffset[0] = mouseEvent.getSceneY();
+            });
+
+            root.setOnMouseDragged(mouseEvent -> {
+                stage.setX(mouseEvent.getScreenX() - xOffset[0]);
+                stage.setY(mouseEvent.getScreenY() - yOffset[0]);
+            });
+
+            stage.setScene(scene);
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
             stage.setResizable(false);
 
         } catch (NoEmployeeFoundException e) {
-            alert.setTitle("No Employee Found");
-            alert.setContentText("No employee account found under the provided user name");
-            alert.show();
+            showAlert(Alert.AlertType.ERROR, "No Employee Found", "", "No employee account found under the provided user name",AlertType.SHOW);
         } catch (NoPasswordMatchFoundException e) {
-            alert.setTitle("Invalid Password !");
-            alert.setContentText("Password is invalid for the specific account");
-            alert.show();
+            showAlert(Alert.AlertType.ERROR, "Invalid Password !", "", "Password is invalid for the specific account",AlertType.SHOW);
         }catch (EmptyFieldsException e) {
-            alert.setTitle("Input Username & Password !");
-            alert.setContentText("Please input username & password to continue");
-            alert.show();
+            showAlert(Alert.AlertType.ERROR, "Input Username & Password !", "", "Please input username & password to continue",AlertType.SHOW);
         } catch (RepositoryException e) {
             showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
         } catch (IOException e) {

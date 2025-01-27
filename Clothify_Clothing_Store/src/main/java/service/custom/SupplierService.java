@@ -8,8 +8,6 @@ import service.SuperService;
 public interface SupplierService extends SuperService {
     ObservableList<Supplier> getAll() throws RepositoryException;
 
-    Supplier findSupplierByName(String value) throws RepositoryException;
-
     void deleteSupplier(String supplierId) throws RepositoryException;
 
     void updateSupplier(Supplier supplier) throws RepositoryException;

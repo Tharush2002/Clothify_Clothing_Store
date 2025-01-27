@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
@@ -41,27 +42,60 @@ public class HomeFormController{
     @FXML
     void btnAdminLoginFormOnAction(ActionEvent event) {
         try {
-            Stage stage=new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/AdminLogin.fxml"))));
+            Stage stage = new Stage();
+            Parent root = FXMLLoader.load(getClass().getResource("../view/AdminLogin.fxml"));
+            Scene scene = new Scene(root);
+
+            final double[] xOffset = {0};
+            final double[] yOffset = {0};
+
+            root.setOnMousePressed(e -> {
+                xOffset[0] = e.getSceneX();
+                yOffset[0] = e.getSceneY();
+            });
+
+            root.setOnMouseDragged(e -> {
+                stage.setX(e.getScreenX() - xOffset[0]);
+                stage.setY(e.getScreenY() - yOffset[0]);
+            });
+
+            stage.setScene(scene);
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(), AlertType.SHOW);
         }
         hideHomeStage(event);
+
     }
 
     @FXML
     void btnEmployeeLoginFormOnAction(ActionEvent event) {
         try {
-            Stage stage=new Stage();
-            stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("../view/EmployeeLogin.fxml"))));
+            Stage stage = new Stage();
+            Parent root = FXMLLoader.load(getClass().getResource("../view/EmployeeLogin.fxml"));
+            Scene scene = new Scene(root);
+
+            final double[] xOffset = {0};
+            final double[] yOffset = {0};
+
+            root.setOnMousePressed(e -> {
+                xOffset[0] = e.getSceneX();
+                yOffset[0] = e.getSceneY();
+            });
+
+            root.setOnMouseDragged(e -> {
+                stage.setX(e.getScreenX() - xOffset[0]);
+                stage.setY(e.getScreenY() - yOffset[0]);
+            });
+
+            stage.setScene(scene);
             stage.initStyle(StageStyle.UNDECORATED);
             stage.show();
             stage.setResizable(false);
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(), AlertType.SHOW);
         }
         hideHomeStage(event);
     }

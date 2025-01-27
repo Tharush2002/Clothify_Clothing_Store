@@ -21,6 +21,10 @@
     <include file="db/changelog/scripts/data/liquibase-add-default-values-to-category-table.sql" />
     <include file="db/changelog/scripts/data/liquibase-add-default-values-to-supplier-table.sql" />
     <include file="db/changelog/scripts/data/liquibase-add-default-values-to-product-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-customer-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-order-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-order-items-table.sql" />
+    <include file="db/changelog/scripts/data/liquibase-add-default-values-to-return-order-table.sql" />
 
     <includeAll path="db/changelog/scripts/schema/triggers" />  <!-- Table data insertion trigger scripts here -->
 </databaseChangeLog>

@@ -98,7 +98,7 @@ public class ProductServiceImpl implements ProductService {
                 session.flush();
             }
 
-            productRepository.update(session, productEntity);
+            session.update(productEntity);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();

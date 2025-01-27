@@ -68,7 +68,7 @@ public class ReturnOrderServiceImpl implements ReturnOrderService {
             ProductEntity productEntity = productRepository.findByProductID(returnOrder.getProductId(), session);
 
             productEntity.setQuantity(productEntity.getQuantity() + 1);
-            productRepository.update(session, productEntity);
+            session.update(productEntity);
 
             orderItemsRepository.deleteBySizeId(returnOrder.getOrder().getOrderId(),returnOrder.getProductId(),returnOrder.getSize(),session);
             transaction.commit();

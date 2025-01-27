@@ -1,12 +1,13 @@
 package service;
 
+import lombok.extern.slf4j.Slf4j;
 import service.custom.impl.*;
 import util.Type;
 
+@Slf4j
 public class ServiceFactory {
     private static ServiceFactory serviceFactory;
-
-//    private ServiceFactory(){}
+    private ServiceFactory(){}
 
     public static ServiceFactory getInstance(){
         return serviceFactory==null? new ServiceFactory():serviceFactory;
@@ -24,6 +25,7 @@ public class ServiceFactory {
             case RETURNORDER:return (T) new ReturnOrderServiceImpl();
             case ORDERITEMS:return (T) new OrderItemsServiceImpl();
         }
+        log.error("No specific service found");
         return null;
     }
 }

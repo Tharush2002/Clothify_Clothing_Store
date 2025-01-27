@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="448.0" prefWidth="682.0" scaleShape="false" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.HomeFormController">
+<AnchorPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="448.0" prefWidth="682.0" scaleShape="false" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.HomeFormController">
    <children>
       <VBox alignment="TOP_RIGHT" prefHeight="448.0" prefWidth="535.0" styleClass="bodyBGHome" stylesheets="@../styles/style.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <VBox layoutX="354.0" layoutY="75.0" opacity="0.7" prefHeight="312.0" prefWidth="279.0" style="-fx-background-color: f1e8b7; -fx-background-radius: 15;">
@@ -61,7 +61,7 @@
             </Button>
          </children>
       </VBox>
-      <HBox alignment="CENTER_RIGHT" onMouseClicked="#btnCloseOnAction" prefHeight="42.0" prefWidth="682.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="639.0" onMouseClicked="#btnCloseOnAction" prefHeight="42.0" prefWidth="43.0">
          <children>
             <ImageView fitHeight="28.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
                <image>

@@ -17,8 +17,6 @@ public interface AdminService extends SuperService {
 
     Admin findByUserName(String trim) throws NoAdminFoundException, RepositoryException;
 
-    boolean saveOrUpdate(Admin admin, int i);
-
     ObservableList<Admin> getAll() throws RepositoryException;
 
     void deleteById(String adminId) throws RepositoryException;
