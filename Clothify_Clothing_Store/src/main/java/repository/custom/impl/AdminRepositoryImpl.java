@@ -1,6 +1,7 @@
 package repository.custom.impl;
 
 import entity.AdminEntity;
+import entity.CategoryEntity;
 import exceptions.RepositoryException;
 import jakarta.persistence.OptimisticLockException;
 import lombok.extern.slf4j.Slf4j;
@@ -66,13 +67,24 @@ public class AdminRepositoryImpl implements AdminRepository {
         Transaction transaction = null;
         try {
             transaction = session.beginTransaction();
-            session.update(adminEntity);
+            AdminEntity existingAdmin = session
+                    .createQuery("FROM AdminEntity WHERE adminId = :adminId", AdminEntity.class)
+                    .setParameter("adminId", adminEntity.getAdminId())
+                    .uniqueResult();
+
+            existingAdmin.setFirstName(adminEntity.getFirstName());
+            existingAdmin.setLastName(adminEntity.getLastName());
+            existingAdmin.setEmail(adminEntity.getEmail());
+            existingAdmin.setPhoneNumber(adminEntity.getPhoneNumber());
+            existingAdmin.setUserName(adminEntity.getUserName());
+
+            session.update(existingAdmin);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RepositoryException("Failed to update teh specific admin entity record.");
+            throw new RepositoryException("Failed to update the specific admin entity record.");
         } finally {
             session.close();
         }

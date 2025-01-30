@@ -1,6 +1,5 @@
 package controller.admin;
 
-import controller.employee.EmployeeDashboardFormController;
 import exceptions.RepositoryException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,10 +13,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import lombok.Setter;
 import model.Admin;
-import model.Employee;
 import service.ServiceFactory;
 import service.custom.AdminService;
-import service.custom.EmployeeService;
 import util.AlertType;
 import util.Type;
 
@@ -26,12 +23,9 @@ import java.util.ResourceBundle;
 
 @Setter
 public class EditAdminFormController implements Initializable {
-    private AdminDashboardFormController adminDashboardFormController;
-
     private final Admin selectedAdminToEdit = AdminDashboardFormController.getInstance().getSelectedAdminToEdit();
-
     private final AdminService adminService = ServiceFactory.getInstance().getServiceType(Type.ADMIN);
-
+    private AdminDashboardFormController adminDashboardFormController;
     @FXML
     private Label lblAdminID;
 
@@ -68,8 +62,8 @@ public class EditAdminFormController implements Initializable {
         String contactNumber = txtSetAdminContactNumber.getText().trim();
         String userName = txtSetAdminUserName.getText().trim();
 
-        try{
-            if(validateAdmin(firstName,lastName,email,contactNumber,userName)){
+        try {
+            if (validateAdmin(firstName, lastName, email, contactNumber, userName)) {
                 adminService.update(new Admin(
                         lblAdminID.getText(),
                         firstName,
@@ -79,13 +73,13 @@ public class EditAdminFormController implements Initializable {
                         contactNumber,
                         null
                 ));
-                showAlert(Alert.AlertType.INFORMATION,"Edit Admin","Success!","Selected admin details have been successfully updated.",AlertType.SHOWANDWAIT);
+                showAlert(Alert.AlertType.INFORMATION, "Edit Admin", "Success!", "Selected admin details have been successfully updated.", AlertType.SHOWANDWAIT);
 
                 adminDashboardFormController.loadAdminTable(adminService.getAll());
                 btnCloseFormOnAction(event);
             }
         } catch (RepositoryException e) {
-            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(), AlertType.SHOW);
         }
     }
 
@@ -95,27 +89,27 @@ public class EditAdminFormController implements Initializable {
     }
 
     private void initializeAdminDetails() {
-        lblAdminID.setText(selectedAdminToEdit.getAdminId() != null ? selectedAdminToEdit.getAdminId():"");
-        txtSetAdminFirstName.setText(selectedAdminToEdit.getFirstName() != null ? selectedAdminToEdit.getFirstName():"");
-        txtSetAdminLastName.setText(selectedAdminToEdit.getLastName() != null ? selectedAdminToEdit.getLastName():"");
-        txtSetAdminEmail.setText(selectedAdminToEdit.getEmail() != null ? selectedAdminToEdit.getEmail():"");
-        txtSetAdminContactNumber.setText(selectedAdminToEdit.getPhoneNumber() != null ? selectedAdminToEdit.getPhoneNumber():"");
-        txtSetAdminUserName.setText(selectedAdminToEdit.getUserName() != null ? selectedAdminToEdit.getUserName():"");
+        lblAdminID.setText(selectedAdminToEdit.getAdminId() != null ? selectedAdminToEdit.getAdminId() : "");
+        txtSetAdminFirstName.setText(selectedAdminToEdit.getFirstName() != null ? selectedAdminToEdit.getFirstName() : "");
+        txtSetAdminLastName.setText(selectedAdminToEdit.getLastName() != null ? selectedAdminToEdit.getLastName() : "");
+        txtSetAdminEmail.setText(selectedAdminToEdit.getEmail() != null ? selectedAdminToEdit.getEmail() : "");
+        txtSetAdminContactNumber.setText(selectedAdminToEdit.getPhoneNumber() != null ? selectedAdminToEdit.getPhoneNumber() : "");
+        txtSetAdminUserName.setText(selectedAdminToEdit.getUserName() != null ? selectedAdminToEdit.getUserName() : "");
     }
 
-    private boolean validateAdmin(String firstName, String lastName, String email, String contactNumber, String userName){
+    private boolean validateAdmin(String firstName, String lastName, String email, String contactNumber, String userName) {
 
-        if(firstName.isEmpty() && lastName.isEmpty() && email.isEmpty() && contactNumber.isEmpty() && userName.isEmpty()){
+        if (firstName.isEmpty() && lastName.isEmpty() && email.isEmpty() && contactNumber.isEmpty() && userName.isEmpty()) {
             showAlert(Alert.AlertType.ERROR, "Error", "Empty Fields Found", "Please fill all the fields and try again.", AlertType.SHOW);
             return false;
-        } else if(!adminService.isValidEmail(email)) {
+        } else if (!adminService.isValidEmail(email)) {
             showAlert(Alert.AlertType.ERROR, "Error", "Invalid Email", """
                     The email you entered is invalid.
                     
                     Hint: Ensure the email includes '@' and a domain like '.com'.
                     Example: user@example.com""", AlertType.SHOW);
             return false;
-        } else if(!adminService.isValidContactNumber(contactNumber)) {
+        } else if (!adminService.isValidContactNumber(contactNumber)) {
             showAlert(Alert.AlertType.ERROR, "Error", "Invalid Contact Number", """
                     The contact number you entered is invalid.
                     
@@ -126,7 +120,7 @@ public class EditAdminFormController implements Initializable {
                     - Example without country code: 0123456789
                     """, AlertType.SHOW);
             return false;
-        } else if(userName.length()<8){
+        } else if (userName.length() < 8) {
             showAlert(Alert.AlertType.ERROR, "Error", "UserName Is Too Short", "The minimum username length is 8 characters.", AlertType.SHOW);
             return false;
         }
@@ -138,9 +132,9 @@ public class EditAdminFormController implements Initializable {
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(message);
-        if(showType==AlertType.SHOW){
+        if (showType == AlertType.SHOW) {
             alert.show();
-        }else{
+        } else {
             alert.showAndWait();
         }
     }

@@ -100,7 +100,7 @@ public class EmployeeDashboardFormController implements Initializable {
     }
 
     public EmployeeDashboardFormController() {
-        if (instance == null) instance = this;
+        instance = this;
     }
 
     //VARIABLES ===============

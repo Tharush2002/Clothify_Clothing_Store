@@ -91,7 +91,7 @@ public class AdminDashboardFormController implements Initializable {
     }
 
     public AdminDashboardFormController() {
-        if (instance == null) instance = this;
+         instance = this;
     }
 
     @FXML
