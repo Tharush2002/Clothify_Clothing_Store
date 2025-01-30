@@ -51,7 +51,21 @@ Clothify is built using the following technologies:
 
 ## 📸 Screenshots
 
-_(Add screenshots or GIFs of your UI here for better visualization)_
+<img src="https://github.com/user-attachments/assets/05010703-be47-47d7-95d9-cb184e84fd7e" width="400">
+
+<img src="https://github.com/user-attachments/assets/ada2473a-eed9-4538-8f47-a4f8dcff4780" width="180">
+
+<img src="https://github.com/user-attachments/assets/63e73567-adb1-417f-89f4-71f1230737bf" width="400">
+
+<img src="https://github.com/user-attachments/assets/1b68e86b-cf3f-451a-84c5-e8a5be9418e6" width="400">
+
+<img src="https://github.com/user-attachments/assets/d28e8f7b-7ee1-4b69-b1d0-d1b093db0628" width="180">
+
+<img src="https://github.com/user-attachments/assets/e960783b-e7f9-4313-ac80-57685411677f" width="300">
+
+<img src="https://github.com/user-attachments/assets/b90c6e49-446d-48d0-9a13-25c1cc0d1851" width="300">
+
+<img src="https://github.com/user-attachments/assets/23454499-3389-4e05-8b26-5f4c85dacb22" width="180">
 
 ---
 
