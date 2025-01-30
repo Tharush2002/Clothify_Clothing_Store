@@ -41,7 +41,7 @@
             <text><![CDATA[Customer Report]]></text>
         </element>
         <element kind="image" uuid="88ca2149-ebd0-4ff1-8d2f-e5379f959a2f" x="350" y="-150" width="349" height="270" vImageAlign="Bottom">
-            <expression><![CDATA["D:/_ICET_/Standalone Application Development/Assignments/Clothify - Clothing Store/Project/Clothify_Clothing_Store/src/main/resources/img/StoreIcon - Reports.png"]]></expression>
+            <expression><![CDATA[getClass().getResource("/img/StoreIcon - Reports.png").toString()]]></expression>
         </element>
     </title>
     <pageHeader splitType="Stretch"/>

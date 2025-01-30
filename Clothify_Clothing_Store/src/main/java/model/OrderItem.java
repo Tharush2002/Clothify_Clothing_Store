@@ -17,4 +17,14 @@ public class OrderItem {
     private String supplierName;
     private Double unitPrice;
     private String size;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class OrderItemWithQuantity {
+        private OrderItem orderItem;
+        private Integer quantity;
+    }
 }

@@ -347,22 +347,22 @@ public class AdminDashboardFormController implements Initializable {
 
     @FXML
     void btnLoadCustomerReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/Customer.jrxml");
+        openReports("./src/main/resources/reports/Customer.jrxml");
     }
 
     @FXML
     void btnLoadEmployeeReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/Employee.jrxml");
+        openReports("./src/main/resources/reports/Employee.jrxml");
     }
 
     @FXML
     void btnLoadInventoryReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/Inventory.jrxml");
+        openReports("./src/main/resources/reports/Inventory.jrxml");
     }
 
     @FXML
     void btnLoadSalesReportOnAction(ActionEvent event) {
-
+        openReports("./src/main/resources/reports/Sales.jrxml");
     }
 
     @FXML
@@ -480,7 +480,14 @@ public class AdminDashboardFormController implements Initializable {
 
     @FXML
     void openInstagramOnAction(MouseEvent event) {
-
+        try {
+            URI uri = new URI("https://www.instagram.com/_tharush_00/");
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(uri);
+            }
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred.", e.getMessage(),AlertType.SHOW);
+        }
     }
 
     @FXML
@@ -686,7 +693,7 @@ public class AdminDashboardFormController implements Initializable {
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, DBConnection.getInstance().getConnection());
             JasperViewer viewer = new JasperViewer(jasperPrint, false);
-            viewer.setZoomRatio(0.5f);
+            viewer.setZoomRatio(0.45f);
             viewer.setVisible(true);
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred while generating the report.", e.getMessage(),AlertType.SHOW);
@@ -825,30 +832,23 @@ public class AdminDashboardFormController implements Initializable {
                         } else {
                             Admin currentAdmin = tblAdmin.getItems().get(getIndex());
 
-                            Button editIcon = new Button("Edit");
-                            Button deleteIcon = new Button("Delete");
-
-                            deleteIcon.setStyle("-fx-cursor: hand ;");
-                            editIcon.setStyle("-fx-cursor: hand ;");
-
-                            deleteIcon.setOnMouseClicked(event -> handleDeleteActions(type, tblAdmin.getItems().get(getIndex())));
-
-                            editIcon.setOnMouseClicked(event -> {
-                                selectedAdminToEdit = tblAdmin.getItems().get(getIndex());
-                                handleEditActions(type, event);
-                            });
-
-                            HBox managebtn = new HBox();
-                            managebtn.setStyle("-fx-alignment:center");
-                            managebtn.setSpacing(8);
-
                             if (!currentAdmin.getAdminId().equals(loggedAdmin.getAdminId())) {
-                                managebtn.getChildren().addAll(editIcon, deleteIcon);
-                            } else {
-                                managebtn.getChildren().add(editIcon);
-                            }
+                                Button editIcon = new Button("Edit");
 
-                            setGraphic(managebtn);
+                                editIcon.setStyle("-fx-cursor: hand ;");
+
+                                editIcon.setOnMouseClicked(event -> {
+                                    selectedAdminToEdit = tblAdmin.getItems().get(getIndex());
+                                    handleEditActions(type, event);
+                                });
+
+                                HBox managebtn = new HBox();
+                                managebtn.setStyle("-fx-alignment:center");
+                                managebtn.setSpacing(8);
+
+                                managebtn.getChildren().add(editIcon);
+                                setGraphic(managebtn);
+                            }
                         }
                     }
                 };
@@ -904,16 +904,11 @@ public class AdminDashboardFormController implements Initializable {
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try{
-                if (type == UserType.ADMIN) {
-                    Admin admin = (Admin) object;
-                    adminService.deleteById(admin.getAdminId());
-                    loadAdminTable(adminService.getAll());
-                } else if (type == UserType.EMPLOYEE) {
+                if (type == UserType.EMPLOYEE) {
                     Employee employee = (Employee) object;
                     employeeService.deleteById(employee.getEmployeeId());
                     loadEmployeeTable(employeeService.getAll());
                 }
-
                 showAlert(Alert.AlertType.INFORMATION, "Deletion Successful", null, "Selected property has been successfully deleted.", AlertType.SHOW);
 
             } catch (RepositoryException e) {

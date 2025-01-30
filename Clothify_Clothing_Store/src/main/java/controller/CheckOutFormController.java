@@ -139,7 +139,7 @@ public class CheckOutFormController implements Initializable {
             String email = txtSetCustomerEmail.getText().trim();
             String phoneNumber = txtSetCustomerPhoneNumber.getText().trim();
 
-            List<OrderItemWithQuantity> orderItemWithQuantityList = EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList();
+            List<OrderItem.OrderItemWithQuantity> orderItemWithQuantityList = EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList();
 
 
             if(name.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || !customerService.isValidEmail(email) || !customerService.isValidPhoneNumber(phoneNumber) || orderItemWithQuantityList.isEmpty() || cmbSetPaymentType.getValue().isEmpty()) {
@@ -157,7 +157,7 @@ public class CheckOutFormController implements Initializable {
                 LocalDate date = LocalDate.now();
                 LocalTime time = LocalTime.now().withNano(0);
 
-                for(OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList){
+                for(OrderItem.OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList){
                     Order tempOrder = orderItemWithQuantity.getOrderItem().getOrder();
                     tempOrder.setDate(date);
                     tempOrder.setTime(time);
@@ -258,14 +258,14 @@ public class CheckOutFormController implements Initializable {
 
     private void calculateTotal() {
         double total=0.0;
-        List<OrderItemWithQuantity> orderItemWithQuantityList = EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList();
-        for (OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList) {
+        List<OrderItem.OrderItemWithQuantity> orderItemWithQuantityList = EmployeeDashboardFormController.getInstance().getOrderItemWithQuantityList();
+        for (OrderItem.OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList) {
             total += (orderItemWithQuantity.getOrderItem().getUnitPrice() * orderItemWithQuantity.getQuantity());
         }
         lblTotalCost.setText("Rs. "+total);
     }
 
-    private void loadOrderItemsTable(List<OrderItemWithQuantity> orderItemWithQuantityList) {
+    private void loadOrderItemsTable(List<OrderItem.OrderItemWithQuantity> orderItemWithQuantityList) {
         if (!orderItemWithQuantityList.isEmpty()){
             ObservableList<OrderItem> orderItems = FXCollections.observableArrayList();
             orderItemWithQuantityList.forEach(orderItemWithQuantity -> {

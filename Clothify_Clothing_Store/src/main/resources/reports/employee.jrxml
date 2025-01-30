@@ -50,8 +50,8 @@
         <element kind="staticText" uuid="aba09b2d-cdb0-4454-8d09-873b3ef0e18a" x="40" y="10" width="263" height="62" vTextAlign="Middle" style="Title">
             <text><![CDATA[Clothify]]></text>
         </element>
-        <element kind="image" uuid="7155c38c-a96b-4cbb-bf99-0a0aec7a4e76" x="350" y="-150" width="349" height="270" vImageAlign="Bottom">
-            <expression><![CDATA["D:/_ICET_/Standalone Application Development/Assignments/Clothify - Clothing Store/Project/Clothify_Clothing_Store/src/main/resources/img/StoreIcon - Reports.png"]]></expression>
+        <element kind="image" uuid="88ca2149-ebd0-4ff1-8d2f-e5379f959a2f" x="350" y="-150" width="349" height="270" vImageAlign="Bottom">
+            <expression><![CDATA[getClass().getResource("/img/StoreIcon - Reports.png").toString()]]></expression>
         </element>
     </title>
     <pageHeader splitType="Stretch"/>

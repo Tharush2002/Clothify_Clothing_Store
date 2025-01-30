@@ -47,8 +47,8 @@
 		<element kind="staticText" uuid="0bec7530-f06c-41b7-ab57-c8260e1327e2" x="40" y="10" width="263" height="62" vTextAlign="Middle" style="Title">
 			<text><![CDATA[Clothify]]></text>
 		</element>
-		<element kind="image" uuid="be383e7e-7742-4d4f-b1e8-0cd0583e6a57" x="350" y="-150" width="349" height="270" vImageAlign="Bottom">
-			<expression><![CDATA["D:/_ICET_/Standalone Application Development/Assignments/Clothify - Clothing Store/Project/Clothify_Clothing_Store/src/main/resources/img/StoreIcon - Reports.png"]]></expression>
+		<element kind="image" uuid="88ca2149-ebd0-4ff1-8d2f-e5379f959a2f" x="350" y="-150" width="349" height="270" vImageAlign="Bottom">
+			<expression><![CDATA[getClass().getResource("/img/StoreIcon - Reports.png").toString()]]></expression>
 		</element>
 		<element kind="staticText" uuid="bcdb6619-dcf8-4940-b475-eb22982edc52" x="40" y="90" width="196" height="22" fontName="Times New Roman" style="SubTitle">
 			<text><![CDATA[Inventory Report]]></text>

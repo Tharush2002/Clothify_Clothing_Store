@@ -117,7 +117,7 @@ public class EmployeeDashboardFormController implements Initializable {
     private ObservableList<Order> allOrders = FXCollections.observableArrayList();
     private ObservableList<ReturnOrder> allReturnOrderItems = FXCollections.observableArrayList();
     private ObservableList<Category> allCategories = FXCollections.observableArrayList();
-    private final List<OrderItemWithQuantity> orderItemWithQuantityList = new ArrayList<>();
+    private final List<OrderItem.OrderItemWithQuantity> orderItemWithQuantityList = new ArrayList<>();
 
     //SERVICE-FACTORIES
     private final ProductService productService = ServiceFactory.getInstance().getServiceType(Type.PRODUCT);
@@ -619,7 +619,7 @@ public class EmployeeDashboardFormController implements Initializable {
                 }
             }
 
-            for (OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList) {
+            for (OrderItem.OrderItemWithQuantity orderItemWithQuantity : orderItemWithQuantityList) {
                 boolean isProductIdMatches = orderItemWithQuantity.getOrderItem().getProductId().equals(lblCatalogProductID.getText());
                 boolean isProductSizeMatches = orderItemWithQuantity.getOrderItem().getSize().equals(cmbCatalogSize.getValue().trim());
                 if (isProductSizeMatches && isProductIdMatches) {
@@ -629,7 +629,7 @@ public class EmployeeDashboardFormController implements Initializable {
             }
 
             if (selectedProduct != null) {
-                orderItemWithQuantityList.add(new OrderItemWithQuantity(
+                orderItemWithQuantityList.add(new OrderItem.OrderItemWithQuantity(
                         new OrderItem(
                                 new Order(null, null, null, spinnerCatalogQuantity.getValue() * selectedProduct.getUnitPrice(), null, new Customer(), null),
                                 selectedProduct.getName(),
@@ -727,17 +727,17 @@ public class EmployeeDashboardFormController implements Initializable {
 
     @FXML
     void btnLoadCustomerReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/Customer.jrxml");
+        openReports("./src/main/resources/reports/Customer.jrxml");
     }
 
     @FXML
     void btnLoadEmployeeReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/Employee.jrxml");
+        openReports("./src/main/resources/reports/Employee.jrxml");
     }
 
     @FXML
     void btnLoadInventoryReportOnAction(ActionEvent event) {
-        openReports("src/main/resources/reports/Inventory.jrxml");
+        openReports("./src/main/resources/reports/Inventory.jrxml");
     }
 
     @FXML
@@ -1688,11 +1688,10 @@ public class EmployeeDashboardFormController implements Initializable {
             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, DBConnection.getInstance().getConnection());
             JasperViewer viewer = new JasperViewer(jasperPrint, false);
-            viewer.setZoomRatio(0.5f);
+            viewer.setZoomRatio(0.45f);
             viewer.setVisible(true);
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Error", "An unexpected error occurred while generating the report.", e.getMessage(),AlertType.SHOW);
-            log.error(e.getMessage());
         }
     }
 
